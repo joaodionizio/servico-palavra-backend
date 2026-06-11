@@ -1,0 +1,6 @@
+@ServicoPalavra.Api_HostAddress = http://localhost:0
+
+GET {{ServicoPalavra.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
