@@ -1,0 +1,1 @@
+# servico-palavra-backend
