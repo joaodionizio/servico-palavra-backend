@@ -1,0 +1,22 @@
+[
+  {
+    "ordem": 1,
+    "livro": "1 Joao",
+    "capitulo": 1,
+    "grupo": "Cartas Joaninas",
+    "subgrupo": null,
+    "testamento": "Novo",
+    "tempoEstimadoMinutos": 4,
+    "ativo": true
+  },
+  {
+    "ordem": 2,
+    "livro": "Joao",
+    "capitulo": 1,
+    "grupo": "Evangelhos",
+    "subgrupo": null,
+    "testamento": "Novo",
+    "tempoEstimadoMinutos": 5,
+    "ativo": true
+  }
+]
