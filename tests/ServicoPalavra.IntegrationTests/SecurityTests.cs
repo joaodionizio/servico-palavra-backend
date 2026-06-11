@@ -1,0 +1,296 @@
+using System.Net;
+using System.Net.Http.Json;
+using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using ServicoPalavra.Application.Auth;
+using ServicoPalavra.Application.Categorias;
+using ServicoPalavra.Application.Conteudos;
+using ServicoPalavra.Application.PlanosBiblicos;
+using ServicoPalavra.Domain.Entities;
+using ServicoPalavra.Domain.Enums;
+using ServicoPalavra.Infrastructure.Persistence;
+
+namespace ServicoPalavra.IntegrationTests;
+
+public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
+{
+    private readonly HttpClient _client;
+    private readonly SecurityWebApplicationFactory _factory;
+
+    public SecurityTests(SecurityWebApplicationFactory factory)
+    {
+        _factory = factory;
+        _client = factory.CreateClient();
+    }
+
+    [Fact]
+    public async Task Login_valid_returns_cookie_without_password_hash_or_token()
+    {
+        await EnsureCsrfAsync();
+        var response = await _client.PostAsJsonAsync("/api/auth/login", new LoginRequest("admin@tests.local", "AdminTest@123456"));
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("__Host-ServicoPalavra", response.Headers.GetValues("Set-Cookie").First());
+        Assert.DoesNotContain("\"token\"", body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("senhaHash", body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("passwordHash", body, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task Login_invalid_uses_generic_response()
+    {
+        await EnsureCsrfAsync();
+        var response = await _client.PostAsJsonAsync("/api/auth/login", new LoginRequest("missing@tests.local", "wrong"));
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Contains("Credenciais invalidas", body);
+        Assert.DoesNotContain("missing@tests.local", body);
+    }
+
+    [Fact]
+    public async Task Login_lockout_blocks_repeated_invalid_attempts()
+    {
+        await EnsureCsrfAsync();
+
+        for (var i = 0; i < 5; i++)
+        {
+            var invalid = await _client.PostAsJsonAsync("/api/auth/login", new LoginRequest("admin@tests.local", "wrong-password"));
+            Assert.Equal(HttpStatusCode.Unauthorized, invalid.StatusCode);
+        }
+
+        var locked = await _client.PostAsJsonAsync("/api/auth/login", new LoginRequest("admin@tests.local", "AdminTest@123456"));
+        Assert.Equal(HttpStatusCode.Unauthorized, locked.StatusCode);
+    }
+
+    [Fact]
+    public async Task Protected_route_requires_authentication()
+    {
+        var response = await _client.GetAsync("/api/auth/me");
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Admin_endpoint_denies_common_user_and_allows_admin()
+    {
+        await EnsureCsrfAsync();
+        await RegisterAsync("Usuario A", "usuario-a@tests.local");
+
+        var userResponse = await _client.PostAsJsonAsync("/api/admin/categorias", new CategoriaRequest("Formacao", null, null, null, null, 1));
+        Assert.Equal(HttpStatusCode.Forbidden, userResponse.StatusCode);
+
+        await LoginAsync("admin@tests.local", "AdminTest@123456");
+
+        var adminResponse = await _client.PostAsJsonAsync("/api/admin/categorias", new CategoriaRequest("Formacao Admin", null, null, null, null, 1));
+        Assert.Equal(HttpStatusCode.OK, adminResponse.StatusCode);
+
+        var me = await _client.GetAsync("/api/auth/me");
+        me.EnsureSuccessStatusCode();
+        var body = await me.Content.ReadAsStringAsync();
+        Assert.Contains("Admin", body);
+    }
+
+    [Fact]
+    public async Task User_cannot_read_other_users_biblical_plan_even_with_guid()
+    {
+        await EnsureCsrfAsync();
+        await SeedBibleBaseAsync();
+        await RegisterAsync("Usuario Plano A", "plano-a@tests.local");
+        await RegisterAsync("Usuario Plano B", "plano-b@tests.local");
+
+        var createB = await _client.PostAsJsonAsync("/api/planos-biblicos", new CriarPlanoBiblicoRequest("Plano B", 0, 1, DateOnly.FromDateTime(DateTime.UtcNow)));
+        createB.EnsureSuccessStatusCode();
+        var planBId = await ReadGuidAsync(createB, "id");
+
+        await LoginAsync("plano-a@tests.local", "UserTest@123456");
+        var crossRead = await _client.GetAsync($"/api/planos-biblicos/{planBId}");
+
+        Assert.Equal(HttpStatusCode.NotFound, crossRead.StatusCode);
+    }
+
+    [Fact]
+    public async Task Biblical_plan_generates_pastoral_order_continue_restart_and_history()
+    {
+        await SeedBibleBaseAsync();
+        await RegisterAsync("Usuario Plano Pastoral", "plano-pastoral@tests.local");
+
+        var create = await _client.PostAsJsonAsync("/api/planos-biblicos", new CriarPlanoBiblicoRequest("Plano Pastoral", 0, 1, DateOnly.FromDateTime(DateTime.UtcNow)));
+        await EnsureSuccessAsync(create);
+        var firstPlanId = await ReadGuidAsync(create, "id");
+
+        var days = await _client.GetAsync($"/api/planos-biblicos/{firstPlanId}/dias");
+        await EnsureSuccessAsync(days);
+        using (var document = JsonDocument.Parse(await days.Content.ReadAsStringAsync()))
+        {
+            var items = document.RootElement.GetProperty("data").EnumerateArray().ToArray();
+            Assert.Equal(9, items.Length);
+            Assert.Contains("1 Joao 1", items[0].GetProperty("leiturasTexto").GetString());
+            Assert.Contains("Tobias 1", items[^1].GetProperty("leiturasTexto").GetString());
+        }
+
+        var firstDayId = await ReadFirstDayIdAsync(firstPlanId);
+        var conclude = await _client.PostAsync($"/api/planos-biblicos/dias/{firstDayId}/concluir", null);
+        await EnsureSuccessAsync(conclude);
+
+        var continuePlan = await _client.PostAsJsonAsync("/api/planos-biblicos/alterar", new AlterarPlanoBiblicoRequest(0, 1, ModoAlteracaoPlanoBiblico.ContinuarDeOndeParei));
+        await EnsureSuccessAsync(continuePlan);
+        using (var document = JsonDocument.Parse(await continuePlan.Content.ReadAsStringAsync()))
+        {
+            var data = document.RootElement.GetProperty("data");
+            Assert.Equal(2, data.GetProperty("ordemInicio").GetInt32());
+            Assert.Equal("Continuacao", data.GetProperty("modoCriacao").GetString());
+        }
+
+        var restartPlan = await _client.PostAsJsonAsync("/api/planos-biblicos/alterar", new AlterarPlanoBiblicoRequest(0, 1, ModoAlteracaoPlanoBiblico.RecomecarDoInicio));
+        await EnsureSuccessAsync(restartPlan);
+        using (var document = JsonDocument.Parse(await restartPlan.Content.ReadAsStringAsync()))
+        {
+            var data = document.RootElement.GetProperty("data");
+            Assert.Equal(1, data.GetProperty("ordemInicio").GetInt32());
+            Assert.Equal("Reinicio", data.GetProperty("modoCriacao").GetString());
+        }
+
+        var history = await _client.GetAsync("/api/planos-biblicos/me/historico");
+        await EnsureSuccessAsync(history);
+        using (var document = JsonDocument.Parse(await history.Content.ReadAsStringAsync()))
+        {
+            Assert.Equal(3, document.RootElement.GetProperty("data").GetArrayLength());
+        }
+    }
+
+    [Fact]
+    public async Task Biblical_plan_failed_continuation_keeps_active_plan()
+    {
+        await SeedBibleBaseAsync();
+        await RegisterAsync("Usuario Plano Rollback", "plano-rollback@tests.local");
+
+        var create = await _client.PostAsJsonAsync("/api/planos-biblicos", new CriarPlanoBiblicoRequest("Plano Rollback", 0, 1, DateOnly.FromDateTime(DateTime.UtcNow)));
+        await EnsureSuccessAsync(create);
+        var planId = await ReadGuidAsync(create, "id");
+
+        var daysResponse = await _client.GetAsync($"/api/planos-biblicos/{planId}/dias");
+        await EnsureSuccessAsync(daysResponse);
+        using (var document = JsonDocument.Parse(await daysResponse.Content.ReadAsStringAsync()))
+        {
+            foreach (var day in document.RootElement.GetProperty("data").EnumerateArray())
+            {
+                var conclude = await _client.PostAsync($"/api/planos-biblicos/dias/{day.GetProperty("id").GetGuid()}/concluir", null);
+                await EnsureSuccessAsync(conclude);
+            }
+        }
+
+        var failed = await _client.PostAsJsonAsync("/api/planos-biblicos/alterar", new AlterarPlanoBiblicoRequest(0, 1, ModoAlteracaoPlanoBiblico.ContinuarDeOndeParei));
+        Assert.Equal((HttpStatusCode)422, failed.StatusCode);
+
+        var active = await _client.GetAsync("/api/planos-biblicos/me/ativo");
+        await EnsureSuccessAsync(active);
+        Assert.Equal(planId, await ReadGuidAsync(active, "id"));
+    }
+
+    [Fact]
+    public async Task Malicious_or_untrusted_content_url_is_rejected()
+    {
+        await EnsureCsrfAsync();
+        await LoginAsync("admin@tests.local", "AdminTest@123456");
+
+        var categoryResponse = await _client.PostAsJsonAsync("/api/admin/categorias", new CategoriaRequest("Videos", null, null, null, null, 1));
+        await EnsureSuccessAsync(categoryResponse);
+        var categoryId = await ReadGuidAsync(categoryResponse, "id");
+
+        var request = new ConteudoRequest("Video ruim", null, null, null, TipoConteudo.Video, OrigemConteudo.YouTube, "javascript:alert(1)", null, null, categoryId, true, false, null);
+        var response = await _client.PostAsJsonAsync("/api/admin/conteudos", request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Error_response_does_not_expose_stack_trace()
+    {
+        await EnsureCsrfAsync();
+        var response = await _client.PostAsJsonAsync("/api/auth/login", new LoginRequest("admin@tests.local", ""));
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.DoesNotContain(" at ", body);
+        Assert.DoesNotContain("ConnectionString", body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("Exception", body, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async Task EnsureCsrfAsync()
+    {
+        var response = await _client.GetAsync("/api/auth/csrf");
+        response.EnsureSuccessStatusCode();
+        var token = await ReadStringAsync(response, "token");
+        _client.DefaultRequestHeaders.Remove("X-CSRF-TOKEN");
+        _client.DefaultRequestHeaders.Add("X-CSRF-TOKEN", token);
+    }
+
+    private async Task RegisterAsync(string nome, string email)
+    {
+        await EnsureCsrfAsync();
+        var response = await _client.PostAsJsonAsync("/api/auth/register", new RegisterRequest(nome, email, "UserTest@123456"));
+        await EnsureSuccessAsync(response);
+        await EnsureCsrfAsync();
+    }
+
+    private async Task LoginAsync(string email, string password)
+    {
+        await EnsureCsrfAsync();
+        var response = await _client.PostAsJsonAsync("/api/auth/login", new LoginRequest(email, password));
+        await EnsureSuccessAsync(response);
+        await EnsureCsrfAsync();
+    }
+
+    private async Task SeedBibleBaseAsync()
+    {
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        if (db.BaseBiblica.Any())
+        {
+            return;
+        }
+
+        var now = DateTime.UtcNow;
+        db.BaseBiblica.AddRange(
+            new BaseBiblica { Id = Guid.NewGuid(), Ordem = 1, Livro = "1 Joao", Capitulo = 1, Grupo = "Cartas Joaninas", Testamento = "Novo", CriadoEm = now },
+            new BaseBiblica { Id = Guid.NewGuid(), Ordem = 2, Livro = "1 Joao", Capitulo = 2, Grupo = "Cartas Joaninas", Testamento = "Novo", CriadoEm = now },
+            new BaseBiblica { Id = Guid.NewGuid(), Ordem = 3, Livro = "Joao", Capitulo = 1, Grupo = "Evangelhos", Testamento = "Novo", CriadoEm = now },
+            new BaseBiblica { Id = Guid.NewGuid(), Ordem = 4, Livro = "Romanos", Capitulo = 1, Grupo = "Cartas Apostolicas", Testamento = "Novo", CriadoEm = now },
+            new BaseBiblica { Id = Guid.NewGuid(), Ordem = 5, Livro = "Genesis", Capitulo = 1, Grupo = "Pentateuco", Testamento = "Antigo", CriadoEm = now },
+            new BaseBiblica { Id = Guid.NewGuid(), Ordem = 6, Livro = "Josue", Capitulo = 1, Grupo = "Historicos", Testamento = "Antigo", CriadoEm = now },
+            new BaseBiblica { Id = Guid.NewGuid(), Ordem = 7, Livro = "Isaias", Capitulo = 1, Grupo = "Profetas", Testamento = "Antigo", CriadoEm = now },
+            new BaseBiblica { Id = Guid.NewGuid(), Ordem = 8, Livro = "Salmos", Capitulo = 1, Grupo = "Sapienciais", Testamento = "Antigo", CriadoEm = now },
+            new BaseBiblica { Id = Guid.NewGuid(), Ordem = 9, Livro = "Tobias", Capitulo = 1, Grupo = "Deuterocanonicos", Testamento = "Antigo", CriadoEm = now });
+        await db.SaveChangesAsync();
+    }
+
+    private async Task<Guid> ReadFirstDayIdAsync(Guid planId)
+    {
+        var days = await _client.GetAsync($"/api/planos-biblicos/{planId}/dias");
+        await EnsureSuccessAsync(days);
+        using var document = JsonDocument.Parse(await days.Content.ReadAsStringAsync());
+        return document.RootElement.GetProperty("data").EnumerateArray().First().GetProperty("id").GetGuid();
+    }
+
+    private static async Task<Guid> ReadGuidAsync(HttpResponseMessage response, string property)
+    {
+        var value = await ReadStringAsync(response, property);
+        return Guid.Parse(value);
+    }
+
+    private static async Task<string> ReadStringAsync(HttpResponseMessage response, string property)
+    {
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        return document.RootElement.GetProperty("data").GetProperty(property).GetString()!;
+    }
+
+    private static async Task EnsureSuccessAsync(HttpResponseMessage response)
+    {
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException($"Response status code does not indicate success: {(int)response.StatusCode} ({response.StatusCode}). Body: {body}");
+        }
+    }
+}
