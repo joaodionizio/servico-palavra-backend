@@ -1,0 +1,36 @@
+# Pre-Deploy Security Checklist
+
+- [ ] SQLite nao e usado como banco persistente no Render Free
+- [ ] PostgreSQL remoto persistente configurado
+- [ ] Connection string fora do repositorio
+- [ ] Secrets fora do repositorio
+- [x] JWT removido da autenticacao
+- [x] Decisao registrada: ASP.NET Core Identity
+- [x] Cookies HttpOnly configurados
+- [x] Cookies Secure em producao
+- [x] SameSite documentado
+- [x] CSRF implementado para escritas
+- [ ] CORS restritivo com dominios reais
+- [ ] HTTPS obrigatorio
+- [ ] HSTS ativo
+- [ ] CSP configurada no frontend
+- [ ] `X-Content-Type-Options` configurado
+- [ ] `Referrer-Policy` configurada
+- [ ] `Permissions-Policy` configurada
+- [ ] Sem token no localStorage no frontend
+- [ ] Sem secrets `NEXT_PUBLIC_`
+- [ ] Sem senha padrao de admin em producao
+- [ ] Swagger revisado para producao
+- [ ] Stack traces ocultos
+- [ ] Logs sem dados sensiveis
+- [ ] Rate limit ativo
+- [ ] Endpoints admin protegidos
+- [ ] Ownership validado
+- [ ] Testes UsuarioA x UsuarioB passando
+- [ ] Migrations revisadas
+- [ ] Dependencias auditadas
+- [ ] Backup/exportacao documentado
+- [ ] Ambiente Production configurado
+- [ ] Google Drive revisado
+- [ ] URLs externas validadas
+- [ ] Documentacao atualizada
