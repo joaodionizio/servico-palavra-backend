@@ -1,11 +1,12 @@
 using System.Text;
+using System.Reflection;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi;
+using Microsoft.OpenApi.Models;
 using ServicoPalavra.Api.Middleware;
 using ServicoPalavra.Api.Services;
 using ServicoPalavra.Application;
@@ -33,10 +34,17 @@ builder.Services.AddSwaggerGen(options =>
         Type = SecuritySchemeType.ApiKey,
         In = ParameterLocation.Cookie
     });
-    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
-            new OpenApiSecuritySchemeReference("Cookie", document),
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Cookie"
+                }
+            },
             []
         }
     });
@@ -181,10 +189,20 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-using (var scope = app.Services.CreateScope())
+var isEfTool = Assembly.GetEntryAssembly()?.GetName().Name == "ef";
+if (!EF.IsDesignTime && !isEfTool)
 {
+    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.Database.MigrateAsync();
+    if (app.Environment.IsEnvironment("Testing"))
+    {
+        await db.Database.EnsureCreatedAsync();
+    }
+    else
+    {
+        await db.Database.MigrateAsync();
+    }
+
     await scope.ServiceProvider.GetRequiredService<DatabaseSeeder>().SeedAsync();
 }
 
@@ -214,6 +232,9 @@ app.Use(async (context, next) =>
 app.MapHealthChecks("/health").RequireRateLimiting("general");
 app.MapControllers().RequireRateLimiting("general");
 
-app.Run();
+if (!EF.IsDesignTime && !isEfTool)
+{
+    app.Run();
+}
 
 public partial class Program;
