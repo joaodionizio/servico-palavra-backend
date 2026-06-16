@@ -272,6 +272,13 @@ app.Use(async (context, next) =>
     await next();
 });
 
+app.MapGet("/", () => Results.Ok(new
+{
+    nome = "Serviço da Palavra API",
+    status = "online",
+    ambiente = app.Environment.EnvironmentName,
+    health = "/health"
+})).RequireRateLimiting("general");
 app.MapHealthChecks("/health").RequireRateLimiting("general");
 app.MapControllers().RequireRateLimiting("general");
 
