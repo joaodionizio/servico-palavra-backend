@@ -11,6 +11,7 @@ Nao declarar como pronto para producao ate validar PostgreSQL/Neon real, CORS co
 ## 3. Arquitetura analisada
 
 Clean architecture com Api, Application, Domain e Infrastructure.
+Runtime alvo atual: .NET 8 LTS com EF Core 8.
 
 ## 4. Dados pessoais tratados
 
@@ -47,17 +48,59 @@ Nome, e-mail, hash de senha, perfil, ultimo acesso, favoritos, progresso, plano 
 - Auditar frontend.
 - Importar base biblica pastoral completa a partir de fonte revisada.
 - Ampliar testes A x B para favoritos, progresso, dias e dashboard.
+- Executar validacao real PostgreSQL/Neon com `DATABASE_PROVIDER=postgresql` e `ConnectionStrings__DefaultConnection` disponiveis no ambiente local.
 
 ## 11-13. Testes
 
-Executado `dotnet test ServicoPalavra.sln`.
+Validacao executada em 2026-06-16:
 
-Resultado atual: 13 testes passaram.
+- Migracao controlada de .NET 10 / EF Core 10 para .NET 8 LTS / EF Core 8.
+- `dotnet restore ServicoPalavra.sln`: passou.
+- `dotnet build ServicoPalavra.sln`: passou, 0 warnings, 0 erros.
+- `dotnet test ServicoPalavra.sln`: passou, 13 testes no total.
+- Baseline PostgreSQL/Npgsql atual: `20260616004919_InitialIdentityBaseline`.
+- Todos os campos `DateTime`/`DateTime?` do modelo estao mapeados como `timestamp with time zone`.
+- Nao ha uso de `DateTime.Now` nas regras de persistencia.
+- `dotnet list ServicoPalavra.sln package --vulnerable --include-transitive`: nenhum pacote vulneravel conhecido nos projetos da solucao.
+- Validacao PostgreSQL/Neon real: pendente de reset manual do schema parcial no Neon e execucao manual de `dotnet ef database update`.
+
+Validacao executada em 2026-06-15:
+
+- `dotnet restore ServicoPalavra.sln`: passou.
+- `dotnet build ServicoPalavra.sln --no-restore`: passou, 0 warnings, 0 erros.
+- `dotnet test ServicoPalavra.sln --no-build`: passou, 13 testes no total.
+- `dotnet ef migrations list --project src/ServicoPalavra.Infrastructure --startup-project src/ServicoPalavra.Infrastructure --no-build`: listou a baseline disponivel naquele momento.
+- Primeiro `dotnet ef migrations list` sem `--no-build` foi interrompido apos ficar sem saida util alem de `Build started...`; a repeticao com `--no-build` passou.
+- Validacao PostgreSQL/Neon real: nao executada porque `DATABASE_PROVIDER` e `ConnectionStrings__DefaultConnection` nao estavam visiveis nesta sessao.
+- `DATABASE_PROVIDER=postgresql` sem connection string foi validado como falha segura: o `DbContext` nao e criado.
+
+Smoke tests cobertos pela suite de integracao atual:
+
+- Login retorna cookie `__Host-ServicoPalavra` sem token nem hash de senha no body.
+- Login invalido usa resposta generica.
+- Lockout apos tentativas invalidas.
+- Rota protegida exige autenticacao.
+- Usuario comum recebe 403 em endpoint admin e admin consegue criar categoria.
+- Usuario nao le plano biblico de outro usuario mesmo com GUID real.
+- Plano biblico gera ordem pastoral, conclui dia, continua de onde parou, recomeca do inicio e preserva historico.
+- Falha de continuacao preserva plano ativo.
+- URL de conteudo maliciosa e rejeitada.
+- Resposta de erro nao expoe stack trace nem connection string.
+
+Smoke tests reais contra PostgreSQL/Neon: pendentes ate as variaveis reais estarem disponiveis na sessao.
+
+Auditoria de dependencias executada por projeto:
+
+- `ServicoPalavra.Api`: nenhum pacote vulneravel conhecido.
+- `ServicoPalavra.Application`: nenhum pacote vulneravel conhecido.
+- `ServicoPalavra.Domain`: nenhum pacote vulneravel conhecido.
+- `ServicoPalavra.Infrastructure`: nenhum pacote vulneravel conhecido.
 
 ## 14. Bloqueadores de deploy
 
 - Frontend nao auditado.
-- Banco PostgreSQL Neon ainda nao validado em ambiente real.
+- Banco PostgreSQL/Neon ainda nao validado em ambiente real.
+- Smoke tests UsuarioA x UsuarioB contra IDs reais do Neon ainda nao executados.
 
 ## 15. Decisoes humanas necessarias
 

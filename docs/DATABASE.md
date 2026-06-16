@@ -13,8 +13,8 @@ src/ServicoPalavra.Infrastructure/Persistence/Migrations/*_InitialIdentityBaseli
 Comandos:
 
 ```bash
-dotnet ef migrations add NomeDaMigration --project src/ServicoPalavra.Infrastructure --startup-project src/ServicoPalavra.Api --output-dir Persistence/Migrations
-dotnet ef database update --project src/ServicoPalavra.Infrastructure --startup-project src/ServicoPalavra.Api
+dotnet ef migrations add NomeDaMigration --project src/ServicoPalavra.Infrastructure --startup-project src/ServicoPalavra.Infrastructure --output-dir Persistence/Migrations
+dotnet ef database update --project src/ServicoPalavra.Infrastructure --startup-project src/ServicoPalavra.Infrastructure
 ```
 
 ## Indices unicos

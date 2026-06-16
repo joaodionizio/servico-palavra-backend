@@ -4,8 +4,8 @@ Backend V2 da plataforma Servico da Palavra, uma base de formacao biblica e espi
 
 ## Stack
 
-- ASP.NET Core
-- Entity Framework Core
+- .NET 8 LTS / ASP.NET Core
+- Entity Framework Core 8
 - SQLite local / PostgreSQL em producao
 - ASP.NET Core Identity
 - Cookie auth HttpOnly + CSRF
@@ -52,16 +52,22 @@ GET /health
 Criar migration:
 
 ```bash
-dotnet ef migrations add NomeDaMigration --project src/ServicoPalavra.Infrastructure --startup-project src/ServicoPalavra.Api --output-dir Persistence/Migrations
+dotnet ef migrations add NomeDaMigration --project src/ServicoPalavra.Infrastructure --startup-project src/ServicoPalavra.Infrastructure --output-dir Persistence/Migrations
 ```
 
 Aplicar migration:
 
 ```bash
-dotnet ef database update --project src/ServicoPalavra.Infrastructure --startup-project src/ServicoPalavra.Api
+dotnet ef database update --project src/ServicoPalavra.Infrastructure --startup-project src/ServicoPalavra.Infrastructure
 ```
 
-A API tambem aplica migrations na inicializacao.
+Para gerar migrations, prefira usar `ServicoPalavra.Infrastructure` como startup para que o EF use a factory design-time sem inicializar a API:
+
+```bash
+dotnet ef migrations add NomeDaMigration --project src/ServicoPalavra.Infrastructure --startup-project src/ServicoPalavra.Infrastructure --output-dir Persistence/Migrations
+```
+
+A API aplica migrations na inicializacao fora do ambiente `Testing`.
 
 ## Banco de dados
 
