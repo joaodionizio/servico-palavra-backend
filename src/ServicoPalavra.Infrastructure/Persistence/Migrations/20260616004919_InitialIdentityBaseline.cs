@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -15,10 +16,10 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -29,17 +30,17 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "BaseBiblica",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Ordem = table.Column<int>(type: "INTEGER", nullable: false),
-                    Livro = table.Column<string>(type: "TEXT", maxLength: 80, nullable: false),
-                    Capitulo = table.Column<int>(type: "INTEGER", nullable: false),
-                    Grupo = table.Column<string>(type: "TEXT", maxLength: 80, nullable: false),
-                    Subgrupo = table.Column<string>(type: "TEXT", maxLength: 80, nullable: true),
-                    Testamento = table.Column<string>(type: "TEXT", maxLength: 40, nullable: false),
-                    TempoEstimadoMinutos = table.Column<int>(type: "INTEGER", nullable: true),
-                    Ativo = table.Column<bool>(type: "INTEGER", nullable: false),
-                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    AtualizadoEm = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Ordem = table.Column<int>(type: "integer", nullable: false),
+                    Livro = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
+                    Capitulo = table.Column<int>(type: "integer", nullable: false),
+                    Grupo = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
+                    Subgrupo = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: true),
+                    Testamento = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
+                    TempoEstimadoMinutos = table.Column<int>(type: "integer", nullable: true),
+                    Ativo = table.Column<bool>(type: "boolean", nullable: false),
+                    CriadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    AtualizadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -50,16 +51,16 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "CategoriasConteudo",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Nome = table.Column<string>(type: "TEXT", maxLength: 140, nullable: false),
-                    Slug = table.Column<string>(type: "TEXT", maxLength: 160, nullable: false),
-                    Descricao = table.Column<string>(type: "TEXT", maxLength: 600, nullable: true),
-                    Cor = table.Column<string>(type: "TEXT", maxLength: 30, nullable: true),
-                    Icone = table.Column<string>(type: "TEXT", maxLength: 80, nullable: true),
-                    Ordem = table.Column<int>(type: "INTEGER", nullable: false),
-                    Ativo = table.Column<bool>(type: "INTEGER", nullable: false),
-                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    AtualizadoEm = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Nome = table.Column<string>(type: "character varying(140)", maxLength: 140, nullable: false),
+                    Slug = table.Column<string>(type: "character varying(160)", maxLength: 160, nullable: false),
+                    Descricao = table.Column<string>(type: "character varying(600)", maxLength: 600, nullable: true),
+                    Cor = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: true),
+                    Icone = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: true),
+                    Ordem = table.Column<int>(type: "integer", nullable: false),
+                    Ativo = table.Column<bool>(type: "boolean", nullable: false),
+                    CriadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    AtualizadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -70,12 +71,12 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "Perfis",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Nome = table.Column<string>(type: "TEXT", maxLength: 80, nullable: false),
-                    Descricao = table.Column<string>(type: "TEXT", maxLength: 300, nullable: true),
-                    Ativo = table.Column<bool>(type: "INTEGER", nullable: false),
-                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    AtualizadoEm = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Nome = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
+                    Descricao = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: true),
+                    Ativo = table.Column<bool>(type: "boolean", nullable: false),
+                    CriadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    AtualizadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -86,27 +87,27 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "Usuarios",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Nome = table.Column<string>(type: "TEXT", maxLength: 160, nullable: false),
-                    FotoUrl = table.Column<string>(type: "TEXT", maxLength: 600, nullable: true),
-                    Ativo = table.Column<bool>(type: "INTEGER", nullable: false),
-                    UltimoAcessoEm = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    AtualizadoEm = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "TEXT", maxLength: 180, nullable: false),
-                    NormalizedEmail = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    PasswordHash = table.Column<string>(type: "TEXT", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "TEXT", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "TEXT", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Nome = table.Column<string>(type: "character varying(160)", maxLength: 160, nullable: false),
+                    FotoUrl = table.Column<string>(type: "character varying(600)", maxLength: 600, nullable: true),
+                    Ativo = table.Column<bool>(type: "boolean", nullable: false),
+                    UltimoAcessoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CriadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    AtualizadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "character varying(180)", maxLength: 180, nullable: false),
+                    NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -117,11 +118,11 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    RoleId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    ClaimType = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClaimType = table.Column<string>(type: "text", nullable: true),
+                    ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -138,11 +139,11 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    ClaimType = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClaimType = table.Column<string>(type: "text", nullable: true),
+                    ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -159,10 +160,10 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "TEXT", nullable: false),
-                    ProviderKey = table.Column<string>(type: "TEXT", nullable: false),
-                    ProviderDisplayName = table.Column<string>(type: "TEXT", nullable: true),
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    ProviderKey = table.Column<string>(type: "text", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -179,8 +180,8 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    RoleId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -203,10 +204,10 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    LoginProvider = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Value = table.Column<string>(type: "TEXT", nullable: true)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -223,24 +224,24 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "Conteudos",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Titulo = table.Column<string>(type: "TEXT", maxLength: 180, nullable: false),
-                    Slug = table.Column<string>(type: "TEXT", maxLength: 220, nullable: false),
-                    Descricao = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: true),
-                    Resumo = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
-                    Tipo = table.Column<int>(type: "INTEGER", nullable: false),
-                    Origem = table.Column<int>(type: "INTEGER", nullable: false),
-                    Url = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: false),
-                    UrlThumbnail = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
-                    DuracaoMinutos = table.Column<int>(type: "INTEGER", nullable: true),
-                    CategoriaConteudoId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    CriadoPorUsuarioId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Publicado = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Destaque = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Ordem = table.Column<int>(type: "INTEGER", nullable: true),
-                    PublicadoEm = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    AtualizadoEm = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Titulo = table.Column<string>(type: "character varying(180)", maxLength: 180, nullable: false),
+                    Slug = table.Column<string>(type: "character varying(220)", maxLength: 220, nullable: false),
+                    Descricao = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Resumo = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    Tipo = table.Column<int>(type: "integer", nullable: false),
+                    Origem = table.Column<int>(type: "integer", nullable: false),
+                    Url = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    UrlThumbnail = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
+                    DuracaoMinutos = table.Column<int>(type: "integer", nullable: true),
+                    CategoriaConteudoId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CriadoPorUsuarioId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Publicado = table.Column<bool>(type: "boolean", nullable: false),
+                    Destaque = table.Column<bool>(type: "boolean", nullable: false),
+                    Ordem = table.Column<int>(type: "integer", nullable: true),
+                    PublicadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CriadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    AtualizadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -263,22 +264,22 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "PlanosBiblicosUsuario",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UsuarioId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Nome = table.Column<string>(type: "TEXT", maxLength: 160, nullable: false),
-                    DuracaoDias = table.Column<int>(type: "INTEGER", nullable: false),
-                    DuracaoMeses = table.Column<int>(type: "INTEGER", nullable: false),
-                    DuracaoAnos = table.Column<int>(type: "INTEGER", nullable: false),
-                    DataInicio = table.Column<DateOnly>(type: "TEXT", nullable: false),
-                    DataFimPrevista = table.Column<DateOnly>(type: "TEXT", nullable: false),
-                    Ativo = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Status = table.Column<int>(type: "INTEGER", nullable: false),
-                    PlanoOrigemId = table.Column<Guid>(type: "TEXT", nullable: true),
-                    ModoCriacao = table.Column<int>(type: "INTEGER", nullable: false),
-                    OrdemInicio = table.Column<int>(type: "INTEGER", nullable: false),
-                    OrdemFim = table.Column<int>(type: "INTEGER", nullable: true),
-                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    AtualizadoEm = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UsuarioId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Nome = table.Column<string>(type: "character varying(160)", maxLength: 160, nullable: false),
+                    DuracaoDias = table.Column<int>(type: "integer", nullable: false),
+                    DuracaoMeses = table.Column<int>(type: "integer", nullable: false),
+                    DuracaoAnos = table.Column<int>(type: "integer", nullable: false),
+                    DataInicio = table.Column<DateOnly>(type: "date", nullable: false),
+                    DataFimPrevista = table.Column<DateOnly>(type: "date", nullable: false),
+                    Ativo = table.Column<bool>(type: "boolean", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    PlanoOrigemId = table.Column<Guid>(type: "uuid", nullable: true),
+                    ModoCriacao = table.Column<int>(type: "integer", nullable: false),
+                    OrdemInicio = table.Column<int>(type: "integer", nullable: false),
+                    OrdemFim = table.Column<int>(type: "integer", nullable: true),
+                    CriadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    AtualizadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -301,17 +302,17 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "PosicoesBiblicasUsuario",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UsuarioId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UltimaBaseBiblicaConcluidaId = table.Column<Guid>(type: "TEXT", nullable: true),
-                    UltimaOrdemConcluida = table.Column<int>(type: "INTEGER", nullable: false),
-                    AtualizadoEm = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UsuarioId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UltimaBaseBiblicaConcluidaId = table.Column<Guid>(type: "uuid", nullable: true),
+                    UltimaOrdemConcluida = table.Column<int>(type: "integer", nullable: false),
+                    AtualizadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PosicoesBiblicasUsuario", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PosicoesBiblicasUsuario_BaseBiblica_UltimaBaseBiblicaConcluidaId",
+                        name: "FK_PosicoesBiblicasUsuario_BaseBiblica_UltimaBaseBiblicaConclu~",
                         column: x => x.UltimaBaseBiblicaConcluidaId,
                         principalTable: "BaseBiblica",
                         principalColumn: "Id",
@@ -328,19 +329,19 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "TrilhasFormacao",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Titulo = table.Column<string>(type: "TEXT", maxLength: 180, nullable: false),
-                    Slug = table.Column<string>(type: "TEXT", maxLength: 220, nullable: false),
-                    Descricao = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: true),
-                    Resumo = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
-                    ImagemUrl = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
-                    Publicado = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Destaque = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Ordem = table.Column<int>(type: "INTEGER", nullable: true),
-                    CriadoPorUsuarioId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    PublicadoEm = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    AtualizadoEm = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Titulo = table.Column<string>(type: "character varying(180)", maxLength: 180, nullable: false),
+                    Slug = table.Column<string>(type: "character varying(220)", maxLength: 220, nullable: false),
+                    Descricao = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Resumo = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    ImagemUrl = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
+                    Publicado = table.Column<bool>(type: "boolean", nullable: false),
+                    Destaque = table.Column<bool>(type: "boolean", nullable: false),
+                    Ordem = table.Column<int>(type: "integer", nullable: true),
+                    CriadoPorUsuarioId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PublicadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CriadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    AtualizadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -357,10 +358,10 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "Favoritos",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UsuarioId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    ConteudoId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UsuarioId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ConteudoId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CriadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -383,16 +384,16 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "MateriaisApoio",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    ConteudoId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Titulo = table.Column<string>(type: "TEXT", maxLength: 180, nullable: false),
-                    Descricao = table.Column<string>(type: "TEXT", maxLength: 600, nullable: true),
-                    Tipo = table.Column<int>(type: "INTEGER", nullable: false),
-                    Url = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: false),
-                    Ordem = table.Column<int>(type: "INTEGER", nullable: false),
-                    Ativo = table.Column<bool>(type: "INTEGER", nullable: false),
-                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    AtualizadoEm = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ConteudoId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Titulo = table.Column<string>(type: "character varying(180)", maxLength: 180, nullable: false),
+                    Descricao = table.Column<string>(type: "character varying(600)", maxLength: 600, nullable: true),
+                    Tipo = table.Column<int>(type: "integer", nullable: false),
+                    Url = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    Ordem = table.Column<int>(type: "integer", nullable: false),
+                    Ativo = table.Column<bool>(type: "boolean", nullable: false),
+                    CriadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    AtualizadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -409,16 +410,16 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "ProgressosConteudo",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UsuarioId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    ConteudoId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Status = table.Column<int>(type: "INTEGER", nullable: false),
-                    Percentual = table.Column<decimal>(type: "TEXT", precision: 5, scale: 2, nullable: false),
-                    IniciadoEm = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    ConcluidoEm = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UltimoAcessoEm = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    AtualizadoEm = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UsuarioId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ConteudoId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    Percentual = table.Column<decimal>(type: "numeric(5,2)", precision: 5, scale: 2, nullable: false),
+                    IniciadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ConcluidoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UltimoAcessoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CriadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    AtualizadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -441,21 +442,21 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "PlanosBiblicosDias",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    PlanoBiblicoUsuarioId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    DiaNumero = table.Column<int>(type: "INTEGER", nullable: false),
-                    MesNumero = table.Column<int>(type: "INTEGER", nullable: false),
-                    DataPrevista = table.Column<DateOnly>(type: "TEXT", nullable: true),
-                    LeiturasTexto = table.Column<string>(type: "TEXT", maxLength: 800, nullable: true),
-                    SalmoNumero = table.Column<int>(type: "INTEGER", nullable: true),
-                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    AtualizadoEm = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PlanoBiblicoUsuarioId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DiaNumero = table.Column<int>(type: "integer", nullable: false),
+                    MesNumero = table.Column<int>(type: "integer", nullable: false),
+                    DataPrevista = table.Column<DateOnly>(type: "date", nullable: true),
+                    LeiturasTexto = table.Column<string>(type: "character varying(800)", maxLength: 800, nullable: true),
+                    SalmoNumero = table.Column<int>(type: "integer", nullable: true),
+                    CriadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    AtualizadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PlanosBiblicosDias", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PlanosBiblicosDias_PlanosBiblicosUsuario_PlanoBiblicoUsuarioId",
+                        name: "FK_PlanosBiblicosDias_PlanosBiblicosUsuario_PlanoBiblicoUsuari~",
                         column: x => x.PlanoBiblicoUsuarioId,
                         principalTable: "PlanosBiblicosUsuario",
                         principalColumn: "Id",
@@ -466,12 +467,12 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "TrilhasConteudos",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    TrilhaFormacaoId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    ConteudoId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Ordem = table.Column<int>(type: "INTEGER", nullable: false),
-                    Obrigatorio = table.Column<bool>(type: "INTEGER", nullable: false),
-                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TrilhaFormacaoId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ConteudoId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Ordem = table.Column<int>(type: "integer", nullable: false),
+                    Obrigatorio = table.Column<bool>(type: "boolean", nullable: false),
+                    CriadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -494,11 +495,11 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "PlanosBiblicosDiasCapitulos",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    PlanoBiblicoDiaId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    BaseBiblicaId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Ordem = table.Column<int>(type: "INTEGER", nullable: false),
-                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PlanoBiblicoDiaId = table.Column<Guid>(type: "uuid", nullable: false),
+                    BaseBiblicaId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Ordem = table.Column<int>(type: "integer", nullable: false),
+                    CriadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -510,7 +511,7 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_PlanosBiblicosDiasCapitulos_PlanosBiblicosDias_PlanoBiblicoDiaId",
+                        name: "FK_PlanosBiblicosDiasCapitulos_PlanosBiblicosDias_PlanoBiblico~",
                         column: x => x.PlanoBiblicoDiaId,
                         principalTable: "PlanosBiblicosDias",
                         principalColumn: "Id",
@@ -521,13 +522,13 @@ namespace ServicoPalavra.Infrastructure.Persistence.Migrations
                 name: "ProgressosLeitura",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UsuarioId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    PlanoBiblicoDiaId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Concluido = table.Column<bool>(type: "INTEGER", nullable: false),
-                    ConcluidoEm = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    AtualizadoEm = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UsuarioId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PlanoBiblicoDiaId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Concluido = table.Column<bool>(type: "boolean", nullable: false),
+                    ConcluidoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CriadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    AtualizadoEm = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {

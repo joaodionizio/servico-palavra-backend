@@ -32,6 +32,7 @@ public sealed class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRo
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+        ConfigureUtcDateTimes(modelBuilder);
     }
 
     public async Task ExecuteInTransactionAsync(Func<Task> action, CancellationToken cancellationToken = default)
@@ -43,5 +44,19 @@ public sealed class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRo
             await action();
             await transaction.CommitAsync(cancellationToken);
         });
+    }
+
+    private static void ConfigureUtcDateTimes(ModelBuilder modelBuilder)
+    {
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            foreach (var property in entityType.GetProperties())
+            {
+                if (property.ClrType == typeof(DateTime) || property.ClrType == typeof(DateTime?))
+                {
+                    property.SetColumnType("timestamp with time zone");
+                }
+            }
+        }
     }
 }
