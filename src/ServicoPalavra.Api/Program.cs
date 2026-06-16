@@ -45,6 +45,14 @@ if (!string.IsNullOrWhiteSpace(configuredUrls))
 {
     builder.WebHost.UseUrls(configuredUrls);
 }
+else
+{
+    var port = builder.Configuration["PORT"];
+    if (int.TryParse(port, out var renderPort) && renderPort is > 0 and <= 65535)
+    {
+        builder.WebHost.UseUrls($"http://0.0.0.0:{renderPort}");
+    }
+}
 
 StartupTrace("Configuracao carregada.");
 
