@@ -1,6 +1,6 @@
-@ServicoPalavra.Api_HostAddress = http://localhost:0
+@ServicoPalavra.Api_HostAddress = http://127.0.0.1:5050
 
-GET {{ServicoPalavra.Api_HostAddress}}/weatherforecast/
+GET {{ServicoPalavra.Api_HostAddress}}/health
 Accept: application/json
 
 ###

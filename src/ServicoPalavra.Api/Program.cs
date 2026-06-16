@@ -16,12 +16,37 @@ using ServicoPalavra.Infrastructure;
 using ServicoPalavra.Infrastructure.Persistence;
 using ServicoPalavra.Infrastructure.Persistence.Seed;
 
-var builder = WebApplication.CreateSlimBuilder(args);
+var startupDiagnostics = string.Equals(Environment.GetEnvironmentVariable("STARTUP_DIAGNOSTICS"), "true", StringComparison.OrdinalIgnoreCase);
+void StartupTrace(string message)
+{
+    if (startupDiagnostics)
+    {
+        Console.Error.WriteLine($"[startup] {message}");
+    }
+}
+
+StartupTrace("Main iniciado.");
+var builder = WebApplication.CreateEmptyBuilder(new WebApplicationOptions
+{
+    Args = args,
+    ContentRootPath = Directory.GetCurrentDirectory(),
+    EnvironmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+});
+builder.WebHost.UseKestrel();
+builder.Logging.AddConsole();
+StartupTrace("Builder criado.");
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: false)
     .AddEnvironmentVariables()
     .AddCommandLine(args);
+var configuredUrls = builder.Configuration["ASPNETCORE_URLS"] ?? builder.Configuration["urls"];
+if (!string.IsNullOrWhiteSpace(configuredUrls))
+{
+    builder.WebHost.UseUrls(configuredUrls);
+}
+
+StartupTrace("Configuracao carregada.");
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -49,6 +74,7 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+StartupTrace("Swagger configurado.");
 
 builder.Services.AddHealthChecks();
 builder.Services.AddCors(options =>
@@ -113,6 +139,7 @@ builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddScoped<ICurrentUserService>(sp => (CurrentUser)sp.GetRequiredService<ICurrentUser>());
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+StartupTrace("Servicos de aplicacao e infraestrutura configurados.");
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
     {
         options.Password.RequiredLength = 10;
@@ -159,8 +186,10 @@ builder.Services.AddAntiforgery(options =>
 });
 
 builder.Services.AddAuthorization();
+StartupTrace("Identity, cookies, antiforgery e autorizacao configurados.");
 
 var app = builder.Build();
+StartupTrace("Aplicacao construida.");
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
@@ -190,20 +219,26 @@ if (app.Environment.IsDevelopment())
 }
 
 var isEfTool = Assembly.GetEntryAssembly()?.GetName().Name == "ef";
+StartupTrace("Aplicacao configurada; iniciando bootstrap de banco.");
 if (!EF.IsDesignTime && !isEfTool)
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    if (app.Environment.IsEnvironment("Testing"))
+    var databaseProvider = (app.Configuration["DATABASE_PROVIDER"] ?? "sqlite").Trim().ToLowerInvariant();
+    if (app.Environment.IsEnvironment("Testing") || databaseProvider == "sqlite")
     {
+        StartupTrace("Executando EnsureCreated para SQLite/Testing.");
         await db.Database.EnsureCreatedAsync();
     }
     else
     {
+        StartupTrace("Executando Migrate para provider relacional configurado.");
         await db.Database.MigrateAsync();
     }
 
+    StartupTrace("Executando seed de roles/admin.");
     await scope.ServiceProvider.GetRequiredService<DatabaseSeeder>().SeedAsync();
+    StartupTrace("Bootstrap de banco concluido.");
 }
 
 if (!app.Environment.IsEnvironment("Testing"))
@@ -234,6 +269,7 @@ app.MapControllers().RequireRateLimiting("general");
 
 if (!EF.IsDesignTime && !isEfTool)
 {
+    StartupTrace("Chamando app.Run().");
     app.Run();
 }
 
