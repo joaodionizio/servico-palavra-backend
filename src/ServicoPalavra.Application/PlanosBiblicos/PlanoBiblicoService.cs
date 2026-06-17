@@ -75,8 +75,19 @@ public sealed class PlanoBiblicoService : IPlanoBiblicoService
     public async Task<IReadOnlyList<PlanoBiblicoResponse>> GetHistoricoAsync(Guid usuarioId, CancellationToken cancellationToken = default) =>
         (await _planos.ListHistoricoAsync(usuarioId, cancellationToken)).Select(ToResponse).ToList();
 
-    public async Task<IReadOnlyList<PlanoBiblicoDiaResponse>> ListDiasAsync(Guid usuarioId, Guid planoId, CancellationToken cancellationToken = default) =>
-        (await _planos.ListDiasAsync(planoId, usuarioId, cancellationToken)).Select(d => new PlanoBiblicoDiaResponse(d.Id, d.DiaNumero, d.MesNumero, d.DataPrevista, d.LeiturasTexto, d.SalmoNumero)).ToList();
+    public async Task<IReadOnlyList<PlanoBiblicoDiaResponse>> ListDiasAsync(Guid usuarioId, Guid planoId, CancellationToken cancellationToken = default)
+    {
+        var dias = await _planos.ListDiasAsync(planoId, usuarioId, cancellationToken);
+        var response = new List<PlanoBiblicoDiaResponse>(dias.Count);
+
+        foreach (var dia in dias)
+        {
+            var progresso = await _planos.GetProgressoLeituraAsync(usuarioId, dia.Id, cancellationToken);
+            response.Add(new PlanoBiblicoDiaResponse(dia.Id, dia.DiaNumero, dia.MesNumero, dia.DataPrevista, dia.LeiturasTexto, dia.SalmoNumero, progresso?.Concluido == true));
+        }
+
+        return response;
+    }
 
     public async Task<PosicaoBiblicaResponse> GetPosicaoAtualAsync(Guid usuarioId, CancellationToken cancellationToken = default)
     {
