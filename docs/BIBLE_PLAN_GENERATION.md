@@ -95,9 +95,25 @@ Nos dois casos:
 
 - Usuario comum cria e acessa apenas o proprio plano.
 - Admin nao e necessario para criar plano do proprio usuario.
-- Conclusao de dia tambem valida propriedade do usuario.
+- Conclusao e desmarcacao de dia tambem validam propriedade do usuario.
 - O frontend nao controla IDs internos nem ordem biblica.
 - A BaseBiblica nao e importada automaticamente no startup normal.
+
+## Endpoints Do Plano
+
+- `GET /api/planos-biblicos/ativo`: retorna o plano ativo do usuario autenticado.
+- `GET /api/planos-biblicos/{id}/dias`: retorna o cronograma real com `concluido` por dia.
+- `POST /api/planos-biblicos/dias/{diaId}/concluir`: marca o dia como concluido e retorna o dia atualizado.
+- `POST /api/planos-biblicos/dias/{diaId}/desmarcar`: desmarca o dia e retorna o dia atualizado.
+- `GET /api/planos-biblicos/progresso/posicao-atual`: retorna a ultima ordem concluida recalculada.
+
+Os endpoints `POST` exigem cookie de autenticacao e validacao CSRF.
+
+## Performance
+
+O cronograma era sensivel a lentidao porque a listagem de dias consultava o progresso dia a dia. A listagem agora projeta `PlanoBiblicoDiaResponse` em uma unica consulta, com `AsNoTracking`, retornando apenas os campos usados pela tela: identificador, dia, mes, data prevista, texto da leitura, salmo e status `concluido`.
+
+A acao de marcar/desmarcar nao carrega capitulos ou plano inteiro para validar propriedade do dia. Ela altera apenas o registro de progresso, recalcula a posicao biblica do plano ativo e retorna o dia atualizado. Isso permite que o frontend use atualizacao otimista e evite refetch completo quando for seguro.
 
 ## Validacoes Tecnicas
 
@@ -111,6 +127,8 @@ Os testes cobrem:
 - Capitulos gerados resolvidos sempre contra capitulos existentes em `BaseBiblica`.
 - Duracoes de 6 meses, 1 ano e 2 anos.
 - Isolamento entre usuarios.
+- Marcar, desmarcar e marcar novamente um dia concluido.
+- Recalculo de posicao biblica ao desmarcar.
 - Continuar e recomecar.
 - Bloqueio de dois planos ativos.
 - Erro claro quando `BaseBiblica` esta vazia.

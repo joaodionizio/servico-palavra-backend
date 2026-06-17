@@ -181,6 +181,52 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
     }
 
     [Fact]
+    public async Task User_can_conclude_unmark_and_conclude_biblical_plan_day_again()
+    {
+        await SeedBibleBaseAsync();
+        await RegisterAsync("Usuario Toggle", "toggle@tests.local");
+
+        var create = await _client.PostAsJsonAsync("/api/planos-biblicos", new CriarPlanoBiblicoRequest("Plano Toggle", 0, 1, DateOnly.FromDateTime(DateTime.UtcNow)));
+        await EnsureSuccessAsync(create);
+        var planId = await ReadGuidAsync(create, "id");
+        var firstDayId = await ReadFirstDayIdAsync(planId);
+
+        var conclude = await _client.PostAsync($"/api/planos-biblicos/dias/{firstDayId}/concluir", null);
+        await EnsureSuccessAsync(conclude);
+        Assert.True(await ReadDayConcluidoAsync(planId, firstDayId));
+        Assert.True(await ReadCurrentOrderAsync() > 0);
+
+        var unmark = await _client.PostAsync($"/api/planos-biblicos/dias/{firstDayId}/desmarcar", null);
+        await EnsureSuccessAsync(unmark);
+        Assert.False(await ReadDayConcluidoAsync(planId, firstDayId));
+        Assert.Equal(0, await ReadCurrentOrderAsync());
+
+        var concludeAgain = await _client.PostAsync($"/api/planos-biblicos/dias/{firstDayId}/concluir", null);
+        await EnsureSuccessAsync(concludeAgain);
+        Assert.True(await ReadDayConcluidoAsync(planId, firstDayId));
+        Assert.True(await ReadCurrentOrderAsync() > 0);
+    }
+
+    [Fact]
+    public async Task User_cannot_unmark_other_users_day()
+    {
+        await EnsureCsrfAsync();
+        await SeedBibleBaseAsync();
+        await RegisterAsync("Usuario Desmarcar A", "desmarcar-a@tests.local");
+        await RegisterAsync("Usuario Desmarcar B", "desmarcar-b@tests.local");
+
+        var createB = await _client.PostAsJsonAsync("/api/planos-biblicos", new CriarPlanoBiblicoRequest("Plano B", 0, 1, DateOnly.FromDateTime(DateTime.UtcNow)));
+        await EnsureSuccessAsync(createB);
+        var planBId = await ReadGuidAsync(createB, "id");
+        var dayBId = await ReadFirstDayIdAsync(planBId);
+
+        await LoginAsync("desmarcar-a@tests.local", "User12");
+        var crossUnmark = await _client.PostAsync($"/api/planos-biblicos/dias/{dayBId}/desmarcar", null);
+
+        Assert.Equal(HttpStatusCode.NotFound, crossUnmark.StatusCode);
+    }
+
+    [Fact]
     public async Task Biblical_plan_failed_continuation_keeps_active_plan()
     {
         await SeedBibleBaseAsync();
@@ -295,6 +341,27 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
         await EnsureSuccessAsync(days);
         using var document = JsonDocument.Parse(await days.Content.ReadAsStringAsync());
         return document.RootElement.GetProperty("data").EnumerateArray().First().GetProperty("id").GetGuid();
+    }
+
+    private async Task<bool> ReadDayConcluidoAsync(Guid planId, Guid dayId)
+    {
+        var days = await _client.GetAsync($"/api/planos-biblicos/{planId}/dias");
+        await EnsureSuccessAsync(days);
+        using var document = JsonDocument.Parse(await days.Content.ReadAsStringAsync());
+        return document.RootElement
+            .GetProperty("data")
+            .EnumerateArray()
+            .First(x => x.GetProperty("id").GetGuid() == dayId)
+            .GetProperty("concluido")
+            .GetBoolean();
+    }
+
+    private async Task<int> ReadCurrentOrderAsync()
+    {
+        var response = await _client.GetAsync("/api/planos-biblicos/progresso/posicao-atual");
+        await EnsureSuccessAsync(response);
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        return document.RootElement.GetProperty("data").GetProperty("ultimaOrdemConcluida").GetInt32();
     }
 
     private static async Task<Guid> ReadGuidAsync(HttpResponseMessage response, string property)

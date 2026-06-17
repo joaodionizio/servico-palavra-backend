@@ -75,19 +75,8 @@ public sealed class PlanoBiblicoService : IPlanoBiblicoService
     public async Task<IReadOnlyList<PlanoBiblicoResponse>> GetHistoricoAsync(Guid usuarioId, CancellationToken cancellationToken = default) =>
         (await _planos.ListHistoricoAsync(usuarioId, cancellationToken)).Select(ToResponse).ToList();
 
-    public async Task<IReadOnlyList<PlanoBiblicoDiaResponse>> ListDiasAsync(Guid usuarioId, Guid planoId, CancellationToken cancellationToken = default)
-    {
-        var dias = await _planos.ListDiasAsync(planoId, usuarioId, cancellationToken);
-        var response = new List<PlanoBiblicoDiaResponse>(dias.Count);
-
-        foreach (var dia in dias)
-        {
-            var progresso = await _planos.GetProgressoLeituraAsync(usuarioId, dia.Id, cancellationToken);
-            response.Add(new PlanoBiblicoDiaResponse(dia.Id, dia.DiaNumero, dia.MesNumero, dia.DataPrevista, dia.LeiturasTexto, dia.SalmoNumero, progresso?.Concluido == true));
-        }
-
-        return response;
-    }
+    public async Task<IReadOnlyList<PlanoBiblicoDiaResponse>> ListDiasAsync(Guid usuarioId, Guid planoId, CancellationToken cancellationToken = default) =>
+        await _planos.ListDiaResponsesAsync(planoId, usuarioId, cancellationToken);
 
     public async Task<PosicaoBiblicaResponse> GetPosicaoAtualAsync(Guid usuarioId, CancellationToken cancellationToken = default)
     {
@@ -95,7 +84,13 @@ public sealed class PlanoBiblicoService : IPlanoBiblicoService
         return new PosicaoBiblicaResponse(posicao?.UltimaOrdemConcluida ?? 0, posicao?.UltimaBaseBiblicaConcluidaId);
     }
 
-    public async Task ConcluirDiaAsync(Guid usuarioId, Guid diaId, CancellationToken cancellationToken = default)
+    public async Task<PlanoBiblicoDiaResponse> ConcluirDiaAsync(Guid usuarioId, Guid diaId, CancellationToken cancellationToken = default) =>
+        await AlterarConclusaoDiaAsync(usuarioId, diaId, concluido: true, cancellationToken);
+
+    public async Task<PlanoBiblicoDiaResponse> DesmarcarDiaAsync(Guid usuarioId, Guid diaId, CancellationToken cancellationToken = default) =>
+        await AlterarConclusaoDiaAsync(usuarioId, diaId, concluido: false, cancellationToken);
+
+    private async Task<PlanoBiblicoDiaResponse> AlterarConclusaoDiaAsync(Guid usuarioId, Guid diaId, bool concluido, CancellationToken cancellationToken)
     {
         await _unitOfWork.ExecuteInTransactionAsync(async () =>
         {
@@ -111,39 +106,49 @@ public sealed class PlanoBiblicoService : IPlanoBiblicoService
                     Id = Guid.NewGuid(),
                     UsuarioId = usuarioId,
                     PlanoBiblicoDiaId = dia.Id,
-                    Concluido = true,
-                    ConcluidoEm = now,
+                    Concluido = concluido,
+                    ConcluidoEm = concluido ? now : null,
                     CriadoEm = now
                 });
             }
             else
             {
-                progresso.Concluido = true;
-                progresso.ConcluidoEm = now;
-            }
-
-            var ultimoCapitulo = dia.Capitulos.OrderByDescending(c => c.Ordem).FirstOrDefault();
-            var posicao = await _planos.GetPosicaoAsync(usuarioId, cancellationToken);
-            if (posicao is null)
-            {
-                _planos.Add(new PosicaoBiblicaUsuario
-                {
-                    Id = Guid.NewGuid(),
-                    UsuarioId = usuarioId,
-                    UltimaOrdemConcluida = ultimoCapitulo?.Ordem ?? 0,
-                    UltimaBaseBiblicaConcluidaId = ultimoCapitulo?.BaseBiblicaId,
-                    AtualizadoEm = now
-                });
-            }
-            else if ((ultimoCapitulo?.Ordem ?? 0) >= posicao.UltimaOrdemConcluida)
-            {
-                posicao.UltimaOrdemConcluida = ultimoCapitulo?.Ordem ?? posicao.UltimaOrdemConcluida;
-                posicao.UltimaBaseBiblicaConcluidaId = ultimoCapitulo?.BaseBiblicaId ?? posicao.UltimaBaseBiblicaConcluidaId;
-                posicao.AtualizadoEm = now;
+                progresso.Concluido = concluido;
+                progresso.ConcluidoEm = concluido ? now : null;
+                progresso.AtualizadoEm = now;
             }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await RecalcularPosicaoBiblicaAsync(usuarioId, now, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }, cancellationToken);
+
+        return await _planos.GetDiaResponseAsync(diaId, usuarioId, cancellationToken)
+            ?? throw new AppException("Dia do plano nao encontrado.", 404);
+    }
+
+    private async Task RecalcularPosicaoBiblicaAsync(Guid usuarioId, DateTime now, CancellationToken cancellationToken)
+    {
+        var ultimaPosicao = await _planos.GetUltimaPosicaoConcluidaAsync(usuarioId, cancellationToken);
+        var posicao = await _planos.GetPosicaoAsync(usuarioId, cancellationToken);
+
+        if (posicao is null)
+        {
+            _planos.Add(new PosicaoBiblicaUsuario
+            {
+                Id = Guid.NewGuid(),
+                UsuarioId = usuarioId,
+                UltimaOrdemConcluida = ultimaPosicao.Ordem,
+                UltimaBaseBiblicaConcluidaId = ultimaPosicao.BaseBiblicaId,
+                AtualizadoEm = now
+            });
+
+            return;
+        }
+
+        posicao.UltimaOrdemConcluida = ultimaPosicao.Ordem;
+        posicao.UltimaBaseBiblicaConcluidaId = ultimaPosicao.BaseBiblicaId;
+        posicao.AtualizadoEm = now;
     }
 
     private static PlanoBiblicoResponse ToResponse(PlanoBiblicoUsuario plano) =>

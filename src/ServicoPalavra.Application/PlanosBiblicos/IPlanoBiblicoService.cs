@@ -9,5 +9,6 @@ public interface IPlanoBiblicoService
     Task<IReadOnlyList<PlanoBiblicoResponse>> GetHistoricoAsync(Guid usuarioId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<PlanoBiblicoDiaResponse>> ListDiasAsync(Guid usuarioId, Guid planoId, CancellationToken cancellationToken = default);
     Task<PosicaoBiblicaResponse> GetPosicaoAtualAsync(Guid usuarioId, CancellationToken cancellationToken = default);
-    Task ConcluirDiaAsync(Guid usuarioId, Guid diaId, CancellationToken cancellationToken = default);
+    Task<PlanoBiblicoDiaResponse> ConcluirDiaAsync(Guid usuarioId, Guid diaId, CancellationToken cancellationToken = default);
+    Task<PlanoBiblicoDiaResponse> DesmarcarDiaAsync(Guid usuarioId, Guid diaId, CancellationToken cancellationToken = default);
 }

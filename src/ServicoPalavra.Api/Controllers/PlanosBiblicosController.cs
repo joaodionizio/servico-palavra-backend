@@ -53,9 +53,10 @@ public sealed class PlanosBiblicosController : ApiControllerBase
         OkResponse(await _planos.GetPosicaoAtualAsync(CurrentUserId(_currentUser), cancellationToken));
 
     [HttpPost("api/planos-biblicos/dias/{diaId:guid}/concluir")]
-    public async Task<IActionResult> ConcluirDia(Guid diaId, CancellationToken cancellationToken)
-    {
-        await _planos.ConcluirDiaAsync(CurrentUserId(_currentUser), diaId, cancellationToken);
-        return OkResponse("Dia concluido.");
-    }
+    public async Task<IActionResult> ConcluirDia(Guid diaId, CancellationToken cancellationToken) =>
+        OkResponse(await _planos.ConcluirDiaAsync(CurrentUserId(_currentUser), diaId, cancellationToken), "Dia concluido.");
+
+    [HttpPost("api/planos-biblicos/dias/{diaId:guid}/desmarcar")]
+    public async Task<IActionResult> DesmarcarDia(Guid diaId, CancellationToken cancellationToken) =>
+        OkResponse(await _planos.DesmarcarDiaAsync(CurrentUserId(_currentUser), diaId, cancellationToken), "Dia desmarcado.");
 }
