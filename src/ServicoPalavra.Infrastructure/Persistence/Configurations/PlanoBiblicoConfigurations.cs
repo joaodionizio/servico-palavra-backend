@@ -14,6 +14,8 @@ public sealed class BaseBiblicaConfiguration : IEntityTypeConfiguration<BaseBibl
         builder.Property(x => x.Grupo).HasMaxLength(80).IsRequired();
         builder.Property(x => x.Subgrupo).HasMaxLength(80);
         builder.Property(x => x.Testamento).HasMaxLength(40).IsRequired();
+        builder.Property(x => x.QuantidadeVersiculos).IsRequired();
+        builder.Property(x => x.PesoLeitura).IsRequired();
         builder.HasIndex(x => x.Ordem).IsUnique();
     }
 }

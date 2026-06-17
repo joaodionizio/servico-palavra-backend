@@ -1,0 +1,3602 @@
+[
+  {
+    "mesNumero": 1,
+    "diaNumero": 1,
+    "leituraTexto": "1 João 1",
+    "salmoNumero": 1
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 2,
+    "leituraTexto": "1 João 2",
+    "salmoNumero": 2
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 3,
+    "leituraTexto": "1 João 3",
+    "salmoNumero": 3
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 4,
+    "leituraTexto": "1 João 4",
+    "salmoNumero": 4
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 5,
+    "leituraTexto": "1 João 5",
+    "salmoNumero": 5
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 6,
+    "leituraTexto": "João 1",
+    "salmoNumero": 6
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 7,
+    "leituraTexto": "João 2",
+    "salmoNumero": 7
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 8,
+    "leituraTexto": "João 3",
+    "salmoNumero": 8
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 9,
+    "leituraTexto": "João 4",
+    "salmoNumero": 9
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 10,
+    "leituraTexto": "João 5",
+    "salmoNumero": 10
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 11,
+    "leituraTexto": "João 6",
+    "salmoNumero": 11
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 12,
+    "leituraTexto": "João 7",
+    "salmoNumero": 12
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 13,
+    "leituraTexto": "João 8",
+    "salmoNumero": 13
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 14,
+    "leituraTexto": "João 9",
+    "salmoNumero": 14
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 15,
+    "leituraTexto": "João 10",
+    "salmoNumero": 15
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 16,
+    "leituraTexto": "João 11",
+    "salmoNumero": 16
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 17,
+    "leituraTexto": "João 12",
+    "salmoNumero": 17
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 18,
+    "leituraTexto": "João 13",
+    "salmoNumero": 18
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 19,
+    "leituraTexto": "João 14",
+    "salmoNumero": 19
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 20,
+    "leituraTexto": "João 15",
+    "salmoNumero": 20
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 21,
+    "leituraTexto": "João 16",
+    "salmoNumero": 21
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 22,
+    "leituraTexto": "João 17",
+    "salmoNumero": 22
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 23,
+    "leituraTexto": "João 18",
+    "salmoNumero": 23
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 24,
+    "leituraTexto": "João 19",
+    "salmoNumero": 24
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 25,
+    "leituraTexto": "João 20",
+    "salmoNumero": 25
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 26,
+    "leituraTexto": "João 21",
+    "salmoNumero": 26
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 27,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 27
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 28,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 28
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 29,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 29
+  },
+  {
+    "mesNumero": 1,
+    "diaNumero": 30,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 30
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 1,
+    "leituraTexto": "1 João 1",
+    "salmoNumero": 31
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 2,
+    "leituraTexto": "1 João 2",
+    "salmoNumero": 32
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 3,
+    "leituraTexto": "1 João 3",
+    "salmoNumero": 33
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 4,
+    "leituraTexto": "1 João 4",
+    "salmoNumero": 34
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 5,
+    "leituraTexto": "1 João 5",
+    "salmoNumero": 35
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 6,
+    "leituraTexto": "Marcos 1",
+    "salmoNumero": 36
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 7,
+    "leituraTexto": "Marcos 2",
+    "salmoNumero": 37
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 8,
+    "leituraTexto": "Marcos 3",
+    "salmoNumero": 38
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 9,
+    "leituraTexto": "Marcos 4",
+    "salmoNumero": 39
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 10,
+    "leituraTexto": "Marcos 5",
+    "salmoNumero": 40
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 11,
+    "leituraTexto": "Marcos 6",
+    "salmoNumero": 41
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 12,
+    "leituraTexto": "Marcos 7",
+    "salmoNumero": 42
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 13,
+    "leituraTexto": "Marcos 8",
+    "salmoNumero": 43
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 14,
+    "leituraTexto": "Marcos 9",
+    "salmoNumero": 44
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 15,
+    "leituraTexto": "Marcos 10",
+    "salmoNumero": 45
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 16,
+    "leituraTexto": "Marcos 11",
+    "salmoNumero": 46
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 17,
+    "leituraTexto": "Marcos 12",
+    "salmoNumero": 47
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 18,
+    "leituraTexto": "Marcos 13",
+    "salmoNumero": 48
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 19,
+    "leituraTexto": "Marcos 14",
+    "salmoNumero": 49
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 20,
+    "leituraTexto": "Marcos 15",
+    "salmoNumero": 50
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 21,
+    "leituraTexto": "Marcos 16",
+    "salmoNumero": 51
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 22,
+    "leituraTexto": "Gálatas 1",
+    "salmoNumero": 52
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 23,
+    "leituraTexto": "Gálatas 2",
+    "salmoNumero": 53
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 24,
+    "leituraTexto": "Gálatas 3",
+    "salmoNumero": 54
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 25,
+    "leituraTexto": "Gálatas 4",
+    "salmoNumero": 55
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 26,
+    "leituraTexto": "Gálatas 5",
+    "salmoNumero": 56
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 27,
+    "leituraTexto": "Gálatas 6",
+    "salmoNumero": 57
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 28,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 58
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 29,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 59
+  },
+  {
+    "mesNumero": 2,
+    "diaNumero": 30,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 60
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 1,
+    "leituraTexto": "Efésios 1",
+    "salmoNumero": 61
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 2,
+    "leituraTexto": "Efésios 2",
+    "salmoNumero": 62
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 3,
+    "leituraTexto": "Efésios 3",
+    "salmoNumero": 63
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 4,
+    "leituraTexto": "Efésios 4",
+    "salmoNumero": 64
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 5,
+    "leituraTexto": "Efésios 5",
+    "salmoNumero": 65
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 6,
+    "leituraTexto": "Efésios 6",
+    "salmoNumero": 66
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 7,
+    "leituraTexto": "Filipenses 1",
+    "salmoNumero": 67
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 8,
+    "leituraTexto": "Filipenses 2",
+    "salmoNumero": 68
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 9,
+    "leituraTexto": "Filipenses 3",
+    "salmoNumero": 69
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 10,
+    "leituraTexto": "Filipenses 4",
+    "salmoNumero": 70
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 11,
+    "leituraTexto": "Colossenses 1",
+    "salmoNumero": 71
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 12,
+    "leituraTexto": "Colossenses 2",
+    "salmoNumero": 72
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 13,
+    "leituraTexto": "Colossenses 3",
+    "salmoNumero": 73
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 14,
+    "leituraTexto": "Colossenses 4",
+    "salmoNumero": 74
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 15,
+    "leituraTexto": "1 Tessalonicenses 1",
+    "salmoNumero": 75
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 16,
+    "leituraTexto": "1 Tessalonicenses 2",
+    "salmoNumero": 76
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 17,
+    "leituraTexto": "1 Tessalonicenses 3",
+    "salmoNumero": 77
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 18,
+    "leituraTexto": "1 Tessalonicenses 4",
+    "salmoNumero": 78
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 19,
+    "leituraTexto": "1 Tessalonicenses 5",
+    "salmoNumero": 79
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 20,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 80
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 21,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 81
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 22,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 82
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 23,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 83
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 24,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 84
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 25,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 85
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 26,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 86
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 27,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 87
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 28,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 88
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 29,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 89
+  },
+  {
+    "mesNumero": 3,
+    "diaNumero": 30,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 90
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 1,
+    "leituraTexto": "2 Tessalonicenses 1",
+    "salmoNumero": 91
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 2,
+    "leituraTexto": "2 Tessalonicenses 2",
+    "salmoNumero": 92
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 3,
+    "leituraTexto": "2 Tessalonicenses 3",
+    "salmoNumero": 93
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 4,
+    "leituraTexto": "1 Timóteo 1",
+    "salmoNumero": 94
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 5,
+    "leituraTexto": "1 Timóteo 2",
+    "salmoNumero": 95
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 6,
+    "leituraTexto": "1 Timóteo 3",
+    "salmoNumero": 96
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 7,
+    "leituraTexto": "1 Timóteo 4",
+    "salmoNumero": 97
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 8,
+    "leituraTexto": "1 Timóteo 5",
+    "salmoNumero": 98
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 9,
+    "leituraTexto": "1 Timóteo 6",
+    "salmoNumero": 99
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 10,
+    "leituraTexto": "2 Timóteo 1",
+    "salmoNumero": 100
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 11,
+    "leituraTexto": "2 Timóteo 2",
+    "salmoNumero": 101
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 12,
+    "leituraTexto": "2 Timóteo 3",
+    "salmoNumero": 102
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 13,
+    "leituraTexto": "2 Timóteo 4",
+    "salmoNumero": 103
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 14,
+    "leituraTexto": "Tito 1",
+    "salmoNumero": 104
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 15,
+    "leituraTexto": "Tito 2",
+    "salmoNumero": 105
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 16,
+    "leituraTexto": "Tito 3",
+    "salmoNumero": 106
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 17,
+    "leituraTexto": "Filemon 1",
+    "salmoNumero": 107
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 18,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 108
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 19,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 109
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 20,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 110
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 21,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 111
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 22,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 112
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 23,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 113
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 24,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 114
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 25,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 115
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 26,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 116
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 27,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 117
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 28,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 118
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 29,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 119
+  },
+  {
+    "mesNumero": 4,
+    "diaNumero": 30,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 120
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 1,
+    "leituraTexto": "Lucas 1, 2",
+    "salmoNumero": 121
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 2,
+    "leituraTexto": "Lucas 3, 4",
+    "salmoNumero": 122
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 3,
+    "leituraTexto": "Lucas 5, 6",
+    "salmoNumero": 123
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 4,
+    "leituraTexto": "Lucas 7, 8",
+    "salmoNumero": 124
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 5,
+    "leituraTexto": "Lucas 9, 10",
+    "salmoNumero": 125
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 6,
+    "leituraTexto": "Lucas 11, 12",
+    "salmoNumero": 126
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 7,
+    "leituraTexto": "Lucas 13, 14",
+    "salmoNumero": 127
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 8,
+    "leituraTexto": "Lucas 15, 16",
+    "salmoNumero": 128
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 9,
+    "leituraTexto": "Lucas 17",
+    "salmoNumero": 129
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 10,
+    "leituraTexto": "Lucas 18",
+    "salmoNumero": 130
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 11,
+    "leituraTexto": "Lucas 19",
+    "salmoNumero": 131
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 12,
+    "leituraTexto": "Lucas 20",
+    "salmoNumero": 132
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 13,
+    "leituraTexto": "Lucas 21",
+    "salmoNumero": 133
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 14,
+    "leituraTexto": "Lucas 22",
+    "salmoNumero": 134
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 15,
+    "leituraTexto": "Lucas 23",
+    "salmoNumero": 135
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 16,
+    "leituraTexto": "Lucas 24",
+    "salmoNumero": 136
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 17,
+    "leituraTexto": "Atos 1",
+    "salmoNumero": 137
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 18,
+    "leituraTexto": "Atos 2",
+    "salmoNumero": 138
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 19,
+    "leituraTexto": "Atos 3",
+    "salmoNumero": 139
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 20,
+    "leituraTexto": "Atos 4",
+    "salmoNumero": 140
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 21,
+    "leituraTexto": "Atos 5",
+    "salmoNumero": 141
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 22,
+    "leituraTexto": "Atos 6",
+    "salmoNumero": 142
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 23,
+    "leituraTexto": "Atos 7",
+    "salmoNumero": 143
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 24,
+    "leituraTexto": "Atos 8",
+    "salmoNumero": 144
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 25,
+    "leituraTexto": "Atos 9",
+    "salmoNumero": 145
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 26,
+    "leituraTexto": "Atos 10",
+    "salmoNumero": 146
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 27,
+    "leituraTexto": "Atos 11",
+    "salmoNumero": 147
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 28,
+    "leituraTexto": "Atos 12",
+    "salmoNumero": 148
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 29,
+    "leituraTexto": "Atos 13",
+    "salmoNumero": 149
+  },
+  {
+    "mesNumero": 5,
+    "diaNumero": 30,
+    "leituraTexto": "Atos 14",
+    "salmoNumero": 150
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 1,
+    "leituraTexto": "Atos 15",
+    "salmoNumero": 1
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 2,
+    "leituraTexto": "Atos 16",
+    "salmoNumero": 2
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 3,
+    "leituraTexto": "Atos 17",
+    "salmoNumero": 3
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 4,
+    "leituraTexto": "Atos 18",
+    "salmoNumero": 4
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 5,
+    "leituraTexto": "Atos 19",
+    "salmoNumero": 5
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 6,
+    "leituraTexto": "Atos 20",
+    "salmoNumero": 6
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 7,
+    "leituraTexto": "Atos 21",
+    "salmoNumero": 7
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 8,
+    "leituraTexto": "Atos 22",
+    "salmoNumero": 8
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 9,
+    "leituraTexto": "Atos 23",
+    "salmoNumero": 9
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 10,
+    "leituraTexto": "Atos 24",
+    "salmoNumero": 10
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 11,
+    "leituraTexto": "Atos 25",
+    "salmoNumero": 11
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 12,
+    "leituraTexto": "Atos 26",
+    "salmoNumero": 12
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 13,
+    "leituraTexto": "Atos 27",
+    "salmoNumero": 13
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 14,
+    "leituraTexto": "Atos 28",
+    "salmoNumero": 14
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 15,
+    "leituraTexto": "Romanos 1",
+    "salmoNumero": 15
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 16,
+    "leituraTexto": "Romanos 2",
+    "salmoNumero": 16
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 17,
+    "leituraTexto": "Romanos 3",
+    "salmoNumero": 17
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 18,
+    "leituraTexto": "Romanos 4",
+    "salmoNumero": 18
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 19,
+    "leituraTexto": "Romanos 5",
+    "salmoNumero": 19
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 20,
+    "leituraTexto": "Romanos 6",
+    "salmoNumero": 20
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 21,
+    "leituraTexto": "Romanos 7",
+    "salmoNumero": 21
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 22,
+    "leituraTexto": "Romanos 8",
+    "salmoNumero": 22
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 23,
+    "leituraTexto": "Romanos 9",
+    "salmoNumero": 23
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 24,
+    "leituraTexto": "Romanos 10",
+    "salmoNumero": 24
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 25,
+    "leituraTexto": "Romanos 11",
+    "salmoNumero": 25
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 26,
+    "leituraTexto": "Romanos 12",
+    "salmoNumero": 26
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 27,
+    "leituraTexto": "Romanos 13",
+    "salmoNumero": 27
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 28,
+    "leituraTexto": "Romanos 14",
+    "salmoNumero": 28
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 29,
+    "leituraTexto": "Romanos 15",
+    "salmoNumero": 29
+  },
+  {
+    "mesNumero": 6,
+    "diaNumero": 30,
+    "leituraTexto": "Romanos 16",
+    "salmoNumero": 30
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 1,
+    "leituraTexto": "Mateus 1, 2",
+    "salmoNumero": 31
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 2,
+    "leituraTexto": "Mateus 3, 4",
+    "salmoNumero": 32
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 3,
+    "leituraTexto": "Mateus 5, 6",
+    "salmoNumero": 33
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 4,
+    "leituraTexto": "Mateus 7, 8",
+    "salmoNumero": 34
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 5,
+    "leituraTexto": "Mateus 9, 10",
+    "salmoNumero": 35
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 6,
+    "leituraTexto": "Mateus 11, 12",
+    "salmoNumero": 36
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 7,
+    "leituraTexto": "Mateus 13, 14",
+    "salmoNumero": 37
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 8,
+    "leituraTexto": "Mateus 15, 16",
+    "salmoNumero": 38
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 9,
+    "leituraTexto": "Mateus 17, 18",
+    "salmoNumero": 39
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 10,
+    "leituraTexto": "Mateus 19, 20",
+    "salmoNumero": 40
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 11,
+    "leituraTexto": "Mateus 21, 22",
+    "salmoNumero": 41
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 12,
+    "leituraTexto": "Mateus 23, 24",
+    "salmoNumero": 42
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 13,
+    "leituraTexto": "Mateus 25, 26",
+    "salmoNumero": 43
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 14,
+    "leituraTexto": "Mateus 27, 28",
+    "salmoNumero": 44
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 15,
+    "leituraTexto": "1 Coríntios 1",
+    "salmoNumero": 45
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 16,
+    "leituraTexto": "1 Coríntios 2",
+    "salmoNumero": 46
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 17,
+    "leituraTexto": "1 Coríntios 3",
+    "salmoNumero": 47
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 18,
+    "leituraTexto": "1 Coríntios 4",
+    "salmoNumero": 48
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 19,
+    "leituraTexto": "1 Coríntios 5",
+    "salmoNumero": 49
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 20,
+    "leituraTexto": "1 Coríntios 6",
+    "salmoNumero": 50
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 21,
+    "leituraTexto": "1 Coríntios 7",
+    "salmoNumero": 51
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 22,
+    "leituraTexto": "1 Coríntios 8",
+    "salmoNumero": 52
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 23,
+    "leituraTexto": "1 Coríntios 9",
+    "salmoNumero": 53
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 24,
+    "leituraTexto": "1 Coríntios 10",
+    "salmoNumero": 54
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 25,
+    "leituraTexto": "1 Coríntios 11",
+    "salmoNumero": 55
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 26,
+    "leituraTexto": "1 Coríntios 12",
+    "salmoNumero": 56
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 27,
+    "leituraTexto": "1 Coríntios 13",
+    "salmoNumero": 57
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 28,
+    "leituraTexto": "1 Coríntios 14",
+    "salmoNumero": 58
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 29,
+    "leituraTexto": "1 Coríntios 15",
+    "salmoNumero": 59
+  },
+  {
+    "mesNumero": 7,
+    "diaNumero": 30,
+    "leituraTexto": "1 Coríntios 16",
+    "salmoNumero": 60
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 1,
+    "leituraTexto": "2 Coríntios 1, 2",
+    "salmoNumero": 61
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 2,
+    "leituraTexto": "2 Coríntios 3",
+    "salmoNumero": 62
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 3,
+    "leituraTexto": "2 Coríntios 4",
+    "salmoNumero": 63
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 4,
+    "leituraTexto": "2 Coríntios 5",
+    "salmoNumero": 64
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 5,
+    "leituraTexto": "2 Coríntios 6",
+    "salmoNumero": 65
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 6,
+    "leituraTexto": "2 Coríntios 7",
+    "salmoNumero": 66
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 7,
+    "leituraTexto": "2 Coríntios 8",
+    "salmoNumero": 67
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 8,
+    "leituraTexto": "2 Coríntios 9",
+    "salmoNumero": 68
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 9,
+    "leituraTexto": "2 Coríntios 10",
+    "salmoNumero": 69
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 10,
+    "leituraTexto": "2 Coríntios 11",
+    "salmoNumero": 70
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 11,
+    "leituraTexto": "2 Coríntios 12",
+    "salmoNumero": 71
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 12,
+    "leituraTexto": "2 Coríntios 13",
+    "salmoNumero": 72
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 13,
+    "leituraTexto": "Hebreus 1",
+    "salmoNumero": 73
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 14,
+    "leituraTexto": "Hebreus 2",
+    "salmoNumero": 74
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 15,
+    "leituraTexto": "Hebreus 3",
+    "salmoNumero": 75
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 16,
+    "leituraTexto": "Hebreus 4",
+    "salmoNumero": 76
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 17,
+    "leituraTexto": "Hebreus 5",
+    "salmoNumero": 77
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 18,
+    "leituraTexto": "Hebreus 6",
+    "salmoNumero": 78
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 19,
+    "leituraTexto": "Hebreus 7",
+    "salmoNumero": 79
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 20,
+    "leituraTexto": "Hebreus 8",
+    "salmoNumero": 80
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 21,
+    "leituraTexto": "Hebreus 9",
+    "salmoNumero": 81
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 22,
+    "leituraTexto": "Hebreus 10",
+    "salmoNumero": 82
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 23,
+    "leituraTexto": "Hebreus 11",
+    "salmoNumero": 83
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 24,
+    "leituraTexto": "Hebreus 12",
+    "salmoNumero": 84
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 25,
+    "leituraTexto": "Hebreus 13",
+    "salmoNumero": 85
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 26,
+    "leituraTexto": "Tiago 1",
+    "salmoNumero": 86
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 27,
+    "leituraTexto": "Tiago 2",
+    "salmoNumero": 87
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 28,
+    "leituraTexto": "Tiago 3",
+    "salmoNumero": 88
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 29,
+    "leituraTexto": "Tiago 4",
+    "salmoNumero": 89
+  },
+  {
+    "mesNumero": 8,
+    "diaNumero": 30,
+    "leituraTexto": "Tiago 5",
+    "salmoNumero": 90
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 1,
+    "leituraTexto": "1 Pedro 1, 2",
+    "salmoNumero": 91
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 2,
+    "leituraTexto": "1 Pedro 3, 4",
+    "salmoNumero": 92
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 3,
+    "leituraTexto": "1 Pedro 5, 2 Pe 1",
+    "salmoNumero": 93
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 4,
+    "leituraTexto": "2 Pedro 2, 3",
+    "salmoNumero": 94
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 5,
+    "leituraTexto": "1 João 1",
+    "salmoNumero": 95
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 6,
+    "leituraTexto": "2 João 1",
+    "salmoNumero": 96
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 7,
+    "leituraTexto": "3 João 1",
+    "salmoNumero": 97
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 8,
+    "leituraTexto": "Judas 1",
+    "salmoNumero": 98
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 9,
+    "leituraTexto": "Apocalipse 1",
+    "salmoNumero": 99
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 10,
+    "leituraTexto": "Apocalipse 2",
+    "salmoNumero": 100
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 11,
+    "leituraTexto": "Apocalipse 3",
+    "salmoNumero": 101
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 12,
+    "leituraTexto": "Apocalipse 4",
+    "salmoNumero": 102
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 13,
+    "leituraTexto": "Apocalipse 5",
+    "salmoNumero": 103
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 14,
+    "leituraTexto": "Apocalipse 6",
+    "salmoNumero": 104
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 15,
+    "leituraTexto": "Apocalipse 7",
+    "salmoNumero": 105
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 16,
+    "leituraTexto": "Apocalipse 8",
+    "salmoNumero": 106
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 17,
+    "leituraTexto": "Apocalipse 9",
+    "salmoNumero": 107
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 18,
+    "leituraTexto": "Apocalipse 10",
+    "salmoNumero": 108
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 19,
+    "leituraTexto": "Apocalipse 11",
+    "salmoNumero": 109
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 20,
+    "leituraTexto": "Apocalipse 12",
+    "salmoNumero": 110
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 21,
+    "leituraTexto": "Apocalipse 13",
+    "salmoNumero": 111
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 22,
+    "leituraTexto": "Apocalipse 14",
+    "salmoNumero": 112
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 23,
+    "leituraTexto": "Apocalipse 15",
+    "salmoNumero": 113
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 24,
+    "leituraTexto": "Apocalipse 16",
+    "salmoNumero": 114
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 25,
+    "leituraTexto": "Apocalipse 17",
+    "salmoNumero": 115
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 26,
+    "leituraTexto": "Apocalipse 18",
+    "salmoNumero": 116
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 27,
+    "leituraTexto": "Apocalipse 19",
+    "salmoNumero": 117
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 28,
+    "leituraTexto": "Apocalipse 20",
+    "salmoNumero": 118
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 29,
+    "leituraTexto": "Apocalipse 21",
+    "salmoNumero": 119
+  },
+  {
+    "mesNumero": 9,
+    "diaNumero": 30,
+    "leituraTexto": "Apocalipse 22",
+    "salmoNumero": 120
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 1,
+    "leituraTexto": "1 João 1",
+    "salmoNumero": 121
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 2,
+    "leituraTexto": "1 João 2",
+    "salmoNumero": 122
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 3,
+    "leituraTexto": "1 João 3",
+    "salmoNumero": 123
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 4,
+    "leituraTexto": "1 João 4",
+    "salmoNumero": 124
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 5,
+    "leituraTexto": "1 João 5",
+    "salmoNumero": 125
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 6,
+    "leituraTexto": "João 1",
+    "salmoNumero": 126
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 7,
+    "leituraTexto": "João 2",
+    "salmoNumero": 127
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 8,
+    "leituraTexto": "João 3",
+    "salmoNumero": 128
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 9,
+    "leituraTexto": "João 4",
+    "salmoNumero": 129
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 10,
+    "leituraTexto": "João 5",
+    "salmoNumero": 130
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 11,
+    "leituraTexto": "João 6",
+    "salmoNumero": 131
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 12,
+    "leituraTexto": "João 7",
+    "salmoNumero": 132
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 13,
+    "leituraTexto": "João 8",
+    "salmoNumero": 133
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 14,
+    "leituraTexto": "João 9",
+    "salmoNumero": 134
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 15,
+    "leituraTexto": "João 10",
+    "salmoNumero": 135
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 16,
+    "leituraTexto": "João 11",
+    "salmoNumero": 136
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 17,
+    "leituraTexto": "João 12",
+    "salmoNumero": 137
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 18,
+    "leituraTexto": "João 13",
+    "salmoNumero": 138
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 19,
+    "leituraTexto": "João 14",
+    "salmoNumero": 139
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 20,
+    "leituraTexto": "João 15",
+    "salmoNumero": 140
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 21,
+    "leituraTexto": "João 16",
+    "salmoNumero": 141
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 22,
+    "leituraTexto": "João 17",
+    "salmoNumero": 142
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 23,
+    "leituraTexto": "João 18",
+    "salmoNumero": 143
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 24,
+    "leituraTexto": "João 19",
+    "salmoNumero": 144
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 25,
+    "leituraTexto": "João 20",
+    "salmoNumero": 145
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 26,
+    "leituraTexto": "João 21",
+    "salmoNumero": 146
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 27,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 147
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 28,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 148
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 29,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 149
+  },
+  {
+    "mesNumero": 10,
+    "diaNumero": 30,
+    "leituraTexto": "Meditação livre",
+    "salmoNumero": 150
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 1,
+    "leituraTexto": "Gênesis 1-3",
+    "salmoNumero": 1
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 2,
+    "leituraTexto": "Gênesis 4-6",
+    "salmoNumero": 2
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 3,
+    "leituraTexto": "Gênesis 7-9",
+    "salmoNumero": 3
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 4,
+    "leituraTexto": "Gênesis 10-12",
+    "salmoNumero": 4
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 5,
+    "leituraTexto": "Gênesis 13-15",
+    "salmoNumero": 5
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 6,
+    "leituraTexto": "Gênesis 16-18",
+    "salmoNumero": 6
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 7,
+    "leituraTexto": "Gênesis 19-21",
+    "salmoNumero": 7
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 8,
+    "leituraTexto": "Gênesis 22-24",
+    "salmoNumero": 8
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 9,
+    "leituraTexto": "Gênesis 25-27",
+    "salmoNumero": 9
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 10,
+    "leituraTexto": "Gênesis 28-30",
+    "salmoNumero": 10
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 11,
+    "leituraTexto": "Gênesis 31, 32",
+    "salmoNumero": 11
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 12,
+    "leituraTexto": "Gênesis 33, 34",
+    "salmoNumero": 12
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 13,
+    "leituraTexto": "Gênesis 35, 36",
+    "salmoNumero": 13
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 14,
+    "leituraTexto": "Gênesis 37, 38",
+    "salmoNumero": 14
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 15,
+    "leituraTexto": "Gênesis 39, 40",
+    "salmoNumero": 15
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 16,
+    "leituraTexto": "Gênesis 41, 42",
+    "salmoNumero": 16
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 17,
+    "leituraTexto": "Gênesis 43, 44",
+    "salmoNumero": 17
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 18,
+    "leituraTexto": "Gênesis 45, 46",
+    "salmoNumero": 18
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 19,
+    "leituraTexto": "Gênesis 47, 48",
+    "salmoNumero": 19
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 20,
+    "leituraTexto": "Gênesis 49, 50",
+    "salmoNumero": 20
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 21,
+    "leituraTexto": "Êxodo 1, 2",
+    "salmoNumero": 21
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 22,
+    "leituraTexto": "Êxodo 3, 4",
+    "salmoNumero": 22
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 23,
+    "leituraTexto": "Êxodo 5, 6",
+    "salmoNumero": 23
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 24,
+    "leituraTexto": "Êxodo 7, 8",
+    "salmoNumero": 24
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 25,
+    "leituraTexto": "Êxodo 9, 10",
+    "salmoNumero": 25
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 26,
+    "leituraTexto": "Êxodo 11, 12",
+    "salmoNumero": 26
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 27,
+    "leituraTexto": "Êxodo 13, 14",
+    "salmoNumero": 27
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 28,
+    "leituraTexto": "Êxodo 15, 16",
+    "salmoNumero": 28
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 29,
+    "leituraTexto": "Êxodo 17, 18",
+    "salmoNumero": 29
+  },
+  {
+    "mesNumero": 11,
+    "diaNumero": 30,
+    "leituraTexto": "Êxodo 19, 20",
+    "salmoNumero": 30
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 1,
+    "leituraTexto": "Êxodo 21, 22",
+    "salmoNumero": 31
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 2,
+    "leituraTexto": "Êxodo 23, 24",
+    "salmoNumero": 32
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 3,
+    "leituraTexto": "Êxodo 25, 26",
+    "salmoNumero": 33
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 4,
+    "leituraTexto": "Êxodo 27, 28",
+    "salmoNumero": 34
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 5,
+    "leituraTexto": "Êxodo 29, 30",
+    "salmoNumero": 35
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 6,
+    "leituraTexto": "Êxodo 31, 32",
+    "salmoNumero": 36
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 7,
+    "leituraTexto": "Êxodo 33, 34",
+    "salmoNumero": 37
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 8,
+    "leituraTexto": "Êxodo 35, 36",
+    "salmoNumero": 38
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 9,
+    "leituraTexto": "Êxodo 37, 38",
+    "salmoNumero": 39
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 10,
+    "leituraTexto": "Êxodo 39, 40",
+    "salmoNumero": 40
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 11,
+    "leituraTexto": "Números 1, 2",
+    "salmoNumero": 41
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 12,
+    "leituraTexto": "Números 3, 4",
+    "salmoNumero": 42
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 13,
+    "leituraTexto": "Números 5, 6",
+    "salmoNumero": 43
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 14,
+    "leituraTexto": "Números 7, 8",
+    "salmoNumero": 44
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 15,
+    "leituraTexto": "Números 9, 10",
+    "salmoNumero": 45
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 16,
+    "leituraTexto": "Números 11, 12",
+    "salmoNumero": 46
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 17,
+    "leituraTexto": "Números 13, 14",
+    "salmoNumero": 47
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 18,
+    "leituraTexto": "Números 15, 16",
+    "salmoNumero": 48
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 19,
+    "leituraTexto": "Números 17, 18",
+    "salmoNumero": 49
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 20,
+    "leituraTexto": "Números 19, 20",
+    "salmoNumero": 50
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 21,
+    "leituraTexto": "Números 21, 22",
+    "salmoNumero": 51
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 22,
+    "leituraTexto": "Números 23, 24",
+    "salmoNumero": 52
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 23,
+    "leituraTexto": "Números 25, 26",
+    "salmoNumero": 53
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 24,
+    "leituraTexto": "Números 27, 28",
+    "salmoNumero": 54
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 25,
+    "leituraTexto": "Números 29, 30",
+    "salmoNumero": 55
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 26,
+    "leituraTexto": "Números 31, 32",
+    "salmoNumero": 56
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 27,
+    "leituraTexto": "Números 33",
+    "salmoNumero": 57
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 28,
+    "leituraTexto": "Números 34",
+    "salmoNumero": 58
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 29,
+    "leituraTexto": "Números 35",
+    "salmoNumero": 59
+  },
+  {
+    "mesNumero": 12,
+    "diaNumero": 30,
+    "leituraTexto": "Números 36",
+    "salmoNumero": 60
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 1,
+    "leituraTexto": "Josué 1, 2",
+    "salmoNumero": 61
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 2,
+    "leituraTexto": "Josué 3, 4",
+    "salmoNumero": 62
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 3,
+    "leituraTexto": "Josué 5, 6",
+    "salmoNumero": 63
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 4,
+    "leituraTexto": "Josué 7, 8",
+    "salmoNumero": 64
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 5,
+    "leituraTexto": "Josué 9, 10",
+    "salmoNumero": 65
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 6,
+    "leituraTexto": "Josué 11, 12",
+    "salmoNumero": 66
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 7,
+    "leituraTexto": "Josué 13, 14",
+    "salmoNumero": 67
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 8,
+    "leituraTexto": "Josué 15, 16",
+    "salmoNumero": 68
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 9,
+    "leituraTexto": "Josué 17, 18",
+    "salmoNumero": 69
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 10,
+    "leituraTexto": "Josué 19, 20",
+    "salmoNumero": 70
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 11,
+    "leituraTexto": "Josué 21, 22",
+    "salmoNumero": 71
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 12,
+    "leituraTexto": "Josué 23, 24",
+    "salmoNumero": 72
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 13,
+    "leituraTexto": "Juízes 1, 2",
+    "salmoNumero": 73
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 14,
+    "leituraTexto": "Juízes 3, 4",
+    "salmoNumero": 74
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 15,
+    "leituraTexto": "Juízes 5, 6",
+    "salmoNumero": 75
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 16,
+    "leituraTexto": "Juízes 7, 8",
+    "salmoNumero": 76
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 17,
+    "leituraTexto": "Juízes 9, 10",
+    "salmoNumero": 77
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 18,
+    "leituraTexto": "Juízes 11, 12",
+    "salmoNumero": 78
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 19,
+    "leituraTexto": "Juízes 13, 14",
+    "salmoNumero": 79
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 20,
+    "leituraTexto": "Juízes 15",
+    "salmoNumero": 80
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 21,
+    "leituraTexto": "Juízes 16",
+    "salmoNumero": 81
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 22,
+    "leituraTexto": "Juízes 17",
+    "salmoNumero": 82
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 23,
+    "leituraTexto": "Juízes 18",
+    "salmoNumero": 83
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 24,
+    "leituraTexto": "Juízes 19",
+    "salmoNumero": 84
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 25,
+    "leituraTexto": "Juízes 20",
+    "salmoNumero": 85
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 26,
+    "leituraTexto": "Juízes 21",
+    "salmoNumero": 86
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 27,
+    "leituraTexto": "Rute 1",
+    "salmoNumero": 87
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 28,
+    "leituraTexto": "Rute 2",
+    "salmoNumero": 88
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 29,
+    "leituraTexto": "Rute 3",
+    "salmoNumero": 89
+  },
+  {
+    "mesNumero": 13,
+    "diaNumero": 30,
+    "leituraTexto": "Rute 4",
+    "salmoNumero": 90
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 1,
+    "leituraTexto": "1 Samuel 1, 2",
+    "salmoNumero": 91
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 2,
+    "leituraTexto": "1 Samuel 3, 4",
+    "salmoNumero": 92
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 3,
+    "leituraTexto": "1 Samuel 5, 6",
+    "salmoNumero": 93
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 4,
+    "leituraTexto": "1 Samuel 7, 8",
+    "salmoNumero": 94
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 5,
+    "leituraTexto": "1 Samuel 9, 10",
+    "salmoNumero": 95
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 6,
+    "leituraTexto": "1 Samuel 11, 12",
+    "salmoNumero": 96
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 7,
+    "leituraTexto": "1 Samuel 13, 14",
+    "salmoNumero": 97
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 8,
+    "leituraTexto": "1 Samuel 15, 16",
+    "salmoNumero": 98
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 9,
+    "leituraTexto": "1 Samuel 17, 18",
+    "salmoNumero": 99
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 10,
+    "leituraTexto": "1 Samuel 19, 20",
+    "salmoNumero": 100
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 11,
+    "leituraTexto": "1 Samuel 21, 22",
+    "salmoNumero": 101
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 12,
+    "leituraTexto": "1 Samuel 23, 24",
+    "salmoNumero": 102
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 13,
+    "leituraTexto": "1 Samuel 25, 26",
+    "salmoNumero": 103
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 14,
+    "leituraTexto": "1 Samuel 27, 28",
+    "salmoNumero": 104
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 15,
+    "leituraTexto": "1 Samuel 29, 30",
+    "salmoNumero": 105
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 16,
+    "leituraTexto": "1 Sm 31, 2 Sm 1",
+    "salmoNumero": 106
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 17,
+    "leituraTexto": "2 Samuel 2, 3",
+    "salmoNumero": 107
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 18,
+    "leituraTexto": "2 Samuel 4, 5",
+    "salmoNumero": 108
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 19,
+    "leituraTexto": "2 Samuel 6, 7",
+    "salmoNumero": 109
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 20,
+    "leituraTexto": "2 Samuel 8, 9",
+    "salmoNumero": 110
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 21,
+    "leituraTexto": "2 Samuel 10, 11",
+    "salmoNumero": 111
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 22,
+    "leituraTexto": "2 Samuel 12, 13",
+    "salmoNumero": 112
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 23,
+    "leituraTexto": "2 Samuel 14, 15",
+    "salmoNumero": 113
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 24,
+    "leituraTexto": "2 Samuel 16, 17",
+    "salmoNumero": 114
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 25,
+    "leituraTexto": "2 Samuel 18, 19",
+    "salmoNumero": 115
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 26,
+    "leituraTexto": "2 Samuel 20",
+    "salmoNumero": 116
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 27,
+    "leituraTexto": "2 Samuel 21",
+    "salmoNumero": 117
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 28,
+    "leituraTexto": "2 Samuel 22",
+    "salmoNumero": 118
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 29,
+    "leituraTexto": "2 Samuel 23",
+    "salmoNumero": 119
+  },
+  {
+    "mesNumero": 14,
+    "diaNumero": 30,
+    "leituraTexto": "2 Samuel 24",
+    "salmoNumero": 120
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 1,
+    "leituraTexto": "1 Reis 1, 2",
+    "salmoNumero": 121
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 2,
+    "leituraTexto": "1 Reis 3, 4",
+    "salmoNumero": 122
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 3,
+    "leituraTexto": "1 Reis 5, 6",
+    "salmoNumero": 123
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 4,
+    "leituraTexto": "1 Reis 7, 8",
+    "salmoNumero": 124
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 5,
+    "leituraTexto": "1 Reis 9, 10",
+    "salmoNumero": 125
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 6,
+    "leituraTexto": "1 Reis 11, 12",
+    "salmoNumero": 126
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 7,
+    "leituraTexto": "1 Reis 13, 14",
+    "salmoNumero": 127
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 8,
+    "leituraTexto": "1 Reis 15, 16",
+    "salmoNumero": 128
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 9,
+    "leituraTexto": "1 Reis 17, 18",
+    "salmoNumero": 129
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 10,
+    "leituraTexto": "1 Reis 19, 20",
+    "salmoNumero": 130
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 11,
+    "leituraTexto": "1 Reis 21, 22",
+    "salmoNumero": 131
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 12,
+    "leituraTexto": "2 Reis 1, 2",
+    "salmoNumero": 132
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 13,
+    "leituraTexto": "2 Reis 3, 4",
+    "salmoNumero": 133
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 14,
+    "leituraTexto": "2 Reis 5, 6",
+    "salmoNumero": 134
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 15,
+    "leituraTexto": "2 Reis 7, 8",
+    "salmoNumero": 135
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 16,
+    "leituraTexto": "2 Reis 9, 10",
+    "salmoNumero": 136
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 17,
+    "leituraTexto": "2 Reis 11, 12",
+    "salmoNumero": 137
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 18,
+    "leituraTexto": "2 Reis 13",
+    "salmoNumero": 138
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 19,
+    "leituraTexto": "2 Reis 14",
+    "salmoNumero": 139
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 20,
+    "leituraTexto": "2 Reis 15",
+    "salmoNumero": 140
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 21,
+    "leituraTexto": "2 Reis 16",
+    "salmoNumero": 141
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 22,
+    "leituraTexto": "2 Reis 17",
+    "salmoNumero": 142
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 23,
+    "leituraTexto": "2 Reis 18",
+    "salmoNumero": 143
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 24,
+    "leituraTexto": "2 Reis 19",
+    "salmoNumero": 144
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 25,
+    "leituraTexto": "2 Reis 20",
+    "salmoNumero": 145
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 26,
+    "leituraTexto": "2 Reis 21",
+    "salmoNumero": 146
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 27,
+    "leituraTexto": "2 Reis 22",
+    "salmoNumero": 147
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 28,
+    "leituraTexto": "2 Reis 23",
+    "salmoNumero": 148
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 29,
+    "leituraTexto": "2 Reis 24",
+    "salmoNumero": 149
+  },
+  {
+    "mesNumero": 15,
+    "diaNumero": 30,
+    "leituraTexto": "2 Reis 25",
+    "salmoNumero": 150
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 1,
+    "leituraTexto": "Amós 1-3",
+    "salmoNumero": 1
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 2,
+    "leituraTexto": "Amós 4-6",
+    "salmoNumero": 2
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 3,
+    "leituraTexto": "Amós 7, 8",
+    "salmoNumero": 3
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 4,
+    "leituraTexto": "Amós 9, Oseias 1",
+    "salmoNumero": 4
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 5,
+    "leituraTexto": "Oseias 2, 3",
+    "salmoNumero": 5
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 6,
+    "leituraTexto": "Oseias 4, 5",
+    "salmoNumero": 6
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 7,
+    "leituraTexto": "Oseias 6, 7",
+    "salmoNumero": 7
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 8,
+    "leituraTexto": "Oseias 8, 9",
+    "salmoNumero": 8
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 9,
+    "leituraTexto": "Oseias 10, 11",
+    "salmoNumero": 9
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 10,
+    "leituraTexto": "Oseias 12, 13",
+    "salmoNumero": 10
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 11,
+    "leituraTexto": "Oseias 14, Isaías 1",
+    "salmoNumero": 11
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 12,
+    "leituraTexto": "Isaías 2, 3",
+    "salmoNumero": 12
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 13,
+    "leituraTexto": "Isaías 4, 5",
+    "salmoNumero": 13
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 14,
+    "leituraTexto": "Isaías 6, 7",
+    "salmoNumero": 14
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 15,
+    "leituraTexto": "Isaías 8, 9",
+    "salmoNumero": 15
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 16,
+    "leituraTexto": "Isaías 10, 11",
+    "salmoNumero": 16
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 17,
+    "leituraTexto": "Isaías 12, 13",
+    "salmoNumero": 17
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 18,
+    "leituraTexto": "Isaías 14, 15",
+    "salmoNumero": 18
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 19,
+    "leituraTexto": "Isaías 16, 17",
+    "salmoNumero": 19
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 20,
+    "leituraTexto": "Isaías 18, 19",
+    "salmoNumero": 20
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 21,
+    "leituraTexto": "Isaías 20, 21",
+    "salmoNumero": 21
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 22,
+    "leituraTexto": "Isaías 22, 23",
+    "salmoNumero": 22
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 23,
+    "leituraTexto": "Isaías 24, 25",
+    "salmoNumero": 23
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 24,
+    "leituraTexto": "Isaías 26, 27",
+    "salmoNumero": 24
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 25,
+    "leituraTexto": "Isaías 28, 29",
+    "salmoNumero": 25
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 26,
+    "leituraTexto": "Isaías 30, 31",
+    "salmoNumero": 26
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 27,
+    "leituraTexto": "Isaías 32, 33",
+    "salmoNumero": 27
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 28,
+    "leituraTexto": "Isaías 34, 35",
+    "salmoNumero": 28
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 29,
+    "leituraTexto": "Isaías 36, 37",
+    "salmoNumero": 29
+  },
+  {
+    "mesNumero": 16,
+    "diaNumero": 30,
+    "leituraTexto": "Isaías 38, 39",
+    "salmoNumero": 30
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 1,
+    "leituraTexto": "Miqueias 1-3",
+    "salmoNumero": 31
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 2,
+    "leituraTexto": "Miqueias 4-6",
+    "salmoNumero": 32
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 3,
+    "leituraTexto": "Miqueias 7, Naum 1-2",
+    "salmoNumero": 33
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 4,
+    "leituraTexto": "Naum 3, Hab 1-2",
+    "salmoNumero": 34
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 5,
+    "leituraTexto": "Hab 3, Jer 1-2",
+    "salmoNumero": 35
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 6,
+    "leituraTexto": "Jeremias 3-5",
+    "salmoNumero": 36
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 7,
+    "leituraTexto": "Jeremias 6-8",
+    "salmoNumero": 37
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 8,
+    "leituraTexto": "Jeremias 9-11",
+    "salmoNumero": 38
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 9,
+    "leituraTexto": "Jeremias 12-14",
+    "salmoNumero": 39
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 10,
+    "leituraTexto": "Jeremias 15-17",
+    "salmoNumero": 40
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 11,
+    "leituraTexto": "Jeremias 18, 19",
+    "salmoNumero": 41
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 12,
+    "leituraTexto": "Jeremias 20, 21",
+    "salmoNumero": 42
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 13,
+    "leituraTexto": "Jeremias 22, 23",
+    "salmoNumero": 43
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 14,
+    "leituraTexto": "Jeremias 24, 25",
+    "salmoNumero": 44
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 15,
+    "leituraTexto": "Jeremias 26, 27",
+    "salmoNumero": 45
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 16,
+    "leituraTexto": "Jeremias 28, 29",
+    "salmoNumero": 46
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 17,
+    "leituraTexto": "Jeremias 30, 31",
+    "salmoNumero": 47
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 18,
+    "leituraTexto": "Jeremias 32, 33",
+    "salmoNumero": 48
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 19,
+    "leituraTexto": "Jeremias 34, 35",
+    "salmoNumero": 49
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 20,
+    "leituraTexto": "Jeremias 36, 37",
+    "salmoNumero": 50
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 21,
+    "leituraTexto": "Jeremias 38, 39",
+    "salmoNumero": 51
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 22,
+    "leituraTexto": "Jeremias 40, 41",
+    "salmoNumero": 52
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 23,
+    "leituraTexto": "Jeremias 42, 43",
+    "salmoNumero": 53
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 24,
+    "leituraTexto": "Jeremias 44, 45",
+    "salmoNumero": 54
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 25,
+    "leituraTexto": "Jeremias 46, 47",
+    "salmoNumero": 55
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 26,
+    "leituraTexto": "Jeremias 48, 49",
+    "salmoNumero": 56
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 27,
+    "leituraTexto": "Jeremias 50, 51",
+    "salmoNumero": 57
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 28,
+    "leituraTexto": "Jeremias 52, Lam 1",
+    "salmoNumero": 58
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 29,
+    "leituraTexto": "Lamentações 2, 3",
+    "salmoNumero": 59
+  },
+  {
+    "mesNumero": 17,
+    "diaNumero": 30,
+    "leituraTexto": "Lamentações 4, 5",
+    "salmoNumero": 60
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 1,
+    "leituraTexto": "Ezequiel 1-3",
+    "salmoNumero": 61
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 2,
+    "leituraTexto": "Ezequiel 4, 5",
+    "salmoNumero": 62
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 3,
+    "leituraTexto": "Ezequiel 6, 7",
+    "salmoNumero": 63
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 4,
+    "leituraTexto": "Ezequiel 8, 9",
+    "salmoNumero": 64
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 5,
+    "leituraTexto": "Ezequiel 10, 11",
+    "salmoNumero": 65
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 6,
+    "leituraTexto": "Ezequiel 12, 13",
+    "salmoNumero": 66
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 7,
+    "leituraTexto": "Ezequiel 14, 15",
+    "salmoNumero": 67
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 8,
+    "leituraTexto": "Ezequiel 16, 17",
+    "salmoNumero": 68
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 9,
+    "leituraTexto": "Ezequiel 18, 19",
+    "salmoNumero": 69
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 10,
+    "leituraTexto": "Ezequiel 20, 21",
+    "salmoNumero": 70
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 11,
+    "leituraTexto": "Ezequiel 22, 23",
+    "salmoNumero": 71
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 12,
+    "leituraTexto": "Ezequiel 24, 25",
+    "salmoNumero": 72
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 13,
+    "leituraTexto": "Ezequiel 26, 27",
+    "salmoNumero": 73
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 14,
+    "leituraTexto": "Ezequiel 28, 29",
+    "salmoNumero": 74
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 15,
+    "leituraTexto": "Ezequiel 30, 31",
+    "salmoNumero": 75
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 16,
+    "leituraTexto": "Ezequiel 32, 33",
+    "salmoNumero": 76
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 17,
+    "leituraTexto": "Ezequiel 34, 35",
+    "salmoNumero": 77
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 18,
+    "leituraTexto": "Ezequiel 36, 37",
+    "salmoNumero": 78
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 19,
+    "leituraTexto": "Ezequiel 38, 39",
+    "salmoNumero": 79
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 20,
+    "leituraTexto": "Ezequiel 40, 41",
+    "salmoNumero": 80
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 21,
+    "leituraTexto": "Ezequiel 42, 43",
+    "salmoNumero": 81
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 22,
+    "leituraTexto": "Ezequiel 44, 45",
+    "salmoNumero": 82
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 23,
+    "leituraTexto": "Ezequiel 46, 47",
+    "salmoNumero": 83
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 24,
+    "leituraTexto": "Ezequiel 48, Abdias 1",
+    "salmoNumero": 84
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 25,
+    "leituraTexto": "Isaías 44, 45",
+    "salmoNumero": 85
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 26,
+    "leituraTexto": "Isaías 46, 47",
+    "salmoNumero": 86
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 27,
+    "leituraTexto": "Isaías 48, 49",
+    "salmoNumero": 87
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 28,
+    "leituraTexto": "Isaías 50, 51",
+    "salmoNumero": 88
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 29,
+    "leituraTexto": "Isaías 52, 53",
+    "salmoNumero": 89
+  },
+  {
+    "mesNumero": 18,
+    "diaNumero": 30,
+    "leituraTexto": "Isaías 54, 55",
+    "salmoNumero": 90
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 1,
+    "leituraTexto": "1 Crônicas 1-3",
+    "salmoNumero": 91
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 2,
+    "leituraTexto": "1 Crônicas 4-6",
+    "salmoNumero": 92
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 3,
+    "leituraTexto": "1 Crônicas 7-9",
+    "salmoNumero": 93
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 4,
+    "leituraTexto": "1 Crônicas 10-12",
+    "salmoNumero": 94
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 5,
+    "leituraTexto": "1 Crônicas 13-15",
+    "salmoNumero": 95
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 6,
+    "leituraTexto": "1 Crônicas 16-18",
+    "salmoNumero": 96
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 7,
+    "leituraTexto": "1 Crônicas 19-21",
+    "salmoNumero": 97
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 8,
+    "leituraTexto": "1 Crônicas 22-24",
+    "salmoNumero": 98
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 9,
+    "leituraTexto": "1 Crônicas 25-27",
+    "salmoNumero": 99
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 10,
+    "leituraTexto": "1 Crôn 28-29, 2 Crôn 1",
+    "salmoNumero": 100
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 11,
+    "leituraTexto": "2 Crônicas 2-4",
+    "salmoNumero": 101
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 12,
+    "leituraTexto": "2 Crônicas 5-7",
+    "salmoNumero": 102
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 13,
+    "leituraTexto": "2 Crônicas 8-10",
+    "salmoNumero": 103
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 14,
+    "leituraTexto": "2 Crônicas 11-13",
+    "salmoNumero": 104
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 15,
+    "leituraTexto": "2 Crônicas 14-16",
+    "salmoNumero": 105
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 16,
+    "leituraTexto": "2 Crônicas 17-19",
+    "salmoNumero": 106
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 17,
+    "leituraTexto": "2 Crônicas 20-22",
+    "salmoNumero": 107
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 18,
+    "leituraTexto": "2 Crônicas 23-25",
+    "salmoNumero": 108
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 19,
+    "leituraTexto": "2 Crônicas 26-28",
+    "salmoNumero": 109
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 20,
+    "leituraTexto": "2 Crônicas 29-31",
+    "salmoNumero": 110
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 21,
+    "leituraTexto": "2 Crônicas 32-34",
+    "salmoNumero": 111
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 22,
+    "leituraTexto": "2 Crôn 35-36, Esdras 1",
+    "salmoNumero": 112
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 23,
+    "leituraTexto": "Esdras 2-4",
+    "salmoNumero": 113
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 24,
+    "leituraTexto": "Esdras 5-7",
+    "salmoNumero": 114
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 25,
+    "leituraTexto": "Esdras 8-10",
+    "salmoNumero": 115
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 26,
+    "leituraTexto": "Neemias 1-3",
+    "salmoNumero": 116
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 27,
+    "leituraTexto": "Neemias 4-6",
+    "salmoNumero": 117
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 28,
+    "leituraTexto": "Neemias 7-9",
+    "salmoNumero": 118
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 29,
+    "leituraTexto": "Neemias 10, 11",
+    "salmoNumero": 119
+  },
+  {
+    "mesNumero": 19,
+    "diaNumero": 30,
+    "leituraTexto": "Neemias 12, 13",
+    "salmoNumero": 120
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 1,
+    "leituraTexto": "Ageu 1-2, Zac 1-7",
+    "salmoNumero": 121
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 2,
+    "leituraTexto": "Zac 8-14, Mal 1-2",
+    "salmoNumero": 122
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 3,
+    "leituraTexto": "Mal 3-4, Joel 1-3, Jon 1-4",
+    "salmoNumero": 123
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 4,
+    "leituraTexto": "Tobias 1-9",
+    "salmoNumero": 124
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 5,
+    "leituraTexto": "Tobias 10-14, Jud 1-4",
+    "salmoNumero": 125
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 6,
+    "leituraTexto": "Judite 5-13",
+    "salmoNumero": 126
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 7,
+    "leituraTexto": "Jud 14-16, Est 1-6",
+    "salmoNumero": 127
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 8,
+    "leituraTexto": "Ester 7-10, Jó 1-5",
+    "salmoNumero": 128
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 9,
+    "leituraTexto": "Jó 6-14 (exceto 10)",
+    "salmoNumero": 129
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 10,
+    "leituraTexto": "Jó 15-23 (exceto 18)",
+    "salmoNumero": 130
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 11,
+    "leituraTexto": "Jó 24-32",
+    "salmoNumero": 131
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 12,
+    "leituraTexto": "Jó 33-41",
+    "salmoNumero": 132
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 13,
+    "leituraTexto": "Jó 42, Eclesiastes 1-7",
+    "salmoNumero": 133
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 14,
+    "leituraTexto": "Ecl 8-12, 1 Mac 1-3",
+    "salmoNumero": 134
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 15,
+    "leituraTexto": "1 Macabeus 4-11",
+    "salmoNumero": 135
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 16,
+    "leituraTexto": "1 Mac 12-16, 2 Mac 1-3",
+    "salmoNumero": 136
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 17,
+    "leituraTexto": "2 Macabeus 4-11",
+    "salmoNumero": 137
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 18,
+    "leituraTexto": "2 Mac 12-15, Baruc 1-4",
+    "salmoNumero": 138
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 19,
+    "leituraTexto": "Baruc 5-6, Daniel 1-6",
+    "salmoNumero": 139
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 20,
+    "leituraTexto": "Daniel 7-14",
+    "salmoNumero": 140
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 21,
+    "leituraTexto": "Sabedoria 1-8",
+    "salmoNumero": 141
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 22,
+    "leituraTexto": "Sabedoria 9-16",
+    "salmoNumero": 142
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 23,
+    "leituraTexto": "Sab 17-19, Levítico 1-5",
+    "salmoNumero": 143
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 24,
+    "leituraTexto": "Levítico 6-13",
+    "salmoNumero": 144
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 25,
+    "leituraTexto": "Levítico 14-21",
+    "salmoNumero": 145
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 26,
+    "leituraTexto": "Lev 22-27, Deut 1-2",
+    "salmoNumero": 146
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 27,
+    "leituraTexto": "Deuteronômio 3-10",
+    "salmoNumero": 147
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 28,
+    "leituraTexto": "Deuteronômio 11-18",
+    "salmoNumero": 148
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 29,
+    "leituraTexto": "Deuteronômio 19-26",
+    "salmoNumero": 149
+  },
+  {
+    "mesNumero": 20,
+    "diaNumero": 30,
+    "leituraTexto": "Deuteronômio 27-34",
+    "salmoNumero": 150
+  }
+]

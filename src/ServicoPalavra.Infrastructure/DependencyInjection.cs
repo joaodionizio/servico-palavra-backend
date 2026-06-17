@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ServicoPalavra.Application.Abstractions;
 using ServicoPalavra.Infrastructure.Persistence;
+using ServicoPalavra.Infrastructure.Persistence.Import;
 using ServicoPalavra.Infrastructure.Persistence.Seed;
 
 namespace ServicoPalavra.Infrastructure;
@@ -45,6 +46,7 @@ public static class DependencyInjection
         services.AddScoped<ITrilhaRepository, TrilhaRepository>();
         services.AddScoped<IPlanoBiblicoRepository, PlanoBiblicoRepository>();
         services.AddScoped<DatabaseSeeder>();
+        services.AddScoped<BaseBiblicaV2Importer>();
 
         return services;
     }
