@@ -125,9 +125,10 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
         using (var document = JsonDocument.Parse(await days.Content.ReadAsStringAsync()))
         {
             var items = document.RootElement.GetProperty("data").EnumerateArray().ToArray();
-            Assert.Equal(9, items.Length);
+            Assert.Equal(30, items.Length);
             Assert.Contains("1 Joao 1", items[0].GetProperty("leiturasTexto").GetString());
-            Assert.Contains("Tobias 1", items[^1].GetProperty("leiturasTexto").GetString());
+            Assert.Contains("Meditação livre", items[^1].GetProperty("leiturasTexto").GetString());
+            Assert.Contains("Tobias 1", items.First(x => x.GetProperty("leiturasTexto").GetString()?.Contains("Tobias 1") == true).GetProperty("leiturasTexto").GetString());
         }
 
         var firstDayId = await ReadFirstDayIdAsync(firstPlanId);
@@ -161,6 +162,25 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
     }
 
     [Fact]
+    public async Task User_cannot_conclude_other_users_day()
+    {
+        await EnsureCsrfAsync();
+        await SeedBibleBaseAsync();
+        await RegisterAsync("Usuario Dia A", "dia-a@tests.local");
+        await RegisterAsync("Usuario Dia B", "dia-b@tests.local");
+
+        var createB = await _client.PostAsJsonAsync("/api/planos-biblicos", new CriarPlanoBiblicoRequest("Plano B", 0, 1, DateOnly.FromDateTime(DateTime.UtcNow)));
+        await EnsureSuccessAsync(createB);
+        var planBId = await ReadGuidAsync(createB, "id");
+        var dayBId = await ReadFirstDayIdAsync(planBId);
+
+        await LoginAsync("dia-a@tests.local", "User12");
+        var crossConclude = await _client.PostAsync($"/api/planos-biblicos/dias/{dayBId}/concluir", null);
+
+        Assert.Equal(HttpStatusCode.NotFound, crossConclude.StatusCode);
+    }
+
+    [Fact]
     public async Task Biblical_plan_failed_continuation_keeps_active_plan()
     {
         await SeedBibleBaseAsync();
@@ -187,6 +207,20 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
         var active = await _client.GetAsync("/api/planos-biblicos/me/ativo");
         await EnsureSuccessAsync(active);
         Assert.Equal(planId, await ReadGuidAsync(active, "id"));
+    }
+
+    [Fact]
+    public async Task Biblical_plan_does_not_allow_two_active_plans_for_same_user()
+    {
+        await SeedBibleBaseAsync();
+        await RegisterAsync("Usuario Plano Unico", "plano-unico@tests.local");
+
+        var first = await _client.PostAsJsonAsync("/api/planos-biblicos", new CriarPlanoBiblicoRequest("Plano 1", 0, 1, DateOnly.FromDateTime(DateTime.UtcNow)));
+        await EnsureSuccessAsync(first);
+
+        var second = await _client.PostAsJsonAsync("/api/planos-biblicos", new CriarPlanoBiblicoRequest("Plano 2", 0, 1, DateOnly.FromDateTime(DateTime.UtcNow)));
+
+        Assert.Equal(HttpStatusCode.BadRequest, second.StatusCode);
     }
 
     [Fact]
@@ -253,17 +287,32 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
 
         var now = DateTime.UtcNow;
         db.BaseBiblica.AddRange(
-            new BaseBiblica { Id = Guid.NewGuid(), Ordem = 1, Livro = "1 Joao", Capitulo = 1, Grupo = "Cartas Joaninas", Testamento = "Novo", CriadoEm = now },
-            new BaseBiblica { Id = Guid.NewGuid(), Ordem = 2, Livro = "1 Joao", Capitulo = 2, Grupo = "Cartas Joaninas", Testamento = "Novo", CriadoEm = now },
-            new BaseBiblica { Id = Guid.NewGuid(), Ordem = 3, Livro = "Joao", Capitulo = 1, Grupo = "Evangelhos", Testamento = "Novo", CriadoEm = now },
-            new BaseBiblica { Id = Guid.NewGuid(), Ordem = 4, Livro = "Romanos", Capitulo = 1, Grupo = "Cartas Apostolicas", Testamento = "Novo", CriadoEm = now },
-            new BaseBiblica { Id = Guid.NewGuid(), Ordem = 5, Livro = "Genesis", Capitulo = 1, Grupo = "Pentateuco", Testamento = "Antigo", CriadoEm = now },
-            new BaseBiblica { Id = Guid.NewGuid(), Ordem = 6, Livro = "Josue", Capitulo = 1, Grupo = "Historicos", Testamento = "Antigo", CriadoEm = now },
-            new BaseBiblica { Id = Guid.NewGuid(), Ordem = 7, Livro = "Isaias", Capitulo = 1, Grupo = "Profetas", Testamento = "Antigo", CriadoEm = now },
-            new BaseBiblica { Id = Guid.NewGuid(), Ordem = 8, Livro = "Salmos", Capitulo = 1, Grupo = "Sapienciais", Testamento = "Antigo", CriadoEm = now },
-            new BaseBiblica { Id = Guid.NewGuid(), Ordem = 9, Livro = "Tobias", Capitulo = 1, Grupo = "Deuterocanonicos", Testamento = "Antigo", CriadoEm = now });
+            TestChapter(1, "1 Joao", 1, "Cartas Joaninas", "Novo", 10, now),
+            TestChapter(2, "1 Joao", 2, "Cartas Joaninas", "Novo", 29, now),
+            TestChapter(3, "Joao", 1, "Evangelhos", "Novo", 51, now),
+            TestChapter(4, "Romanos", 1, "Cartas Apostolicas", "Novo", 32, now),
+            TestChapter(5, "Genesis", 1, "Pentateuco", "Antigo", 31, now),
+            TestChapter(6, "Josue", 1, "Historicos", "Antigo", 18, now),
+            TestChapter(7, "Isaias", 1, "Profetas", "Antigo", 31, now),
+            TestChapter(8, "Salmos", 1, "Sapienciais", "Antigo", 6, now),
+            TestChapter(9, "Tobias", 1, "Deuterocanonicos", "Antigo", 25, now));
         await db.SaveChangesAsync();
     }
+
+    private static BaseBiblica TestChapter(int ordem, string livro, int capitulo, string grupo, string testamento, int peso, DateTime now) =>
+        new()
+        {
+            Id = Guid.NewGuid(),
+            Ordem = ordem,
+            Livro = livro,
+            Capitulo = capitulo,
+            Grupo = grupo,
+            Testamento = testamento,
+            TempoEstimadoMinutos = Math.Max(2, (int)Math.Ceiling(peso / 4m)),
+            QuantidadeVersiculos = peso,
+            PesoLeitura = peso,
+            CriadoEm = now
+        };
 
     private async Task<Guid> ReadFirstDayIdAsync(Guid planId)
     {

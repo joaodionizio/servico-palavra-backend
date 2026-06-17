@@ -51,11 +51,14 @@ public sealed class BiblePlanGeneratorService : IBiblePlanGeneratorService
             CriadoEm = DateTime.UtcNow
         };
 
-        var dayCount = Math.Min(duracaoDias, baseBiblica.Count);
+        var dayCount = duracaoDias;
         var groups = Distribute(baseBiblica, dayCount);
         for (var i = 0; i < groups.Count; i++)
         {
             var chapters = groups[i];
+            var leiturasTexto = chapters.Count == 0
+                ? "Meditação livre"
+                : string.Join(", ", chapters.Select(x => $"{x.Livro} {x.Capitulo}"));
             var dia = new PlanoBiblicoDia
             {
                 Id = Guid.NewGuid(),
@@ -64,7 +67,7 @@ public sealed class BiblePlanGeneratorService : IBiblePlanGeneratorService
                 DiaNumero = i + 1,
                 MesNumero = (i / DaysPerMonth) + 1,
                 DataPrevista = dataInicio.AddDays(i),
-                LeiturasTexto = string.Join(", ", chapters.Select(x => $"{x.Livro} {x.Capitulo}")),
+                LeiturasTexto = leiturasTexto,
                 CriadoEm = DateTime.UtcNow
             };
 
@@ -112,13 +115,84 @@ public sealed class BiblePlanGeneratorService : IBiblePlanGeneratorService
 
     private static List<List<BaseBiblica>> Distribute(IReadOnlyList<BaseBiblica> chapters, int dayCount)
     {
-        var result = Enumerable.Range(0, dayCount).Select(_ => new List<BaseBiblica>()).ToList();
-        for (var i = 0; i < chapters.Count; i++)
+        if (dayCount <= 0)
         {
-            var dayIndex = (int)Math.Floor(i * dayCount / (double)chapters.Count);
-            result[dayIndex].Add(chapters[i]);
+            return [];
         }
 
-        return result.Where(x => x.Count > 0).ToList();
+        var result = Enumerable.Range(0, dayCount).Select(_ => new List<BaseBiblica>()).ToList();
+        var totalWeight = chapters.Sum(ReadingWeight);
+        if (totalWeight <= 0)
+        {
+            throw new AppException("Base biblica pastoral sem peso de leitura valido.", 422);
+        }
+
+        var targetWeightPerDay = totalWeight / (double)dayCount;
+        var chapterIndex = 0;
+        var assignedWeight = 0;
+
+        for (var dayIndex = 0; dayIndex < dayCount && chapterIndex < chapters.Count; dayIndex++)
+        {
+            var remainingDaysIncludingThis = dayCount - dayIndex;
+            if (chapters.Count - chapterIndex <= remainingDaysIncludingThis)
+            {
+                result[dayIndex].Add(chapters[chapterIndex]);
+                assignedWeight += ReadingWeight(chapters[chapterIndex]);
+                chapterIndex++;
+                continue;
+            }
+
+            var dayTargetCumulativeWeight = targetWeightPerDay * (dayIndex + 1);
+            var remainingDaysAfterThis = dayCount - dayIndex - 1;
+
+            while (chapterIndex < chapters.Count)
+            {
+                var chapter = chapters[chapterIndex];
+                var chapterWeight = ReadingWeight(chapter);
+
+                if (result[dayIndex].Count > 0
+                    && assignedWeight + chapterWeight > dayTargetCumulativeWeight
+                    && chapters.Count - chapterIndex > remainingDaysAfterThis)
+                {
+                    var currentGap = Math.Abs(dayTargetCumulativeWeight - assignedWeight);
+                    var withChapterGap = Math.Abs(dayTargetCumulativeWeight - (assignedWeight + chapterWeight));
+                    if (currentGap <= withChapterGap)
+                    {
+                        break;
+                    }
+                }
+
+                result[dayIndex].Add(chapter);
+                assignedWeight += chapterWeight;
+                chapterIndex++;
+
+                if (assignedWeight >= dayTargetCumulativeWeight && chapters.Count - chapterIndex >= remainingDaysAfterThis)
+                {
+                    break;
+                }
+            }
+        }
+
+        if (chapterIndex < chapters.Count)
+        {
+            result[^1].AddRange(chapters.Skip(chapterIndex));
+        }
+
+        return result;
+    }
+
+    private static int ReadingWeight(BaseBiblica chapter)
+    {
+        if (chapter.PesoLeitura > 0)
+        {
+            return chapter.PesoLeitura;
+        }
+
+        if (chapter.QuantidadeVersiculos > 0)
+        {
+            return chapter.QuantidadeVersiculos;
+        }
+
+        return chapter.TempoEstimadoMinutos.GetValueOrDefault();
     }
 }
