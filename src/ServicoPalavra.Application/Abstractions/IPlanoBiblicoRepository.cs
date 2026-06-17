@@ -10,6 +10,7 @@ public interface IPlanoBiblicoRepository
     Task<PlanoBiblicoDia?> GetDiaAsync(Guid diaId, Guid usuarioId, CancellationToken cancellationToken = default);
     Task<PosicaoBiblicaUsuario?> GetPosicaoAsync(Guid usuarioId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<BaseBiblica>> ListBaseAsync(int ordemInicio, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<BaseBiblica>> ListBaseAtivaAsync(CancellationToken cancellationToken = default);
     Task<IReadOnlyList<PlanoBiblicoUsuario>> ListHistoricoAsync(Guid usuarioId, CancellationToken cancellationToken = default);
     Task<ProgressoLeitura?> GetProgressoLeituraAsync(Guid usuarioId, Guid diaId, CancellationToken cancellationToken = default);
     void Add(PlanoBiblicoUsuario plano);

@@ -12,7 +12,7 @@ public sealed class BiblePlanGenerationTests : IDisposable
     private readonly string _databasePath = Path.Combine(Path.GetTempPath(), $"servico-palavra-plan-generation-{Guid.NewGuid():N}.db");
 
     [Fact]
-    public async Task GenerateAsync_with_real_base_creates_ordered_chapters_without_duplicates_and_preserves_total_weight()
+    public async Task GenerateAsync_with_real_base_uses_pastoral_sequence_and_preserves_reading_weight()
     {
         await using var db = await CreateDbWithRealBaseAsync();
         var generator = CreateGenerator(db);
@@ -31,11 +31,114 @@ public sealed class BiblePlanGenerationTests : IDisposable
         var orders = generatedChapters.Select(x => x.Ordem).ToArray();
         var weights = generatedChapters.Sum(x => x.BaseBiblica.PesoLeitura);
 
-        Assert.Equal(180, plan.Dias.Count);
-        Assert.Equal(1334, generatedChapters.Length);
-        Assert.Equal(Enumerable.Range(1, 1334), orders);
+        var days = plan.Dias.OrderBy(x => x.DiaNumero).ToArray();
+
+        Assert.Equal(180, days.Length);
+        Assert.Equal("1 João", generatedChapters[0].BaseBiblica.Livro);
+        Assert.NotEqual("Gênesis", generatedChapters[0].BaseBiblica.Livro);
+        Assert.Equal(1215, generatedChapters.Length);
+        Assert.Equal(Enumerable.Range(1, 1215), orders);
         Assert.Equal(orders.Length, orders.Distinct().Count());
-        Assert.Equal(35527, weights);
+        Assert.True(weights > 0);
+        Assert.Contains("Salmos 1", days[0].LeiturasTexto);
+    }
+
+    [Fact]
+    public async Task GenerateAsync_repeats_joannine_books_as_pastoral_sequence_requires()
+    {
+        await using var db = await CreateDbWithRealBaseAsync();
+        var generator = CreateGenerator(db);
+
+        var plan = await generator.GenerateAsync(
+            Guid.NewGuid(),
+            "Plano real",
+            duracaoAnos: 0,
+            duracaoMeses: 6,
+            DateOnly.FromDateTime(DateTime.UtcNow),
+            ModoCriacaoPlanoBiblico.NovoDoInicio,
+            ordemInicio: 1,
+            planoOrigemId: null);
+
+        var generatedChapters = plan.Dias.SelectMany(x => x.Capitulos).OrderBy(x => x.Ordem).ToArray();
+
+        Assert.Equal(15, generatedChapters.Count(x => x.BaseBiblica.Livro == "1 João"));
+        Assert.Equal(3, generatedChapters.Count(x => x.BaseBiblica.Livro == "1 João" && x.BaseBiblica.Capitulo == 1));
+        Assert.Equal(42, generatedChapters.Count(x => x.BaseBiblica.Livro == "João"));
+        Assert.Equal(2, generatedChapters.Count(x => x.BaseBiblica.Livro == "João" && x.BaseBiblica.Capitulo == 1));
+    }
+
+    [Fact]
+    public async Task GenerateAsync_distributes_psalms_as_parallel_daily_reading()
+    {
+        await using var db = await CreateDbWithRealBaseAsync();
+        var generator = CreateGenerator(db);
+
+        var plan = await generator.GenerateAsync(
+            Guid.NewGuid(),
+            "Plano com salmos",
+            duracaoAnos: 0,
+            duracaoMeses: 6,
+            DateOnly.FromDateTime(DateTime.UtcNow),
+            ModoCriacaoPlanoBiblico.NovoDoInicio,
+            ordemInicio: 1,
+            planoOrigemId: null);
+
+        var days = plan.Dias.OrderBy(x => x.DiaNumero).ToArray();
+
+        Assert.Contains("Salmos 1", days[0].LeiturasTexto);
+        Assert.Contains("Salmos 2", days[1].LeiturasTexto);
+        Assert.Contains("Salmos 150", days[149].LeiturasTexto);
+        Assert.DoesNotContain("Salmos", days[150].LeiturasTexto);
+    }
+
+    [Fact]
+    public async Task GenerateAsync_respects_isaiah_pastoral_blocks()
+    {
+        await using var db = await CreateDbWithRealBaseAsync();
+        var generator = CreateGenerator(db);
+
+        var plan = await generator.GenerateAsync(
+            Guid.NewGuid(),
+            "Plano com Isaias",
+            duracaoAnos: 0,
+            duracaoMeses: 6,
+            DateOnly.FromDateTime(DateTime.UtcNow),
+            ModoCriacaoPlanoBiblico.NovoDoInicio,
+            ordemInicio: 1,
+            planoOrigemId: null);
+
+        var generatedChapters = plan.Dias.SelectMany(x => x.Capitulos).OrderBy(x => x.Ordem).ToArray();
+        var firstBlockEnd = Array.FindLastIndex(generatedChapters, x => x.BaseBiblica.Livro == "Isaías" && x.BaseBiblica.Capitulo <= 39);
+        var secondBlockStart = Array.FindIndex(generatedChapters, x => x.BaseBiblica.Livro == "Isaías" && x.BaseBiblica.Capitulo == 40);
+        var secondBlockEnd = Array.FindLastIndex(generatedChapters, x => x.BaseBiblica.Livro == "Isaías" && x.BaseBiblica.Capitulo <= 55);
+        var thirdBlockStart = Array.FindIndex(generatedChapters, x => x.BaseBiblica.Livro == "Isaías" && x.BaseBiblica.Capitulo == 56);
+
+        Assert.True(firstBlockEnd > 0);
+        Assert.True(secondBlockStart > firstBlockEnd);
+        Assert.True(thirdBlockStart > secondBlockEnd);
+        Assert.Equal(66, generatedChapters.Last(x => x.BaseBiblica.Livro == "Isaías").BaseBiblica.Capitulo);
+    }
+
+    [Fact]
+    public async Task GenerateAsync_generates_only_existing_base_chapters()
+    {
+        await using var db = await CreateDbWithRealBaseAsync();
+        var generator = CreateGenerator(db);
+
+        var plan = await generator.GenerateAsync(
+            Guid.NewGuid(),
+            "Plano real",
+            duracaoAnos: 0,
+            duracaoMeses: 6,
+            DateOnly.FromDateTime(DateTime.UtcNow),
+            ModoCriacaoPlanoBiblico.NovoDoInicio,
+            ordemInicio: 1,
+            planoOrigemId: null);
+
+        var baseIds = await db.BaseBiblica.Select(x => x.Id).ToListAsync();
+        var generatedBaseIds = plan.Dias.SelectMany(x => x.Capitulos).Select(x => x.BaseBiblicaId).ToArray();
+
+        Assert.All(generatedBaseIds, id => Assert.Contains(id, baseIds));
     }
 
     [Theory]

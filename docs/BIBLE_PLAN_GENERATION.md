@@ -1,16 +1,47 @@
 # Bible Plan Generation
 
-O plano biblico personalizado da V2 usa a tabela `BaseBiblica` real do banco. O frontend nao envia `UsuarioId`, `OrdemInicio`, `OrdemFim`, `UltimaOrdemConcluida` nem `PlanoOrigemId`; esses valores sao calculados pelo backend a partir do usuario autenticado e do estado salvo.
+O plano biblico personalizado da V2 usa a tabela `BaseBiblica` real do banco como catalogo unico de capitulos. O frontend nao envia `UsuarioId`, `OrdemInicio`, `OrdemFim`, `UltimaOrdemConcluida` nem `PlanoOrigemId`; esses valores sao calculados pelo backend a partir do usuario autenticado e do estado salvo.
 
-## Fonte
+## BaseBiblica E Sequencia Pastoral
+
+`BaseBiblica` nao representa a ordem de leitura do plano. Ela representa capitulos unicos da Biblia, com metadados como livro, capitulo, quantidade de versiculos e peso de leitura.
+
+A ordem real do plano e definida pela sequencia pastoral V2, documentada em `docs/examples/sequencia-leitura-biblica-v2.json` e implementada no gerador. Essa camada permite:
+
+- repetir livros e capitulos;
+- ler faixas de capitulos;
+- dividir Isaias em blocos;
+- anexar Salmos como leitura diaria paralela.
 
 O gerador consulta `BaseBiblica` com:
 
 - `Ativo = true`.
-- `Ordem >= ordemInicio`.
-- Ordenacao crescente por `Ordem`.
+- todos os capitulos ativos disponiveis.
 
-A ordem pastoral e controlada exclusivamente por `BaseBiblica.Ordem`.
+Depois, expande a sequencia pastoral contra a base real. Assim, `BaseBiblica` continua sem duplicidade, enquanto o plano pode ler `1 João` tres vezes e `João` duas vezes.
+
+## Ordem Pastoral
+
+A sequencia começa pelo Novo Testamento, conforme o metodo pastoral baseado na Canção Nova:
+
+1. `1 João` duas vezes.
+2. `João`.
+3. Demais livros do Novo Testamento na ordem pastoral.
+4. `1 João` pela terceira vez.
+5. `João` pela segunda vez.
+6. Antigo Testamento na ordem pastoral, com `Isaias` dividido em `1-39`, `40-55` e `56-66`.
+
+`Gênesis` nao deve ser a primeira leitura do plano.
+
+## Salmos
+
+Salmos nao e tratado como bloco comum na sequencia principal. A regra atual e anexar `1` salmo por dia como leitura paralela ate `Salmos 150`.
+
+- Plano com 150 dias ou mais: le `Salmos 1` ate `Salmos 150`, um por dia.
+- Plano com mais de 150 dias: depois do `Salmos 150`, nao repete Salmos nesta fase.
+- Plano com menos de 150 dias: nao agrupa Salmos automaticamente nesta fase; os Salmos restantes ficam pendentes de revisao pastoral/manual antes de qualquer regra de agrupamento.
+
+Os Salmos entram no calculo de peso diario para equilibrar a carga de leitura, mas continuam marcados como leitura paralela no texto diario.
 
 ## Peso De Leitura
 
@@ -18,7 +49,7 @@ A distribuicao diaria usa peso, nao quantidade bruta de capitulos:
 
 1. Calcula `pesoTotal = sum(PesoLeitura)`.
 2. Calcula `pesoMedioDia = pesoTotal / duracaoDias`.
-3. Percorre os capitulos em ordem pastoral.
+3. Percorre as ocorrencias da sequencia pastoral.
 4. Agrupa capitulos inteiros buscando aproximar cada dia do peso medio.
 5. Nao divide capitulos por versiculo nesta fase.
 6. Capitulos muito longos podem ficar sozinhos em um dia.
@@ -40,7 +71,7 @@ Ao criar novo plano:
 
 1. O backend usa o usuario autenticado.
 2. Verifica se ja existe plano ativo.
-3. Comeca em `Ordem = 1`.
+3. Comeca na primeira ocorrencia da sequencia pastoral.
 4. Cria `PlanoBiblicoUsuario`, `PlanoBiblicoDia` e `PlanoBiblicoDiaCapitulo`.
 5. Executa em transacao.
 
@@ -73,8 +104,11 @@ Nos dois casos:
 Os testes cobrem:
 
 - Geracao com BaseBiblica real importada.
-- Ordem crescente e sem duplicidade.
-- Soma de `PesoLeitura` igual ao esperado.
+- Plano começando por `1 João`, nao por `Gênesis`.
+- Repeticao de `1 João` tres vezes e `João` duas vezes.
+- Salmos como leitura paralela diaria.
+- Blocos de `Isaias` em `1-39`, `40-55` e `56-66`.
+- Capitulos gerados resolvidos sempre contra capitulos existentes em `BaseBiblica`.
 - Duracoes de 6 meses, 1 ano e 2 anos.
 - Isolamento entre usuarios.
 - Continuar e recomecar.

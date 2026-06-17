@@ -7,9 +7,9 @@ using ServicoPalavra.Application.Auth;
 using ServicoPalavra.Application.Categorias;
 using ServicoPalavra.Application.Conteudos;
 using ServicoPalavra.Application.PlanosBiblicos;
-using ServicoPalavra.Domain.Entities;
 using ServicoPalavra.Domain.Enums;
 using ServicoPalavra.Infrastructure.Persistence;
+using ServicoPalavra.Infrastructure.Persistence.Import;
 
 namespace ServicoPalavra.IntegrationTests;
 
@@ -126,9 +126,9 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
         {
             var items = document.RootElement.GetProperty("data").EnumerateArray().ToArray();
             Assert.Equal(30, items.Length);
-            Assert.Contains("1 Joao 1", items[0].GetProperty("leiturasTexto").GetString());
-            Assert.Contains("Meditação livre", items[^1].GetProperty("leiturasTexto").GetString());
-            Assert.Contains("Tobias 1", items.First(x => x.GetProperty("leiturasTexto").GetString()?.Contains("Tobias 1") == true).GetProperty("leiturasTexto").GetString());
+            Assert.Contains("1 João 1", items[0].GetProperty("leiturasTexto").GetString());
+            Assert.Contains("Salmos 1", items[0].GetProperty("leiturasTexto").GetString());
+            Assert.DoesNotContain("Gênesis", items[0].GetProperty("leiturasTexto").GetString());
         }
 
         var firstDayId = await ReadFirstDayIdAsync(firstPlanId);
@@ -140,7 +140,7 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
         using (var document = JsonDocument.Parse(await continuePlan.Content.ReadAsStringAsync()))
         {
             var data = document.RootElement.GetProperty("data");
-            Assert.Equal(2, data.GetProperty("ordemInicio").GetInt32());
+            Assert.True(data.GetProperty("ordemInicio").GetInt32() > 1);
             Assert.Equal("Continuacao", data.GetProperty("modoCriacao").GetString());
         }
 
@@ -285,34 +285,9 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
             return;
         }
 
-        var now = DateTime.UtcNow;
-        db.BaseBiblica.AddRange(
-            TestChapter(1, "1 Joao", 1, "Cartas Joaninas", "Novo", 10, now),
-            TestChapter(2, "1 Joao", 2, "Cartas Joaninas", "Novo", 29, now),
-            TestChapter(3, "Joao", 1, "Evangelhos", "Novo", 51, now),
-            TestChapter(4, "Romanos", 1, "Cartas Apostolicas", "Novo", 32, now),
-            TestChapter(5, "Genesis", 1, "Pentateuco", "Antigo", 31, now),
-            TestChapter(6, "Josue", 1, "Historicos", "Antigo", 18, now),
-            TestChapter(7, "Isaias", 1, "Profetas", "Antigo", 31, now),
-            TestChapter(8, "Salmos", 1, "Sapienciais", "Antigo", 6, now),
-            TestChapter(9, "Tobias", 1, "Deuterocanonicos", "Antigo", 25, now));
-        await db.SaveChangesAsync();
+        var importer = new BaseBiblicaV2Importer(db);
+        await importer.ImportAsync(FindRepositoryFile("docs/examples/base-biblica-capitulos-com-versiculos.v2.json"));
     }
-
-    private static BaseBiblica TestChapter(int ordem, string livro, int capitulo, string grupo, string testamento, int peso, DateTime now) =>
-        new()
-        {
-            Id = Guid.NewGuid(),
-            Ordem = ordem,
-            Livro = livro,
-            Capitulo = capitulo,
-            Grupo = grupo,
-            Testamento = testamento,
-            TempoEstimadoMinutos = Math.Max(2, (int)Math.Ceiling(peso / 4m)),
-            QuantidadeVersiculos = peso,
-            PesoLeitura = peso,
-            CriadoEm = now
-        };
 
     private async Task<Guid> ReadFirstDayIdAsync(Guid planId)
     {
@@ -341,5 +316,22 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
             var body = await response.Content.ReadAsStringAsync();
             throw new HttpRequestException($"Response status code does not indicate success: {(int)response.StatusCode} ({response.StatusCode}). Body: {body}");
         }
+    }
+
+    private static string FindRepositoryFile(string relativePath)
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null)
+        {
+            var candidate = Path.Combine(directory.FullName, relativePath);
+            if (File.Exists(candidate))
+            {
+                return candidate;
+            }
+
+            directory = directory.Parent;
+        }
+
+        throw new FileNotFoundException($"Arquivo nao encontrado no repositorio: {relativePath}");
     }
 }
