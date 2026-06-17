@@ -14,6 +14,7 @@ using ServicoPalavra.Application.Abstractions;
 using ServicoPalavra.Domain.Entities;
 using ServicoPalavra.Infrastructure;
 using ServicoPalavra.Infrastructure.Persistence;
+using ServicoPalavra.Infrastructure.Persistence.Import;
 using ServicoPalavra.Infrastructure.Persistence.Seed;
 
 var startupDiagnostics = string.Equals(Environment.GetEnvironmentVariable("STARTUP_DIAGNOSTICS"), "true", StringComparison.OrdinalIgnoreCase);
@@ -23,6 +24,28 @@ void StartupTrace(string message)
     {
         Console.Error.WriteLine($"[startup] {message}");
     }
+}
+
+static string ResolveOperationalFilePath(string contentRootPath, string path)
+{
+    if (Path.IsPathRooted(path))
+    {
+        return path;
+    }
+
+    var directory = new DirectoryInfo(contentRootPath);
+    while (directory is not null)
+    {
+        var candidate = Path.Combine(directory.FullName, path);
+        if (File.Exists(candidate))
+        {
+            return candidate;
+        }
+
+        directory = directory.Parent;
+    }
+
+    return Path.Combine(contentRootPath, path);
 }
 
 StartupTrace("Main iniciado.");
@@ -55,6 +78,12 @@ else
 }
 
 StartupTrace("Configuracao carregada.");
+var runMode = builder.Configuration["run-mode"];
+var importBaseBiblicaV2 = string.Equals(runMode, "import-base-biblica-v2", StringComparison.OrdinalIgnoreCase);
+if (importBaseBiblicaV2)
+{
+    builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+}
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -246,7 +275,23 @@ if (!EF.IsDesignTime && !isEfTool)
 
     StartupTrace("Executando seed de roles/admin.");
     await scope.ServiceProvider.GetRequiredService<DatabaseSeeder>().SeedAsync();
+
+    if (importBaseBiblicaV2)
+    {
+        var configuredImportPath = app.Configuration["base-biblica-v2-path"]
+            ?? "docs/examples/base-biblica-capitulos-com-versiculos.v2.json";
+        var importPath = ResolveOperationalFilePath(app.Environment.ContentRootPath, configuredImportPath);
+        var result = await scope.ServiceProvider.GetRequiredService<BaseBiblicaV2Importer>().ImportAsync(importPath);
+        Console.WriteLine($"BaseBiblica V2 importada: processados={result.Processed}; inseridos={result.Inserted}; atualizados={result.Updated}.");
+    }
+
     StartupTrace("Bootstrap de banco concluido.");
+}
+
+if (importBaseBiblicaV2)
+{
+    StartupTrace("Modo import-base-biblica-v2 concluido; servidor HTTP nao sera iniciado.");
+    return;
 }
 
 if (!app.Environment.IsEnvironment("Testing"))

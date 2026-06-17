@@ -10,6 +10,8 @@ public sealed class BaseBiblica
     public string? Subgrupo { get; set; }
     public string Testamento { get; set; } = string.Empty;
     public int? TempoEstimadoMinutos { get; set; }
+    public int QuantidadeVersiculos { get; set; }
+    public int PesoLeitura { get; set; }
     public bool Ativo { get; set; } = true;
     public DateTime CriadoEm { get; set; }
     public DateTime? AtualizadoEm { get; set; }
