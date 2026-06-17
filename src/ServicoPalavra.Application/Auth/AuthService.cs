@@ -18,6 +18,11 @@ public sealed class AuthService : IAuthService
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
     {
         var email = request.Email.Trim().ToLowerInvariant();
+        if (request.Senha.Length is < 6 or > 8)
+        {
+            throw new AppException("Nao foi possivel concluir o cadastro.");
+        }
+
         if (await _userManager.FindByEmailAsync(email) is not null)
         {
             throw new AppException("Nao foi possivel concluir o cadastro.");

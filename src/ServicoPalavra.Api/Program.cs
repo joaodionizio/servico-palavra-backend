@@ -150,7 +150,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 StartupTrace("Servicos de aplicacao e infraestrutura configurados.");
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
     {
-        options.Password.RequiredLength = 10;
+        options.Password.RequiredLength = 6;
         options.Password.RequireNonAlphanumeric = false;
         options.User.RequireUniqueEmail = true;
         options.Lockout.AllowedForNewUsers = true;

@@ -28,7 +28,7 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
     public async Task Login_valid_returns_cookie_without_password_hash_or_token()
     {
         await EnsureCsrfAsync();
-        var response = await _client.PostAsJsonAsync("/api/auth/login", new LoginRequest("admin@tests.local", "AdminTest@123456"));
+        var response = await _client.PostAsJsonAsync("/api/auth/login", new LoginRequest("admin@tests.local", "Admin12"));
         var body = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -61,7 +61,7 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
             Assert.Equal(HttpStatusCode.Unauthorized, invalid.StatusCode);
         }
 
-        var locked = await _client.PostAsJsonAsync("/api/auth/login", new LoginRequest("admin@tests.local", "AdminTest@123456"));
+        var locked = await _client.PostAsJsonAsync("/api/auth/login", new LoginRequest("admin@tests.local", "Admin12"));
         Assert.Equal(HttpStatusCode.Unauthorized, locked.StatusCode);
     }
 
@@ -81,7 +81,7 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
         var userResponse = await _client.PostAsJsonAsync("/api/admin/categorias", new CategoriaRequest("Formacao", null, null, null, null, 1));
         Assert.Equal(HttpStatusCode.Forbidden, userResponse.StatusCode);
 
-        await LoginAsync("admin@tests.local", "AdminTest@123456");
+        await LoginAsync("admin@tests.local", "Admin12");
 
         var adminResponse = await _client.PostAsJsonAsync("/api/admin/categorias", new CategoriaRequest("Formacao Admin", null, null, null, null, 1));
         Assert.Equal(HttpStatusCode.OK, adminResponse.StatusCode);
@@ -104,7 +104,7 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
         createB.EnsureSuccessStatusCode();
         var planBId = await ReadGuidAsync(createB, "id");
 
-        await LoginAsync("plano-a@tests.local", "UserTest@123456");
+        await LoginAsync("plano-a@tests.local", "User12");
         var crossRead = await _client.GetAsync($"/api/planos-biblicos/{planBId}");
 
         Assert.Equal(HttpStatusCode.NotFound, crossRead.StatusCode);
@@ -193,7 +193,7 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
     public async Task Malicious_or_untrusted_content_url_is_rejected()
     {
         await EnsureCsrfAsync();
-        await LoginAsync("admin@tests.local", "AdminTest@123456");
+        await LoginAsync("admin@tests.local", "Admin12");
 
         var categoryResponse = await _client.PostAsJsonAsync("/api/admin/categorias", new CategoriaRequest("Videos", null, null, null, null, 1));
         await EnsureSuccessAsync(categoryResponse);
@@ -229,7 +229,7 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
     private async Task RegisterAsync(string nome, string email)
     {
         await EnsureCsrfAsync();
-        var response = await _client.PostAsJsonAsync("/api/auth/register", new RegisterRequest(nome, email, "UserTest@123456"));
+        var response = await _client.PostAsJsonAsync("/api/auth/register", new RegisterRequest(nome, email, "User12"));
         await EnsureSuccessAsync(response);
         await EnsureCsrfAsync();
     }

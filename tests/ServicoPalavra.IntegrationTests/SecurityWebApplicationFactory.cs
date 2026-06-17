@@ -13,7 +13,7 @@ public sealed class SecurityWebApplicationFactory : WebApplicationFactory<Progra
         Environment.SetEnvironmentVariable("DATABASE_PROVIDER", "sqlite");
         Environment.SetEnvironmentVariable("ConnectionStrings__DefaultConnection", $"Data Source={_databasePath}");
         Environment.SetEnvironmentVariable("INITIAL_ADMIN_EMAIL", "admin@tests.local");
-        Environment.SetEnvironmentVariable("INITIAL_ADMIN_PASSWORD", "AdminTest@123456");
+        Environment.SetEnvironmentVariable("INITIAL_ADMIN_PASSWORD", "Admin12");
         Environment.SetEnvironmentVariable("INITIAL_ADMIN_NAME", "Admin Tests");
     }
 
@@ -27,7 +27,7 @@ public sealed class SecurityWebApplicationFactory : WebApplicationFactory<Progra
                 ["DATABASE_PROVIDER"] = "sqlite",
                 ["ConnectionStrings:DefaultConnection"] = $"Data Source={_databasePath}",
                 ["INITIAL_ADMIN_EMAIL"] = "admin@tests.local",
-                ["INITIAL_ADMIN_PASSWORD"] = "AdminTest@123456",
+                ["INITIAL_ADMIN_PASSWORD"] = "Admin12",
                 ["INITIAL_ADMIN_NAME"] = "Admin Tests"
             });
         });
