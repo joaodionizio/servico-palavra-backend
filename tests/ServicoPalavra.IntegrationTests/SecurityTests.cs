@@ -7,6 +7,8 @@ using ServicoPalavra.Application.Auth;
 using ServicoPalavra.Application.Categorias;
 using ServicoPalavra.Application.Conteudos;
 using ServicoPalavra.Application.PlanosBiblicos;
+using ServicoPalavra.Application.Trilhas;
+using ServicoPalavra.Domain.Entities;
 using ServicoPalavra.Domain.Enums;
 using ServicoPalavra.Infrastructure.Persistence;
 using ServicoPalavra.Infrastructure.Persistence.Import;
@@ -90,6 +92,129 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
         me.EnsureSuccessStatusCode();
         var body = await me.Content.ReadAsStringAsync();
         Assert.Contains("Admin", body);
+    }
+
+    [Fact]
+    public async Task Common_user_cannot_create_or_update_admin_content_or_trail()
+    {
+        await EnsureCsrfAsync();
+        var suffix = Guid.NewGuid().ToString("N");
+        var contentId = await CreatePublishedContentAsync($"Conteudo Admin {suffix}");
+        var trailId = await CreateTrailAsync($"Trilha Admin {suffix}");
+        var categoryId = await CreateCategoryAsync($"Categoria Bloqueada {suffix}");
+
+        await RegisterAsync("Usuario Admin Bloqueado", $"admin-blocked-{suffix}@tests.local");
+
+        var createContent = await _client.PostAsJsonAsync("/api/admin/conteudos", BuildContentRequest($"Conteudo Bloqueado {suffix}", categoryId));
+        Assert.Equal(HttpStatusCode.Forbidden, createContent.StatusCode);
+
+        var updateContent = await _client.PutAsJsonAsync($"/api/admin/conteudos/{contentId}", BuildContentRequest($"Conteudo Alterado {suffix}", categoryId));
+        Assert.Equal(HttpStatusCode.Forbidden, updateContent.StatusCode);
+
+        var createTrail = await _client.PostAsJsonAsync("/api/admin/trilhas", new TrilhaRequest($"Trilha Bloqueada {suffix}", null, null, null, null, true, false, 1));
+        Assert.Equal(HttpStatusCode.Forbidden, createTrail.StatusCode);
+
+        var updateTrail = await _client.PutAsJsonAsync($"/api/admin/trilhas/{trailId}", new TrilhaRequest($"Trilha Alterada {suffix}", null, null, null, null, true, false, 1));
+        Assert.Equal(HttpStatusCode.Forbidden, updateTrail.StatusCode);
+    }
+
+    [Fact]
+    public async Task Favorites_are_isolated_between_users()
+    {
+        var suffix = Guid.NewGuid().ToString("N");
+        var contentA = await CreatePublishedContentAsync($"Favorito A {suffix}");
+        var contentB = await CreatePublishedContentAsync($"Favorito B {suffix}");
+        var userAEmail = $"fav-a-{suffix}@tests.local";
+        var userBEmail = $"fav-b-{suffix}@tests.local";
+
+        await RegisterAsync("Usuario Favorito A", userAEmail);
+        var favoriteA = await _client.PostAsync($"/api/conteudos/{contentA}/favoritar", null);
+        await EnsureSuccessAsync(favoriteA);
+
+        await RegisterAsync("Usuario Favorito B", userBEmail);
+        var favoriteB = await _client.PostAsync($"/api/conteudos/{contentB}/favoritar", null);
+        await EnsureSuccessAsync(favoriteB);
+
+        await LoginAsync(userAEmail, "User12");
+        var favoritesA = await _client.GetAsync("/api/favoritos");
+        await EnsureSuccessAsync(favoritesA);
+        var favoriteIdsA = await ReadDataIdsAsync(favoritesA);
+        Assert.Contains(contentA, favoriteIdsA);
+        Assert.DoesNotContain(contentB, favoriteIdsA);
+
+        var removeA = await _client.DeleteAsync($"/api/conteudos/{contentA}/favoritar");
+        await EnsureSuccessAsync(removeA);
+
+        await LoginAsync(userBEmail, "User12");
+        var favoritesBAfterRemoveA = await _client.GetAsync("/api/favoritos");
+        await EnsureSuccessAsync(favoritesBAfterRemoveA);
+        var favoriteIdsBAfterRemoveA = await ReadDataIdsAsync(favoritesBAfterRemoveA);
+        Assert.Contains(contentB, favoriteIdsBAfterRemoveA);
+        Assert.DoesNotContain(contentA, favoriteIdsBAfterRemoveA);
+    }
+
+    [Fact]
+    public async Task Content_progress_is_isolated_between_users()
+    {
+        var suffix = Guid.NewGuid().ToString("N");
+        var contentA = await CreatePublishedContentAsync($"Progresso A {suffix}");
+        var contentB = await CreatePublishedContentAsync($"Progresso B {suffix}");
+        var userAEmail = $"progress-a-{suffix}@tests.local";
+        var userBEmail = $"progress-b-{suffix}@tests.local";
+
+        await RegisterAsync("Usuario Progresso A", userAEmail);
+        await EnsureSuccessAsync(await _client.PostAsync($"/api/conteudos/{contentA}/favoritar", null));
+        await EnsureSuccessAsync(await _client.PostAsync($"/api/conteudos/{contentA}/concluir", null));
+
+        await RegisterAsync("Usuario Progresso B", userBEmail);
+        await EnsureSuccessAsync(await _client.PostAsync($"/api/conteudos/{contentB}/favoritar", null));
+        await EnsureSuccessAsync(await _client.PostAsync($"/api/conteudos/{contentB}/concluir", null));
+
+        await LoginAsync(userAEmail, "User12");
+        await EnsureSuccessAsync(await _client.PostAsync($"/api/conteudos/{contentA}/concluir", null));
+        var dashboardA = await ReadDashboardAsync();
+        Assert.Equal(1, dashboardA.ConteudosConcluidos);
+        Assert.Equal(1, dashboardA.Favoritos);
+
+        await LoginAsync(userBEmail, "User12");
+        var dashboardB = await ReadDashboardAsync();
+        Assert.Equal(1, dashboardB.ConteudosConcluidos);
+        Assert.Equal(1, dashboardB.Favoritos);
+    }
+
+    [Fact]
+    public async Task Dashboard_counts_only_authenticated_user_data()
+    {
+        await SeedBibleBaseAsync();
+        var suffix = Guid.NewGuid().ToString("N");
+        var contentA = await CreatePublishedContentAsync($"Dashboard A {suffix}");
+        var contentB1 = await CreatePublishedContentAsync($"Dashboard B1 {suffix}");
+        var contentB2 = await CreatePublishedContentAsync($"Dashboard B2 {suffix}");
+        var userAEmail = $"dash-a-{suffix}@tests.local";
+        var userBEmail = $"dash-b-{suffix}@tests.local";
+
+        await RegisterAsync("Usuario Dashboard A", userAEmail);
+        await EnsureSuccessAsync(await _client.PostAsync($"/api/conteudos/{contentA}/favoritar", null));
+        await EnsureSuccessAsync(await _client.PostAsync($"/api/conteudos/{contentA}/concluir", null));
+        await EnsureSuccessAsync(await _client.PostAsJsonAsync("/api/planos-biblicos", new CriarPlanoBiblicoRequest("Plano Dashboard A", 0, 1, DateOnly.FromDateTime(DateTime.UtcNow))));
+
+        await RegisterAsync("Usuario Dashboard B", userBEmail);
+        await EnsureSuccessAsync(await _client.PostAsync($"/api/conteudos/{contentB1}/favoritar", null));
+        await EnsureSuccessAsync(await _client.PostAsync($"/api/conteudos/{contentB2}/favoritar", null));
+        await EnsureSuccessAsync(await _client.PostAsync($"/api/conteudos/{contentB1}/concluir", null));
+        await EnsureSuccessAsync(await _client.PostAsJsonAsync("/api/planos-biblicos", new CriarPlanoBiblicoRequest("Plano Dashboard B", 0, 1, DateOnly.FromDateTime(DateTime.UtcNow))));
+
+        await LoginAsync(userAEmail, "User12");
+        var dashboardA = await ReadDashboardAsync();
+        Assert.Equal(1, dashboardA.ConteudosConcluidos);
+        Assert.Equal(1, dashboardA.Favoritos);
+        Assert.True(dashboardA.PossuiPlanoBiblicoAtivo);
+
+        await LoginAsync(userBEmail, "User12");
+        var dashboardB = await ReadDashboardAsync();
+        Assert.Equal(1, dashboardB.ConteudosConcluidos);
+        Assert.Equal(2, dashboardB.Favoritos);
+        Assert.True(dashboardB.PossuiPlanoBiblicoAtivo);
     }
 
     [Fact]
@@ -362,6 +487,100 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
         await EnsureSuccessAsync(response);
         using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         return document.RootElement.GetProperty("data").GetProperty("ultimaOrdemConcluida").GetInt32();
+    }
+
+    private async Task<Guid> CreatePublishedContentAsync(string title)
+    {
+        var categoryId = await CreateCategoryAsync($"Categoria {title}");
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var admin = await db.Users.FirstAsync(x => x.Email == "admin@tests.local");
+        var now = DateTime.UtcNow;
+        var content = new Conteudo
+        {
+            Id = Guid.NewGuid(),
+            Titulo = title,
+            Slug = $"conteudo-{Guid.NewGuid():N}",
+            Tipo = TipoConteudo.Video,
+            Origem = OrigemConteudo.YouTube,
+            Url = $"https://www.youtube.com/watch?v={Guid.NewGuid():N}",
+            DuracaoMinutos = 10,
+            CategoriaConteudoId = categoryId,
+            CriadoPorUsuarioId = admin.Id,
+            Publicado = true,
+            PublicadoEm = now,
+            CriadoEm = now
+        };
+
+        db.Conteudos.Add(content);
+        await db.SaveChangesAsync();
+        return content.Id;
+    }
+
+    private async Task<Guid> CreateCategoryAsync(string name)
+    {
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var category = new CategoriaConteudo
+        {
+            Id = Guid.NewGuid(),
+            Nome = name,
+            Slug = $"categoria-{Guid.NewGuid():N}",
+            Ativo = true,
+            Ordem = 1,
+            CriadoEm = DateTime.UtcNow
+        };
+
+        db.CategoriasConteudo.Add(category);
+        await db.SaveChangesAsync();
+        return category.Id;
+    }
+
+    private async Task<Guid> CreateTrailAsync(string title)
+    {
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var admin = await db.Users.FirstAsync(x => x.Email == "admin@tests.local");
+        var trail = new TrilhaFormacao
+        {
+            Id = Guid.NewGuid(),
+            Titulo = title,
+            Slug = $"trilha-{Guid.NewGuid():N}",
+            Publicado = true,
+            Ordem = 1,
+            CriadoPorUsuarioId = admin.Id,
+            PublicadoEm = DateTime.UtcNow,
+            CriadoEm = DateTime.UtcNow
+        };
+
+        db.TrilhasFormacao.Add(trail);
+        await db.SaveChangesAsync();
+        return trail.Id;
+    }
+
+    private static ConteudoRequest BuildContentRequest(string title, Guid categoryId) =>
+        new(title, null, null, null, TipoConteudo.Video, OrigemConteudo.YouTube, $"https://www.youtube.com/watch?v={Guid.NewGuid():N}", null, 10, categoryId, true, false, 1);
+
+    private async Task<IReadOnlyCollection<Guid>> ReadDataIdsAsync(HttpResponseMessage response)
+    {
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        return document.RootElement
+            .GetProperty("data")
+            .EnumerateArray()
+            .Select(x => x.GetProperty("id").GetGuid())
+            .ToArray();
+    }
+
+    private async Task<(int ConteudosConcluidos, int Favoritos, bool PossuiPlanoBiblicoAtivo)> ReadDashboardAsync()
+    {
+        var response = await _client.GetAsync("/api/dashboard/me");
+        await EnsureSuccessAsync(response);
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var data = document.RootElement.GetProperty("data");
+        return (
+            data.GetProperty("conteudosConcluidos").GetInt32(),
+            data.GetProperty("favoritos").GetInt32(),
+            data.GetProperty("possuiPlanoBiblicoAtivo").GetBoolean());
     }
 
     private static async Task<Guid> ReadGuidAsync(HttpResponseMessage response, string property)
