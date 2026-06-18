@@ -72,8 +72,8 @@ Fonte: `src/ServicoPalavra.Domain/Enums/TipoMaterialApoio.cs`.
 
 Categoria nao e enum no backend. Os DTOs retornam:
 
-- `categoriaConteudoId`: `Guid` da categoria.
-- `categoria`: nome textual da categoria.
+- `categoriaConteudoId`: `Guid` da categoria, ou `null` quando o conteudo/formacao estiver sem categoria.
+- `categoria`: nome textual da categoria, ou `null` quando nao houver categoria.
 
 ## Listagem
 
@@ -93,8 +93,8 @@ Categoria nao e enum no backend. Os DTOs retornam:
         "origem": 1,
         "urlThumbnail": "https://img.youtube.com/vi/exemplo/hqdefault.jpg",
         "duracaoMinutos": 42,
-        "categoriaConteudoId": "22222222-2222-2222-2222-222222222222",
-        "categoria": "Liturgia",
+        "categoriaConteudoId": null,
+        "categoria": null,
         "destaque": true,
         "publicadoEm": "2026-06-18T12:00:00Z"
       }
@@ -135,8 +135,8 @@ Filtros aceitos:
     "url": "https://www.youtube.com/watch?v=exemplo",
     "urlThumbnail": "https://img.youtube.com/vi/exemplo/hqdefault.jpg",
     "duracaoMinutos": 42,
-    "categoriaConteudoId": "22222222-2222-2222-2222-222222222222",
-    "categoria": "Liturgia",
+    "categoriaConteudoId": null,
+    "categoria": null,
     "publicado": true,
     "destaque": true,
     "ordem": 1,
@@ -162,5 +162,5 @@ Filtros aceitos:
 ## Observacoes Para O Frontend
 
 - `tipo`, `origem` e `materiaisApoio[].tipo` devem ser interpretados como numeros.
-- `categoria` ja e textual; nao ha `categoriaNome` separado.
+- `categoria` ja e textual e pode ser `null`; nao ha `categoriaNome` separado.
 - Campos futuros auxiliares de nome, se adicionados, devem ser tratados como complementares e nao substitutos dos campos numericos.

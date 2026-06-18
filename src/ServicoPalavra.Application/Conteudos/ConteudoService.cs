@@ -79,8 +79,7 @@ public sealed class ConteudoService : IConteudoService
             throw new AppException("Slug de conteudo ja existe.");
         }
 
-        var categoria = await _categorias.GetByIdAsync(request.CategoriaConteudoId, cancellationToken)
-            ?? throw new AppException("Categoria nao encontrada.", 404);
+        var categoria = await GetCategoriaAsync(request.CategoriaConteudoId, cancellationToken);
         var usuario = await _usuarios.GetByIdAsync(usuarioId, cancellationToken)
             ?? throw new AppException("Usuario criador nao encontrado.", 404);
 
@@ -97,7 +96,7 @@ public sealed class ConteudoService : IConteudoService
             Url = request.Url.Trim(),
             UrlThumbnail = request.UrlThumbnail,
             DuracaoMinutos = request.DuracaoMinutos,
-            CategoriaConteudoId = categoria.Id,
+            CategoriaConteudoId = categoria?.Id,
             CategoriaConteudo = categoria,
             CriadoPorUsuarioId = usuario.Id,
             CriadoPorUsuario = usuario,
@@ -129,8 +128,7 @@ public sealed class ConteudoService : IConteudoService
             throw new AppException("Slug de conteudo ja existe.");
         }
 
-        var categoria = await _categorias.GetByIdAsync(request.CategoriaConteudoId, cancellationToken)
-            ?? throw new AppException("Categoria nao encontrada.", 404);
+        var categoria = await GetCategoriaAsync(request.CategoriaConteudoId, cancellationToken);
 
         var now = DateTime.UtcNow;
         conteudo.Titulo = request.Titulo.Trim();
@@ -142,7 +140,7 @@ public sealed class ConteudoService : IConteudoService
         conteudo.Url = request.Url.Trim();
         conteudo.UrlThumbnail = request.UrlThumbnail;
         conteudo.DuracaoMinutos = request.DuracaoMinutos;
-        conteudo.CategoriaConteudoId = request.CategoriaConteudoId;
+        conteudo.CategoriaConteudoId = categoria?.Id;
         conteudo.CategoriaConteudo = categoria;
         conteudo.PublicadoEm = !conteudo.Publicado && request.Publicado ? now : conteudo.PublicadoEm;
         conteudo.Publicado = request.Publicado;
@@ -190,12 +188,23 @@ public sealed class ConteudoService : IConteudoService
     }
 
     private static string BuildSlug(ConteudoRequest request) => string.IsNullOrWhiteSpace(request.Slug) ? Slug.From(request.Titulo) : Slug.From(request.Slug);
+    private async Task<CategoriaConteudo?> GetCategoriaAsync(Guid? categoriaConteudoId, CancellationToken cancellationToken)
+    {
+        if (!categoriaConteudoId.HasValue || categoriaConteudoId.Value == Guid.Empty)
+        {
+            return null;
+        }
+
+        return await _categorias.GetByIdAsync(categoriaConteudoId.Value, cancellationToken)
+            ?? throw new AppException("Categoria nao encontrada.", 404);
+    }
+
     private static ConteudoResumoResponse ToResumoResponse(Conteudo conteudo) =>
-        new(conteudo.Id, conteudo.Titulo, conteudo.Slug, conteudo.Resumo, conteudo.Tipo, conteudo.Origem, conteudo.UrlThumbnail, conteudo.DuracaoMinutos, conteudo.CategoriaConteudoId, conteudo.CategoriaConteudo.Nome, conteudo.Destaque, conteudo.PublicadoEm);
+        new(conteudo.Id, conteudo.Titulo, conteudo.Slug, conteudo.Resumo, conteudo.Tipo, conteudo.Origem, conteudo.UrlThumbnail, conteudo.DuracaoMinutos, conteudo.CategoriaConteudoId, conteudo.CategoriaConteudo?.Nome, conteudo.Destaque, conteudo.PublicadoEm);
     private static ConteudoAdminResumoResponse ToAdminResumoResponse(Conteudo conteudo) =>
-        new(conteudo.Id, conteudo.Titulo, conteudo.Slug, conteudo.Resumo, conteudo.Tipo, conteudo.Origem, conteudo.UrlThumbnail, conteudo.DuracaoMinutos, conteudo.CategoriaConteudoId, conteudo.CategoriaConteudo.Nome, conteudo.Publicado, conteudo.Destaque, conteudo.Ordem, conteudo.PublicadoEm);
+        new(conteudo.Id, conteudo.Titulo, conteudo.Slug, conteudo.Resumo, conteudo.Tipo, conteudo.Origem, conteudo.UrlThumbnail, conteudo.DuracaoMinutos, conteudo.CategoriaConteudoId, conteudo.CategoriaConteudo?.Nome, conteudo.Publicado, conteudo.Destaque, conteudo.Ordem, conteudo.PublicadoEm);
     private static ConteudoResponse ToResponse(Conteudo conteudo) =>
-        new(conteudo.Id, conteudo.Titulo, conteudo.Slug, conteudo.Descricao, conteudo.Resumo, conteudo.Tipo, conteudo.Origem, conteudo.Url, conteudo.UrlThumbnail, conteudo.DuracaoMinutos, conteudo.CategoriaConteudoId, conteudo.CategoriaConteudo.Nome, conteudo.Publicado, conteudo.Destaque, conteudo.Ordem, conteudo.PublicadoEm);
+        new(conteudo.Id, conteudo.Titulo, conteudo.Slug, conteudo.Descricao, conteudo.Resumo, conteudo.Tipo, conteudo.Origem, conteudo.Url, conteudo.UrlThumbnail, conteudo.DuracaoMinutos, conteudo.CategoriaConteudoId, conteudo.CategoriaConteudo?.Nome, conteudo.Publicado, conteudo.Destaque, conteudo.Ordem, conteudo.PublicadoEm);
     private static ConteudoDetalheResponse ToDetalheResponse(Conteudo conteudo, bool favorito, bool concluido) =>
         new(
             conteudo.Id,
@@ -209,7 +218,7 @@ public sealed class ConteudoService : IConteudoService
             conteudo.UrlThumbnail,
             conteudo.DuracaoMinutos,
             conteudo.CategoriaConteudoId,
-            conteudo.CategoriaConteudo.Nome,
+            conteudo.CategoriaConteudo?.Nome,
             conteudo.Publicado,
             conteudo.Destaque,
             conteudo.Ordem,
@@ -235,7 +244,7 @@ public sealed class ConteudoService : IConteudoService
             conteudo.UrlThumbnail,
             conteudo.DuracaoMinutos,
             conteudo.CategoriaConteudoId,
-            conteudo.CategoriaConteudo.Nome,
+            conteudo.CategoriaConteudo?.Nome,
             conteudo.Publicado,
             conteudo.Destaque,
             conteudo.Ordem,

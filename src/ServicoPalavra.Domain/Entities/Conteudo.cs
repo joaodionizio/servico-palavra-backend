@@ -14,8 +14,8 @@ public sealed class Conteudo
     public string Url { get; set; } = string.Empty;
     public string? UrlThumbnail { get; set; }
     public int? DuracaoMinutos { get; set; }
-    public Guid CategoriaConteudoId { get; set; }
-    public CategoriaConteudo CategoriaConteudo { get; set; } = null!;
+    public Guid? CategoriaConteudoId { get; set; }
+    public CategoriaConteudo? CategoriaConteudo { get; set; }
     public Guid CriadoPorUsuarioId { get; set; }
     public ApplicationUser CriadoPorUsuario { get; set; } = null!;
     public bool Publicado { get; set; }

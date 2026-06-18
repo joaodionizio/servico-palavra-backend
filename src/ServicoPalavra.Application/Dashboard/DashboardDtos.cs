@@ -19,7 +19,7 @@ public sealed record DashboardConteudoResumoResponse(
     string Origem,
     string? UrlThumbnail,
     int? DuracaoMinutos,
-    string Categoria,
+    string? Categoria,
     DateTime? PublicadoEm);
 
 public sealed record DashboardFavoritoResponse(

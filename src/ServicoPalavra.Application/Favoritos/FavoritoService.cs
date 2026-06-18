@@ -19,7 +19,7 @@ public sealed class FavoritoService : IFavoritoService
     }
 
     public async Task<IReadOnlyList<ConteudoResponse>> ListAsync(Guid usuarioId, CancellationToken cancellationToken = default) =>
-        (await _favoritos.ListByUsuarioAsync(usuarioId, cancellationToken)).Select(f => new ConteudoResponse(f.Conteudo.Id, f.Conteudo.Titulo, f.Conteudo.Slug, f.Conteudo.Descricao, f.Conteudo.Resumo, f.Conteudo.Tipo, f.Conteudo.Origem, f.Conteudo.Url, f.Conteudo.UrlThumbnail, f.Conteudo.DuracaoMinutos, f.Conteudo.CategoriaConteudoId, f.Conteudo.CategoriaConteudo.Nome, f.Conteudo.Publicado, f.Conteudo.Destaque, f.Conteudo.Ordem, f.Conteudo.PublicadoEm)).ToList();
+        (await _favoritos.ListByUsuarioAsync(usuarioId, cancellationToken)).Select(f => new ConteudoResponse(f.Conteudo.Id, f.Conteudo.Titulo, f.Conteudo.Slug, f.Conteudo.Descricao, f.Conteudo.Resumo, f.Conteudo.Tipo, f.Conteudo.Origem, f.Conteudo.Url, f.Conteudo.UrlThumbnail, f.Conteudo.DuracaoMinutos, f.Conteudo.CategoriaConteudoId, f.Conteudo.CategoriaConteudo?.Nome, f.Conteudo.Publicado, f.Conteudo.Destaque, f.Conteudo.Ordem, f.Conteudo.PublicadoEm)).ToList();
 
     public async Task FavoritarAsync(Guid usuarioId, Guid conteudoId, CancellationToken cancellationToken = default)
     {

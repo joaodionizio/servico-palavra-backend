@@ -32,7 +32,7 @@ public sealed class ConteudoConfiguration : IEntityTypeConfiguration<Conteudo>
         builder.Property(x => x.Url).HasMaxLength(1000).IsRequired();
         builder.Property(x => x.UrlThumbnail).HasMaxLength(1000);
         builder.HasIndex(x => x.Slug).IsUnique();
-        builder.HasOne(x => x.CategoriaConteudo).WithMany(x => x.Conteudos).HasForeignKey(x => x.CategoriaConteudoId).OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(x => x.CategoriaConteudo).WithMany(x => x.Conteudos).HasForeignKey(x => x.CategoriaConteudoId).IsRequired(false).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne(x => x.CriadoPorUsuario).WithMany(x => x.ConteudosCriados).HasForeignKey(x => x.CriadoPorUsuarioId).OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -644,6 +644,58 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
     }
 
     [Fact]
+    public async Task Admin_can_create_content_without_category()
+    {
+        await LoginAsync("admin@tests.local", "Admin12");
+        var suffix = Guid.NewGuid().ToString("N");
+        var request = new ConteudoRequest(
+            $"Formacao Sem Categoria {suffix}",
+            null,
+            null,
+            null,
+            TipoConteudo.Video,
+            OrigemConteudo.YouTube,
+            $"https://www.youtube.com/watch?v={Guid.NewGuid():N}",
+            null,
+            null,
+            null,
+            true,
+            false,
+            null);
+
+        var create = await _client.PostAsJsonAsync("/api/admin/conteudos", request);
+        await EnsureSuccessAsync(create);
+        var contentId = await ReadGuidAsync(create, "id");
+        var slug = await ReadStringAsync(create, "slug");
+
+        using (var document = JsonDocument.Parse(await create.Content.ReadAsStringAsync()))
+        {
+            var data = document.RootElement.GetProperty("data");
+            Assert.Equal(JsonValueKind.Null, data.GetProperty("categoriaConteudoId").ValueKind);
+            Assert.Equal(JsonValueKind.Null, data.GetProperty("categoria").ValueKind);
+        }
+
+        var adminDetail = await _client.GetAsync($"/api/admin/conteudos/{contentId}");
+        await EnsureSuccessAsync(adminDetail);
+        using (var document = JsonDocument.Parse(await adminDetail.Content.ReadAsStringAsync()))
+        {
+            var data = document.RootElement.GetProperty("data");
+            Assert.Equal(JsonValueKind.Null, data.GetProperty("categoriaConteudoId").ValueKind);
+            Assert.Equal(JsonValueKind.Null, data.GetProperty("categoria").ValueKind);
+        }
+
+        var publicDetail = await _client.GetAsync($"/api/conteudos/{slug}");
+        await EnsureSuccessAsync(publicDetail);
+        using (var document = JsonDocument.Parse(await publicDetail.Content.ReadAsStringAsync()))
+        {
+            var data = document.RootElement.GetProperty("data");
+            Assert.Equal(contentId, data.GetProperty("id").GetGuid());
+            Assert.Equal(JsonValueKind.Null, data.GetProperty("categoriaConteudoId").ValueKind);
+            Assert.Equal(JsonValueKind.Null, data.GetProperty("categoria").ValueKind);
+        }
+    }
+
+    [Fact]
     public async Task Error_response_does_not_expose_stack_trace()
     {
         await EnsureCsrfAsync();

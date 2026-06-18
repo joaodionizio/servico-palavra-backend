@@ -59,7 +59,7 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
                 x.Origem,
                 x.UrlThumbnail,
                 x.DuracaoMinutos,
-                Categoria = x.CategoriaConteudo.Nome,
+                Categoria = x.CategoriaConteudo == null ? null : x.CategoriaConteudo.Nome,
                 x.PublicadoEm
             })
             .ToListAsync(cancellationToken))

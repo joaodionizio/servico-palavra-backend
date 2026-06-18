@@ -23,7 +23,7 @@ public sealed class ConteudoRepository : IConteudoRepository
         if (!string.IsNullOrWhiteSpace(categoriaSlug))
         {
             var slug = categoriaSlug.Trim();
-            query = query.Where(x => x.CategoriaConteudo.Slug == slug);
+            query = query.Where(x => x.CategoriaConteudo != null && x.CategoriaConteudo.Slug == slug);
         }
 
         if (tipo.HasValue)
@@ -55,7 +55,7 @@ public sealed class ConteudoRepository : IConteudoRepository
         if (!string.IsNullOrWhiteSpace(categoriaSlug))
         {
             var slug = categoriaSlug.Trim();
-            query = query.Where(x => x.CategoriaConteudo.Slug == slug);
+            query = query.Where(x => x.CategoriaConteudo != null && x.CategoriaConteudo.Slug == slug);
         }
 
         if (tipo.HasValue)
