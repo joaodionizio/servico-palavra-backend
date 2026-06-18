@@ -22,16 +22,24 @@ public sealed class FavoritosController : ApiControllerBase
         OkResponse(await _favoritos.ListAsync(CurrentUserId(_currentUser), cancellationToken));
 
     [HttpPost("api/conteudos/{id:guid}/favoritar")]
-    public async Task<IActionResult> Favoritar(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> FavoritarConteudo(Guid id, CancellationToken cancellationToken) =>
+        await Favoritar(id, cancellationToken);
+
+    [HttpPost("api/favoritos/{conteudoId:guid}")]
+    public async Task<IActionResult> Favoritar(Guid conteudoId, CancellationToken cancellationToken)
     {
-        await _favoritos.FavoritarAsync(CurrentUserId(_currentUser), id, cancellationToken);
+        await _favoritos.FavoritarAsync(CurrentUserId(_currentUser), conteudoId, cancellationToken);
         return OkResponse("Conteudo favoritado.");
     }
 
     [HttpDelete("api/conteudos/{id:guid}/favoritar")]
-    public async Task<IActionResult> Remover(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> RemoverFavoritoConteudo(Guid id, CancellationToken cancellationToken) =>
+        await Remover(id, cancellationToken);
+
+    [HttpDelete("api/favoritos/{conteudoId:guid}")]
+    public async Task<IActionResult> Remover(Guid conteudoId, CancellationToken cancellationToken)
     {
-        await _favoritos.RemoverAsync(CurrentUserId(_currentUser), id, cancellationToken);
+        await _favoritos.RemoverAsync(CurrentUserId(_currentUser), conteudoId, cancellationToken);
         return OkResponse("Favorito removido.");
     }
 }

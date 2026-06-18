@@ -40,12 +40,19 @@ public static class ExternalUrlValidator
             return;
         }
 
-        ParseHttpsUri(url, "URL de thumbnail invalida.");
+        ParseWebUri(url, "URL de thumbnail invalida.");
     }
 
-    private static Uri ParseHttpsUri(string url, string errorMessage)
+    public static void ValidateMaterialUrl(string url)
     {
-        if (!Uri.TryCreate(url.Trim(), UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps)
+        ParseWebUri(url, "URL do material de apoio invalida.");
+    }
+
+    private static Uri ParseHttpsUri(string url, string errorMessage) => ParseWebUri(url, errorMessage);
+
+    private static Uri ParseWebUri(string url, string errorMessage)
+    {
+        if (!Uri.TryCreate(url.Trim(), UriKind.Absolute, out var uri) || (uri.Scheme != Uri.UriSchemeHttps && uri.Scheme != Uri.UriSchemeHttp))
         {
             throw new AppException(errorMessage);
         }

@@ -50,4 +50,22 @@ public sealed class ProgressoService : IProgressoService
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task DesmarcarConclusaoConteudoAsync(Guid usuarioId, Guid conteudoId, CancellationToken cancellationToken = default)
+    {
+        _ = await _conteudos.GetByIdAsync(conteudoId, false, cancellationToken) ?? throw new AppException("Conteudo nao encontrado.", 404);
+        var progresso = await _progressos.GetConteudoAsync(usuarioId, conteudoId, cancellationToken);
+        if (progresso is null)
+        {
+            return;
+        }
+
+        var now = DateTime.UtcNow;
+        progresso.Status = StatusProgressoConteudo.NaoIniciado;
+        progresso.Percentual = 0;
+        progresso.ConcluidoEm = null;
+        progresso.UltimoAcessoEm = now;
+        progresso.AtualizadoEm = now;
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
 }

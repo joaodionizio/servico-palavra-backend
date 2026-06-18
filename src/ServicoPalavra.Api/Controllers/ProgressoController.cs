@@ -18,9 +18,20 @@ public sealed class ProgressoController : ApiControllerBase
     }
 
     [HttpPost("api/conteudos/{id:guid}/concluir")]
-    public async Task<IActionResult> Concluir(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> ConcluirConteudo(Guid id, CancellationToken cancellationToken) =>
+        await Concluir(id, cancellationToken);
+
+    [HttpPost("api/progresso/conteudos/{conteudoId:guid}/concluir")]
+    public async Task<IActionResult> Concluir(Guid conteudoId, CancellationToken cancellationToken)
     {
-        await _progressos.ConcluirConteudoAsync(CurrentUserId(_currentUser), id, cancellationToken);
+        await _progressos.ConcluirConteudoAsync(CurrentUserId(_currentUser), conteudoId, cancellationToken);
         return OkResponse("Conteudo concluido.");
+    }
+
+    [HttpDelete("api/progresso/conteudos/{conteudoId:guid}/concluir")]
+    public async Task<IActionResult> Desmarcar(Guid conteudoId, CancellationToken cancellationToken)
+    {
+        await _progressos.DesmarcarConclusaoConteudoAsync(CurrentUserId(_currentUser), conteudoId, cancellationToken);
+        return OkResponse("Conclusao removida.");
     }
 }

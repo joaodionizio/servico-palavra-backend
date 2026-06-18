@@ -17,12 +17,26 @@ public sealed class ConteudosController : ApiControllerBase
     }
 
     [HttpGet("api/conteudos")]
-    public async Task<IActionResult> List(CancellationToken cancellationToken) =>
-        OkResponse(await _conteudos.ListAsync(cancellationToken));
+    public async Task<IActionResult> List([FromQuery] ConteudoListQuery query, CancellationToken cancellationToken) =>
+        OkResponse(await _conteudos.ListAsync(query, cancellationToken));
 
     [HttpGet("api/conteudos/{id:guid}")]
     public async Task<IActionResult> Get(Guid id, CancellationToken cancellationToken) =>
         OkResponse(await _conteudos.GetAsync(id, false, cancellationToken));
+
+    [HttpGet("api/conteudos/{slug}")]
+    public async Task<IActionResult> GetBySlug(string slug, CancellationToken cancellationToken) =>
+        OkResponse(await _conteudos.GetBySlugAsync(slug, _currentUser.UserId, cancellationToken));
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("api/admin/conteudos")]
+    public async Task<IActionResult> ListAdmin([FromQuery] ConteudoAdminListQuery query, CancellationToken cancellationToken) =>
+        OkResponse(await _conteudos.ListAdminAsync(query, cancellationToken));
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("api/admin/conteudos/{id:guid}")]
+    public async Task<IActionResult> GetAdmin(Guid id, CancellationToken cancellationToken) =>
+        OkResponse(await _conteudos.GetAdminAsync(id, cancellationToken));
 
     [Authorize(Roles = "Admin")]
     [HttpPost("api/admin/conteudos")]
@@ -33,6 +47,11 @@ public sealed class ConteudosController : ApiControllerBase
     [HttpPut("api/admin/conteudos/{id:guid}")]
     public async Task<IActionResult> Update(Guid id, ConteudoRequest request, CancellationToken cancellationToken) =>
         OkResponse(await _conteudos.UpdateAsync(id, request, cancellationToken));
+
+    [Authorize(Roles = "Admin")]
+    [HttpPatch("api/admin/conteudos/{id:guid}/publicacao")]
+    public async Task<IActionResult> UpdatePublicacao(Guid id, ConteudoPublicacaoRequest request, CancellationToken cancellationToken) =>
+        OkResponse(await _conteudos.UpdatePublicacaoAsync(id, request, cancellationToken));
 
     [Authorize(Roles = "Admin")]
     [HttpPatch("api/admin/conteudos/{id:guid}/publicar")]
