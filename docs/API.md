@@ -35,6 +35,7 @@ Auth usa cookie HttpOnly. A API nao retorna JWT/token no login. Para `POST`, `PU
 
 - `GET /api/conteudos`
 - `GET /api/conteudos/{id}`
+- `GET /api/conteudos/{slug}`
 - `POST /api/admin/conteudos` Admin
 - `PUT /api/admin/conteudos/{id}` Admin
 - `PATCH /api/admin/conteudos/{id}/publicar` Admin
@@ -42,25 +43,21 @@ Auth usa cookie HttpOnly. A API nao retorna JWT/token no login. Para `POST`, `PU
 
 Conteudos de video/audio/material nao enviam arquivo binario para a API nesta fase. O cadastro usa metadados e `url` externa, por exemplo YouTube ou Google Drive, conforme `origem`. A estrategia completa esta em `MEDIA_STRATEGY.md`.
 
+O contrato detalhado de listagem, detalhe e enums de conteudos/formacoes esta em `CONTENT_CONTRACT.md`.
+
 ## Favoritos
 
 - `GET /api/favoritos`
 - `POST /api/conteudos/{id}/favoritar`
 - `DELETE /api/conteudos/{id}/favoritar`
+- `POST /api/favoritos/{conteudoId}`
+- `DELETE /api/favoritos/{conteudoId}`
 
 ## Progresso
 
 - `POST /api/conteudos/{id}/concluir`
-
-## Trilhas
-
-- `GET /api/trilhas`
-- `GET /api/trilhas/{id}`
-- `POST /api/admin/trilhas` Admin
-- `PUT /api/admin/trilhas/{id}` Admin
-- `POST /api/admin/trilhas/{id}/conteudos` Admin
-- `PUT /api/admin/trilhas/{id}/conteudos/ordem` Admin
-- `DELETE /api/admin/trilhas/{id}/conteudos/{conteudoId}` Admin
+- `POST /api/progresso/conteudos/{conteudoId}/concluir`
+- `DELETE /api/progresso/conteudos/{conteudoId}/concluir`
 
 ## Plano Biblico
 
@@ -101,3 +98,9 @@ Detalhes de BaseBiblica, sequencia pastoral, importacao e peso de leitura estao 
 ## Dashboard
 
 - `GET /api/dashboard/me`
+
+## Trilhas
+
+Trilhas foram removidas da V2 inicial. A plataforma nesta fase trabalha com conteudos/formacoes individuais, categorias, favoritos, progresso de conteudo, dashboard, admin de conteudos e plano biblico.
+
+As tabelas historicas `TrilhasFormacao` e `TrilhasConteudos` podem existir em bancos criados por migrations antigas, mas nao ha endpoints ou codigo ativo para trilhas nesta fase.

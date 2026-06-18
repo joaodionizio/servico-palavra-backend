@@ -1,6 +1,6 @@
 # Servico da Palavra Backend
 
-Backend V2 da plataforma Servico da Palavra, uma base de formacao biblica e espiritual com foco inicial em conteudos, trilhas e autenticacao. Este repositorio contem somente o backend.
+Backend V2 da plataforma Servico da Palavra, uma base de formacao biblica e espiritual com foco inicial em conteudos/formacoes, categorias, favoritos, progresso, dashboard, administracao de conteudos, plano biblico e autenticacao. Este repositorio contem somente o backend.
 
 ## Stack
 

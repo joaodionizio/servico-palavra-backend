@@ -1,6 +1,6 @@
 # Arquitetura
 
-O backend V2 do Servico da Palavra e uma plataforma catolica de formacao biblica, espiritual e pastoral. O Plano Biblico e um modulo importante, mas a arquitetura deve continuar preparada para conteudos, trilhas, progresso, favoritos, administracao e permissoes.
+O backend V2 do Servico da Palavra e uma plataforma catolica de formacao biblica, espiritual e pastoral. O Plano Biblico e um modulo importante, e a V2 inicial foca em conteudos/formacoes individuais, categorias, progresso, favoritos, administracao de conteudos e permissoes.
 
 A solucao segue uma arquitetura em camadas simples:
 
@@ -50,13 +50,14 @@ O `UsuarioId` de fluxos autenticados deve ser derivado da sessao no backend. O f
 - Dashboard
 - Conteudos/Formacoes
 - Categorias
-- Trilhas
 - Favoritos
 - ProgressoConteudo
 - BibleBase
 - BiblePlans
 - ReadingProgress
 - Admin
+
+Trilhas foram removidas da V2 inicial. Elas podem voltar no futuro se houver necessidade real de agrupar formacoes em percursos formativos.
 
 ## Plano Biblico E Base Biblica
 

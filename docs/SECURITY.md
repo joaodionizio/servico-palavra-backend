@@ -111,7 +111,7 @@ Em desenvolvimento, prefira `dotnet user-secrets`.
 | `/health` e `/` | Publico |
 | `/api/auth/csrf`, login e register | Publico com CSRF para escrita |
 | `/api/auth/me`, logout | Autenticado |
-| `/api/categorias`, `/api/conteudos`, `/api/trilhas` | Publico, somente dados publicados/ativos |
+| `/api/categorias`, `/api/conteudos` | Publico, somente dados publicados/ativos |
 | `/api/admin/*` | Admin |
 | `/api/favoritos` | Usuario autenticado |
 | `/api/conteudos/{id}/favoritar` | Usuario autenticado + CSRF |

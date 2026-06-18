@@ -25,13 +25,15 @@ dotnet ef database update --project src/ServicoPalavra.Infrastructure --startup-
 - `Perfis.Nome`
 - `CategoriasConteudo.Slug`
 - `Conteudos.Slug`
-- `TrilhasFormacao.Slug`
 - `BaseBiblica.Ordem`
-- `TrilhasConteudos(TrilhaFormacaoId, ConteudoId)`
 - `ProgressosConteudo(UsuarioId, ConteudoId)`
 - `Favoritos(UsuarioId, ConteudoId)`
 - `ProgressosLeitura(UsuarioId, PlanoBiblicoDiaId)`
 - `PosicoesBiblicasUsuario(UsuarioId)`
+
+## Tabelas Historicas Inativas
+
+As migrations antigas podem criar `TrilhasFormacao` e `TrilhasConteudos`. O modulo de Trilhas foi removido da V2 inicial e essas tabelas nao fazem parte do modelo ativo da aplicacao nesta fase. Nao remova tabelas de banco de producao sem uma migration explicita e revisada para esse objetivo.
 
 ## Midia E Arquivos
 
