@@ -40,6 +40,8 @@ Auth usa cookie HttpOnly. A API nao retorna JWT/token no login. Para `POST`, `PU
 - `PATCH /api/admin/conteudos/{id}/publicar` Admin
 - `PATCH /api/admin/conteudos/{id}/despublicar` Admin
 
+Conteudos de video/audio/material nao enviam arquivo binario para a API nesta fase. O cadastro usa metadados e `url` externa, por exemplo YouTube ou Google Drive, conforme `origem`. A estrategia completa esta em `MEDIA_STRATEGY.md`.
+
 ## Favoritos
 
 - `GET /api/favoritos`
@@ -71,6 +73,7 @@ Auth usa cookie HttpOnly. A API nao retorna JWT/token no login. Para `POST`, `PU
 - `GET /api/planos-biblicos/{id}/dias`
 - `GET /api/planos-biblicos/progresso/posicao-atual`
 - `POST /api/planos-biblicos/dias/{diaId}/concluir`
+- `POST /api/planos-biblicos/dias/{diaId}/desmarcar`
 
 Criacao de plano:
 

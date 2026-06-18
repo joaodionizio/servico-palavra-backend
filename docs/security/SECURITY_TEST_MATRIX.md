@@ -15,9 +15,12 @@
 | Conteudos | Host indevido para YouTube rejeitado | IMPLEMENTADO |
 | Favoritos | A nao remove favorito de B | PENDENTE |
 | Progresso | A nao conclui conteudo por B | PENDENTE |
-| Plano biblico | A nao conclui dia de B | PENDENTE |
-| Plano biblico | Continuidade usa ultima ordem + 1 | PENDENTE geracao completa |
-| Plano biblico | Troca transacional | IMPLEMENTADO parcialmente; teste de falha pendente |
+| Plano biblico | A nao conclui dia de B | IMPLEMENTADO |
+| Plano biblico | A nao desmarca dia de B | IMPLEMENTADO |
+| Plano biblico | Continuidade usa ultima ordem + 1 | IMPLEMENTADO |
+| Plano biblico | Recomeçar do inicio usa ordem 1 | IMPLEMENTADO |
+| Plano biblico | Troca transacional preserva plano ativo em falha | IMPLEMENTADO |
+| Plano biblico | Marcar, desmarcar e marcar novamente | IMPLEMENTADO |
 | CORS | Origem indevida falha | PENDENTE |
 | Erros | Sem stack trace/connection string para usuario | IMPLEMENTADO |
 | CSRF | POST sem antiforgery falha | IMPLEMENTADO |

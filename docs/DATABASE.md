@@ -33,6 +33,20 @@ dotnet ef database update --project src/ServicoPalavra.Infrastructure --startup-
 - `ProgressosLeitura(UsuarioId, PlanoBiblicoDiaId)`
 - `PosicoesBiblicasUsuario(UsuarioId)`
 
+## Midia E Arquivos
+
+O banco deve armazenar apenas metadados de conteudos e materiais:
+
+- titulo, descricao, resumo e slug;
+- tipo e origem;
+- URL externa;
+- duracao;
+- thumbnail;
+- categoria;
+- status de publicacao.
+
+Videos, audios, imagens e documentos nao devem ser salvos como binario ou base64 no banco. Na V2 inicial, videos e audios devem apontar para origem externa, como YouTube ou Google Drive. Upload direto para storage externo fica pendente de decisao futura e nao esta implementado.
+
 ## Troca futura de banco
 
 Para trocar o banco, use:
