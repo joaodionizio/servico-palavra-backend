@@ -90,6 +90,7 @@ public sealed class ConteudoRepository : IConteudoRepository
     public async Task DeleteMateriaisApoioAsync(Guid conteudoId, CancellationToken cancellationToken = default) => await _db.MateriaisApoio.Where(x => x.ConteudoId == conteudoId).ExecuteDeleteAsync(cancellationToken);
     public void Add(Conteudo conteudo) => _db.Conteudos.Add(conteudo);
     public void AddMaterialApoio(MaterialApoio material) => _db.MateriaisApoio.Add(material);
+    public void Remove(Conteudo conteudo) => _db.Conteudos.Remove(conteudo);
     private IQueryable<Conteudo> Query() => _db.Conteudos.Include(x => x.CategoriaConteudo).Include(x => x.CriadoPorUsuario);
     private IQueryable<Conteudo> ReadQuery(bool includeMaterials = false)
     {

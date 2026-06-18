@@ -38,10 +38,12 @@ Auth usa cookie HttpOnly. A API nao retorna JWT/token no login. Para `POST`, `PU
 - `GET /api/conteudos/{slug}`
 - `POST /api/admin/conteudos` Admin
 - `PUT /api/admin/conteudos/{id}` Admin
+- `DELETE /api/admin/conteudos/{id}` Admin
+- `PATCH /api/admin/conteudos/{id}/publicacao` Admin
 - `PATCH /api/admin/conteudos/{id}/publicar` Admin
 - `PATCH /api/admin/conteudos/{id}/despublicar` Admin
 
-Conteudos de video/audio/material nao enviam arquivo binario para a API nesta fase. O cadastro usa metadados e `url` externa, por exemplo YouTube ou Google Drive, conforme `origem`. A estrategia completa esta em `MEDIA_STRATEGY.md`.
+Conteudos de video/audio/material nao enviam arquivo binario para a API nesta fase. O cadastro usa metadados e `url` externa, por exemplo YouTube ou Google Drive, conforme `origem`. Materiais de apoio tambem usam links externos `http/https`; nao ha upload. A estrategia completa esta em `MEDIA_STRATEGY.md`.
 
 O contrato detalhado de listagem, detalhe e enums de conteudos/formacoes esta em `CONTENT_CONTRACT.md`.
 

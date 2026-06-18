@@ -9,6 +9,7 @@ public interface IConteudoService
     Task<ConteudoDetalheResponse> GetBySlugAsync(string slug, Guid? usuarioId = null, CancellationToken cancellationToken = default);
     Task<ConteudoResponse> CreateAsync(ConteudoRequest request, Guid usuarioId, CancellationToken cancellationToken = default);
     Task<ConteudoResponse> UpdateAsync(Guid id, ConteudoRequest request, CancellationToken cancellationToken = default);
+    Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
     Task<ConteudoResponse> UpdatePublicacaoAsync(Guid id, ConteudoPublicacaoRequest request, CancellationToken cancellationToken = default);
     Task<ConteudoResponse> PublicarAsync(Guid id, CancellationToken cancellationToken = default);
     Task<ConteudoResponse> DespublicarAsync(Guid id, CancellationToken cancellationToken = default);

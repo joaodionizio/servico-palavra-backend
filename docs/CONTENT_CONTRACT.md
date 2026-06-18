@@ -159,6 +159,75 @@ Filtros aceitos:
 }
 ```
 
+## Admin De Conteudos
+
+Endpoints administrativos exigem role `Admin` e CSRF para escrita.
+
+- `GET /api/admin/conteudos?busca=&categoriaSlug=&tipo=&publicado=&pagina=1&tamanhoPagina=20`
+- `GET /api/admin/conteudos/{id}`
+- `POST /api/admin/conteudos`
+- `PUT /api/admin/conteudos/{id}`
+- `PATCH /api/admin/conteudos/{id}/publicacao`
+- `DELETE /api/admin/conteudos/{id}`
+
+Campos obrigatorios para criar/editar:
+
+- `titulo`
+- `tipo`
+- `origem`
+- `url`
+
+Campos opcionais:
+
+- `descricao`
+- `resumo`
+- `urlThumbnail`
+- `duracaoMinutos`
+- `categoriaConteudoId`
+- `publicado`
+- `destaque`
+- `ordem`
+- `materiaisApoio`
+
+Regras do `POST /api/admin/conteudos`:
+
+- se `publicado` for omitido, o conteudo nasce publicado (`true`);
+- se `publicado: false` for enviado explicitamente, o conteudo nasce como rascunho;
+- `categoriaConteudoId` pode ser `null` ou omitido;
+- materiais de apoio sao apenas links externos `http/https`; nao ha upload;
+- se `materiaisApoio[].ordem` for omitido, a API atribui a sequencia automaticamente;
+- se `materiaisApoio[].ativo` for omitido, a API considera `true`.
+
+Exemplo minimo:
+
+```json
+{
+  "titulo": "Pregacao",
+  "tipo": 1,
+  "origem": 1,
+  "url": "https://youtu.be/exemplo"
+}
+```
+
+Exemplo com material externo:
+
+```json
+{
+  "titulo": "Formacao sobre vida de oracao",
+  "tipo": 1,
+  "origem": 1,
+  "url": "https://www.youtube.com/watch?v=exemplo",
+  "categoriaConteudoId": null,
+  "materiaisApoio": [
+    {
+      "titulo": "Roteiro",
+      "tipo": 1,
+      "url": "https://drive.google.com/file/d/exemplo/view"
+    }
+  ]
+}
+```
+
 ## Observacoes Para O Frontend
 
 - `tipo`, `origem` e `materiaisApoio[].tipo` devem ser interpretados como numeros.

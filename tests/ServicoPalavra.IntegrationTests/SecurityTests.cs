@@ -112,6 +112,9 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
         var publishContent = await _client.PatchAsJsonAsync($"/api/admin/conteudos/{contentId}/publicacao", new ConteudoPublicacaoRequest(true));
         Assert.Equal(HttpStatusCode.Forbidden, publishContent.StatusCode);
 
+        var deleteContent = await _client.DeleteAsync($"/api/admin/conteudos/{contentId}");
+        Assert.Equal(HttpStatusCode.Forbidden, deleteContent.StatusCode);
+
         var unpublishContent = await _client.PatchAsync($"/api/admin/conteudos/{contentId}/despublicar", null);
         Assert.Equal(HttpStatusCode.Forbidden, unpublishContent.StatusCode);
     }
@@ -696,6 +699,83 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
     }
 
     [Fact]
+    public async Task Admin_create_defaults_to_published_and_support_material_defaults()
+    {
+        await LoginAsync("admin@tests.local", "Admin12");
+        var suffix = Guid.NewGuid().ToString("N");
+        var request = new
+        {
+            titulo = $"Formacao Defaults {suffix}",
+            tipo = TipoConteudo.Video,
+            origem = OrigemConteudo.YouTube,
+            url = $"https://www.youtube.com/watch?v={Guid.NewGuid():N}",
+            materiaisApoio = new[]
+            {
+                new
+                {
+                    titulo = "Roteiro externo",
+                    tipo = TipoMaterialApoio.PDF,
+                    url = "https://example.com/roteiro.pdf"
+                }
+            }
+        };
+
+        var create = await _client.PostAsJsonAsync("/api/admin/conteudos", request);
+        await EnsureSuccessAsync(create);
+        var contentId = await ReadGuidAsync(create, "id");
+        var slug = await ReadStringAsync(create, "slug");
+
+        using (var document = JsonDocument.Parse(await create.Content.ReadAsStringAsync()))
+        {
+            var data = document.RootElement.GetProperty("data");
+            Assert.True(data.GetProperty("publicado").GetBoolean());
+        }
+
+        var publicDetail = await _client.GetAsync($"/api/conteudos/{slug}");
+        await EnsureSuccessAsync(publicDetail);
+
+        var adminDetail = await _client.GetAsync($"/api/admin/conteudos/{contentId}");
+        await EnsureSuccessAsync(adminDetail);
+        using (var document = JsonDocument.Parse(await adminDetail.Content.ReadAsStringAsync()))
+        {
+            var material = Assert.Single(document.RootElement.GetProperty("data").GetProperty("materiaisApoio").EnumerateArray());
+            Assert.Equal(1, material.GetProperty("ordem").GetInt32());
+            Assert.True(material.GetProperty("ativo").GetBoolean());
+        }
+    }
+
+    [Fact]
+    public async Task Admin_can_delete_content_and_remove_it_from_public_and_admin_lists()
+    {
+        await EnsureCsrfAsync();
+        var suffix = Guid.NewGuid().ToString("N");
+        var content = await CreatePublishedContentWithDetailsAsync($"Excluir {suffix}", TipoConteudo.Video, OrigemConteudo.YouTube, $"https://www.youtube.com/watch?v={Guid.NewGuid():N}", includeMaterial: true);
+        var userEmail = $"delete-content-{suffix}@tests.local";
+
+        await RegisterAsync("Usuario Delete Conteudo", userEmail);
+        await EnsureSuccessAsync(await _client.PostAsync($"/api/favoritos/{content.Id}", null));
+        await EnsureSuccessAsync(await _client.PostAsync($"/api/progresso/conteudos/{content.Id}/concluir", null));
+
+        await LoginAsync("admin@tests.local", "Admin12");
+        var delete = await _client.DeleteAsync($"/api/admin/conteudos/{content.Id}");
+        await EnsureSuccessAsync(delete);
+
+        var publicDetail = await _client.GetAsync($"/api/conteudos/{content.Slug}");
+        Assert.Equal(HttpStatusCode.NotFound, publicDetail.StatusCode);
+
+        var adminDetail = await _client.GetAsync($"/api/admin/conteudos/{content.Id}");
+        Assert.Equal(HttpStatusCode.NotFound, adminDetail.StatusCode);
+
+        var adminList = await _client.GetAsync($"/api/admin/conteudos?busca={Uri.EscapeDataString(suffix)}");
+        await EnsureSuccessAsync(adminList);
+        using (var document = JsonDocument.Parse(await adminList.Content.ReadAsStringAsync()))
+        {
+            var items = document.RootElement.GetProperty("data").GetProperty("itens").EnumerateArray().ToArray();
+            Assert.DoesNotContain(items, x => x.GetProperty("id").GetGuid() == content.Id);
+        }
+    }
+
+    [Fact]
     public async Task Error_response_does_not_expose_stack_trace()
     {
         await EnsureCsrfAsync();
@@ -726,10 +806,31 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
 
     private async Task LoginAsync(string email, string password)
     {
+        if (email == "admin@tests.local")
+        {
+            await ResetLoginStateAsync(email);
+        }
+
         await EnsureCsrfAsync();
         var response = await _client.PostAsJsonAsync("/api/auth/login", new LoginRequest(email, password));
         await EnsureSuccessAsync(response);
         await EnsureCsrfAsync();
+    }
+
+    private async Task ResetLoginStateAsync(string email)
+    {
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var user = await db.Users.FirstOrDefaultAsync(x => x.Email == email);
+
+        if (user is null)
+        {
+            return;
+        }
+
+        user.AccessFailedCount = 0;
+        user.LockoutEnd = null;
+        await db.SaveChangesAsync();
     }
 
     private async Task SeedBibleBaseAsync()

@@ -49,6 +49,14 @@ public sealed class ConteudosController : ApiControllerBase
         OkResponse(await _conteudos.UpdateAsync(id, request, cancellationToken));
 
     [Authorize(Roles = "Admin")]
+    [HttpDelete("api/admin/conteudos/{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+        await _conteudos.DeleteAsync(id, cancellationToken);
+        return OkResponse("Conteudo excluido com sucesso.");
+    }
+
+    [Authorize(Roles = "Admin")]
     [HttpPatch("api/admin/conteudos/{id:guid}/publicacao")]
     public async Task<IActionResult> UpdatePublicacao(Guid id, ConteudoPublicacaoRequest request, CancellationToken cancellationToken) =>
         OkResponse(await _conteudos.UpdatePublicacaoAsync(id, request, cancellationToken));

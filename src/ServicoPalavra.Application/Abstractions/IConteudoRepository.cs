@@ -15,4 +15,5 @@ public interface IConteudoRepository
     Task DeleteMateriaisApoioAsync(Guid conteudoId, CancellationToken cancellationToken = default);
     void Add(Conteudo conteudo);
     void AddMaterialApoio(MaterialApoio material);
+    void Remove(Conteudo conteudo);
 }

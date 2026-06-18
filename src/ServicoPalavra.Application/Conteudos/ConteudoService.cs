@@ -1,6 +1,7 @@
 using ServicoPalavra.Application.Abstractions;
 using ServicoPalavra.Application.Common;
 using ServicoPalavra.Domain.Entities;
+using ServicoPalavra.Domain.Enums;
 
 namespace ServicoPalavra.Application.Conteudos;
 
@@ -69,6 +70,7 @@ public sealed class ConteudoService : IConteudoService
 
     public async Task<ConteudoResponse> CreateAsync(ConteudoRequest request, Guid usuarioId, CancellationToken cancellationToken = default)
     {
+        ValidateRequiredFields(request);
         ExternalUrlValidator.ValidateConteudoUrl(request.Url, request.Origem);
         ExternalUrlValidator.ValidateOptionalThumbnail(request.UrlThumbnail);
         ValidateMateriaisApoio(request.MateriaisApoio);
@@ -84,6 +86,7 @@ public sealed class ConteudoService : IConteudoService
             ?? throw new AppException("Usuario criador nao encontrado.", 404);
 
         var now = DateTime.UtcNow;
+        var publicado = request.Publicado ?? true;
         var conteudo = new Conteudo
         {
             Id = Guid.NewGuid(),
@@ -100,10 +103,10 @@ public sealed class ConteudoService : IConteudoService
             CategoriaConteudo = categoria,
             CriadoPorUsuarioId = usuario.Id,
             CriadoPorUsuario = usuario,
-            Publicado = request.Publicado,
-            Destaque = request.Destaque,
+            Publicado = publicado,
+            Destaque = request.Destaque ?? false,
             Ordem = request.Ordem,
-            PublicadoEm = request.Publicado ? now : null,
+            PublicadoEm = publicado ? now : null,
             CriadoEm = now,
             MateriaisApoio = BuildMateriaisApoio(request.MateriaisApoio, now)
         };
@@ -115,6 +118,7 @@ public sealed class ConteudoService : IConteudoService
 
     public async Task<ConteudoResponse> UpdateAsync(Guid id, ConteudoRequest request, CancellationToken cancellationToken = default)
     {
+        ValidateRequiredFields(request);
         ExternalUrlValidator.ValidateConteudoUrl(request.Url, request.Origem);
         ExternalUrlValidator.ValidateOptionalThumbnail(request.UrlThumbnail);
         ValidateMateriaisApoio(request.MateriaisApoio);
@@ -131,6 +135,7 @@ public sealed class ConteudoService : IConteudoService
         var categoria = await GetCategoriaAsync(request.CategoriaConteudoId, cancellationToken);
 
         var now = DateTime.UtcNow;
+        var publicado = request.Publicado ?? conteudo.Publicado;
         conteudo.Titulo = request.Titulo.Trim();
         conteudo.Slug = slug;
         conteudo.Descricao = request.Descricao;
@@ -142,9 +147,9 @@ public sealed class ConteudoService : IConteudoService
         conteudo.DuracaoMinutos = request.DuracaoMinutos;
         conteudo.CategoriaConteudoId = categoria?.Id;
         conteudo.CategoriaConteudo = categoria;
-        conteudo.PublicadoEm = !conteudo.Publicado && request.Publicado ? now : conteudo.PublicadoEm;
-        conteudo.Publicado = request.Publicado;
-        conteudo.Destaque = request.Destaque;
+        conteudo.PublicadoEm = !conteudo.Publicado && publicado ? now : conteudo.PublicadoEm;
+        conteudo.Publicado = publicado;
+        conteudo.Destaque = request.Destaque ?? conteudo.Destaque;
         conteudo.Ordem = request.Ordem;
         conteudo.AtualizadoEm = now;
 
@@ -161,6 +166,15 @@ public sealed class ConteudoService : IConteudoService
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return ToResponse(conteudo);
+    }
+
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var conteudo = await _conteudos.GetByIdAsync(id, true, cancellationToken)
+            ?? throw new AppException("Conteudo nao encontrado.", 404);
+
+        _conteudos.Remove(conteudo);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<ConteudoResponse> UpdatePublicacaoAsync(Guid id, ConteudoPublicacaoRequest request, CancellationToken cancellationToken = default) =>
@@ -188,6 +202,29 @@ public sealed class ConteudoService : IConteudoService
     }
 
     private static string BuildSlug(ConteudoRequest request) => string.IsNullOrWhiteSpace(request.Slug) ? Slug.From(request.Titulo) : Slug.From(request.Slug);
+    private static void ValidateRequiredFields(ConteudoRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Titulo))
+        {
+            throw new AppException("Titulo e obrigatorio.");
+        }
+
+        if (!Enum.IsDefined(typeof(TipoConteudo), request.Tipo))
+        {
+            throw new AppException("Tipo de conteudo invalido.");
+        }
+
+        if (!Enum.IsDefined(typeof(OrigemConteudo), request.Origem))
+        {
+            throw new AppException("Origem de conteudo invalida.");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Url))
+        {
+            throw new AppException("URL do conteudo e obrigatoria.");
+        }
+    }
+
     private async Task<CategoriaConteudo?> GetCategoriaAsync(Guid? categoriaConteudoId, CancellationToken cancellationToken)
     {
         if (!categoriaConteudoId.HasValue || categoriaConteudoId.Value == Guid.Empty)
@@ -270,15 +307,15 @@ public sealed class ConteudoService : IConteudoService
 
     private static List<MaterialApoio> BuildMateriaisApoio(IReadOnlyList<MaterialApoioRequest>? materiais, DateTime now) =>
         materiais?
-            .Select(material => new MaterialApoio
+            .Select((material, index) => new MaterialApoio
             {
                 Id = Guid.NewGuid(),
                 Titulo = material.Titulo.Trim(),
                 Descricao = material.Descricao,
                 Tipo = material.Tipo,
                 Url = material.Url.Trim(),
-                Ordem = material.Ordem,
-                Ativo = material.Ativo,
+                Ordem = material.Ordem ?? index + 1,
+                Ativo = material.Ativo ?? true,
                 CriadoEm = now
             })
             .ToList() ?? [];
