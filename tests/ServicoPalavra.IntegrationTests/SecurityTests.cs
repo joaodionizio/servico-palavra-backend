@@ -7,7 +7,6 @@ using ServicoPalavra.Application.Auth;
 using ServicoPalavra.Application.Categorias;
 using ServicoPalavra.Application.Conteudos;
 using ServicoPalavra.Application.PlanosBiblicos;
-using ServicoPalavra.Application.Trilhas;
 using ServicoPalavra.Domain.Entities;
 using ServicoPalavra.Domain.Enums;
 using ServicoPalavra.Infrastructure.Persistence;
@@ -95,12 +94,11 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Common_user_cannot_create_or_update_admin_content_or_trail()
+    public async Task Common_user_cannot_create_update_or_publish_admin_content()
     {
         await EnsureCsrfAsync();
         var suffix = Guid.NewGuid().ToString("N");
         var contentId = await CreatePublishedContentAsync($"Conteudo Admin {suffix}");
-        var trailId = await CreateTrailAsync($"Trilha Admin {suffix}");
         var categoryId = await CreateCategoryAsync($"Categoria Bloqueada {suffix}");
 
         await RegisterAsync("Usuario Admin Bloqueado", $"admin-blocked-{suffix}@tests.local");
@@ -111,11 +109,146 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
         var updateContent = await _client.PutAsJsonAsync($"/api/admin/conteudos/{contentId}", BuildContentRequest($"Conteudo Alterado {suffix}", categoryId));
         Assert.Equal(HttpStatusCode.Forbidden, updateContent.StatusCode);
 
-        var createTrail = await _client.PostAsJsonAsync("/api/admin/trilhas", new TrilhaRequest($"Trilha Bloqueada {suffix}", null, null, null, null, true, false, 1));
-        Assert.Equal(HttpStatusCode.Forbidden, createTrail.StatusCode);
+        var publishContent = await _client.PatchAsJsonAsync($"/api/admin/conteudos/{contentId}/publicacao", new ConteudoPublicacaoRequest(true));
+        Assert.Equal(HttpStatusCode.Forbidden, publishContent.StatusCode);
 
-        var updateTrail = await _client.PutAsJsonAsync($"/api/admin/trilhas/{trailId}", new TrilhaRequest($"Trilha Alterada {suffix}", null, null, null, null, true, false, 1));
-        Assert.Equal(HttpStatusCode.Forbidden, updateTrail.StatusCode);
+        var unpublishContent = await _client.PatchAsync($"/api/admin/conteudos/{contentId}/despublicar", null);
+        Assert.Equal(HttpStatusCode.Forbidden, unpublishContent.StatusCode);
+    }
+
+    [Fact]
+    public async Task Public_categories_list_returns_only_active_ordered_contract_fields()
+    {
+        var suffix = Guid.NewGuid().ToString("N");
+        var slugPrefix = $"fase11a-{suffix}";
+        var now = DateTime.UtcNow;
+
+        await using (var scope = _factory.Services.CreateAsyncScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.CategoriasConteudo.AddRange(
+                new CategoriaConteudo
+                {
+                    Id = Guid.NewGuid(),
+                    Nome = $"Zeta {suffix}",
+                    Slug = $"{slugPrefix}-zeta",
+                    Descricao = "Categoria ativa Zeta",
+                    Cor = "#112233",
+                    Icone = "book-open",
+                    Ordem = 1,
+                    Ativo = true,
+                    CriadoEm = now
+                },
+                new CategoriaConteudo
+                {
+                    Id = Guid.NewGuid(),
+                    Nome = $"Alpha {suffix}",
+                    Slug = $"{slugPrefix}-alpha",
+                    Descricao = "Categoria ativa Alpha",
+                    Cor = "#445566",
+                    Icone = "graduation-cap",
+                    Ordem = 1,
+                    Ativo = true,
+                    CriadoEm = now
+                },
+                new CategoriaConteudo
+                {
+                    Id = Guid.NewGuid(),
+                    Nome = $"Inativa {suffix}",
+                    Slug = $"{slugPrefix}-inativa",
+                    Ordem = 0,
+                    Ativo = false,
+                    CriadoEm = now
+                });
+            await db.SaveChangesAsync();
+        }
+
+        var response = await _client.GetAsync("/api/categorias");
+
+        await EnsureSuccessAsync(response);
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var data = document.RootElement.GetProperty("data");
+        var categories = data
+            .EnumerateArray()
+            .Where(x => x.GetProperty("slug").GetString()!.StartsWith(slugPrefix, StringComparison.Ordinal))
+            .ToArray();
+
+        Assert.Equal(2, categories.Length);
+        Assert.Equal($"{slugPrefix}-alpha", categories[0].GetProperty("slug").GetString());
+        Assert.Equal($"{slugPrefix}-zeta", categories[1].GetProperty("slug").GetString());
+        Assert.Equal($"Alpha {suffix}", categories[0].GetProperty("nome").GetString());
+        Assert.Equal("Categoria ativa Alpha", categories[0].GetProperty("descricao").GetString());
+        Assert.Equal("#445566", categories[0].GetProperty("cor").GetString());
+        Assert.Equal("graduation-cap", categories[0].GetProperty("icone").GetString());
+        Assert.Equal(1, categories[0].GetProperty("ordem").GetInt32());
+        Assert.False(categories[0].TryGetProperty("ativo", out _));
+        Assert.False(categories[0].TryGetProperty("criadoEm", out _));
+        Assert.False(categories[0].TryGetProperty("atualizadoEm", out _));
+    }
+
+    [Fact]
+    public async Task Published_content_list_supports_search_category_type_and_pagination()
+    {
+        var suffix = Guid.NewGuid().ToString("N");
+        var first = await CreatePublishedContentWithDetailsAsync($"Formacao Audio {suffix}", TipoConteudo.Audio, OrigemConteudo.GoogleDrive, "https://drive.google.com/file/d/audio/view");
+        _ = await CreatePublishedContentWithDetailsAsync($"Formacao Video {suffix}", TipoConteudo.Video, OrigemConteudo.YouTube, $"https://www.youtube.com/watch?v={Guid.NewGuid():N}");
+
+        var response = await _client.GetAsync($"/api/conteudos?busca=Audio&categoriaSlug={first.CategorySlug}&tipo=Audio&pagina=1&tamanhoPagina=1");
+
+        await EnsureSuccessAsync(response);
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var data = document.RootElement.GetProperty("data");
+        var items = data.GetProperty("itens").EnumerateArray().ToArray();
+
+        Assert.Equal(1, data.GetProperty("pagina").GetInt32());
+        Assert.Equal(1, data.GetProperty("tamanhoPagina").GetInt32());
+        Assert.Equal(1, data.GetProperty("totalItens").GetInt32());
+        Assert.Single(items);
+        Assert.Equal(first.Id, items[0].GetProperty("id").GetGuid());
+        Assert.Equal((int)TipoConteudo.Audio, items[0].GetProperty("tipo").GetInt32());
+    }
+
+    [Fact]
+    public async Task Content_detail_by_slug_includes_support_material_and_authenticated_user_state()
+    {
+        await EnsureCsrfAsync();
+        var suffix = Guid.NewGuid().ToString("N");
+        var content = await CreatePublishedContentWithDetailsAsync($"Detalhe {suffix}", TipoConteudo.Video, OrigemConteudo.YouTube, $"https://www.youtube.com/watch?v={Guid.NewGuid():N}", includeMaterial: true);
+        var email = $"conteudo-detail-{suffix}@tests.local";
+
+        var anonymous = await _client.GetAsync($"/api/conteudos/{content.Slug}");
+        await EnsureSuccessAsync(anonymous);
+        using (var document = JsonDocument.Parse(await anonymous.Content.ReadAsStringAsync()))
+        {
+            var data = document.RootElement.GetProperty("data");
+            Assert.Equal(content.Id, data.GetProperty("id").GetGuid());
+            Assert.False(data.GetProperty("favorito").GetBoolean());
+            Assert.False(data.GetProperty("concluido").GetBoolean());
+            Assert.Single(data.GetProperty("materiaisApoio").EnumerateArray());
+        }
+
+        await RegisterAsync("Usuario Detalhe Conteudo", email);
+        await EnsureSuccessAsync(await _client.PostAsync($"/api/favoritos/{content.Id}", null));
+        await EnsureSuccessAsync(await _client.PostAsync($"/api/progresso/conteudos/{content.Id}/concluir", null));
+
+        var authenticated = await _client.GetAsync($"/api/conteudos/{content.Slug}");
+        await EnsureSuccessAsync(authenticated);
+        using (var document = JsonDocument.Parse(await authenticated.Content.ReadAsStringAsync()))
+        {
+            var data = document.RootElement.GetProperty("data");
+            Assert.True(data.GetProperty("favorito").GetBoolean());
+            Assert.True(data.GetProperty("concluido").GetBoolean());
+        }
+
+        await EnsureSuccessAsync(await _client.DeleteAsync($"/api/progresso/conteudos/{content.Id}/concluir"));
+        var afterUncheck = await _client.GetAsync($"/api/conteudos/{content.Slug}");
+        await EnsureSuccessAsync(afterUncheck);
+        using (var document = JsonDocument.Parse(await afterUncheck.Content.ReadAsStringAsync()))
+        {
+            var data = document.RootElement.GetProperty("data");
+            Assert.True(data.GetProperty("favorito").GetBoolean());
+            Assert.False(data.GetProperty("concluido").GetBoolean());
+        }
     }
 
     [Fact]
@@ -175,11 +308,15 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
         var dashboardA = await ReadDashboardAsync();
         Assert.Equal(1, dashboardA.ConteudosConcluidos);
         Assert.Equal(1, dashboardA.Favoritos);
+        Assert.Contains(contentA, dashboardA.ConteudosComProgresso);
+        Assert.DoesNotContain(contentB, dashboardA.ConteudosComProgresso);
 
         await LoginAsync(userBEmail, "User12");
         var dashboardB = await ReadDashboardAsync();
         Assert.Equal(1, dashboardB.ConteudosConcluidos);
         Assert.Equal(1, dashboardB.Favoritos);
+        Assert.Contains(contentB, dashboardB.ConteudosComProgresso);
+        Assert.DoesNotContain(contentA, dashboardB.ConteudosComProgresso);
     }
 
     [Fact]
@@ -209,12 +346,29 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
         Assert.Equal(1, dashboardA.ConteudosConcluidos);
         Assert.Equal(1, dashboardA.Favoritos);
         Assert.True(dashboardA.PossuiPlanoBiblicoAtivo);
+        Assert.Equal(1, dashboardA.TotalFavoritos);
+        Assert.Equal(1, dashboardA.TotalConteudosConcluidos);
+        Assert.Contains(contentA, dashboardA.FavoritosRecentes);
+        Assert.Contains(contentA, dashboardA.ConteudosComProgresso);
+        Assert.DoesNotContain(contentB1, dashboardA.FavoritosRecentes);
+        Assert.DoesNotContain(contentB2, dashboardA.FavoritosRecentes);
+        Assert.NotNull(dashboardA.PlanoBiblicoAtivoId);
+        Assert.NotNull(dashboardA.LeituraHojeId);
 
         await LoginAsync(userBEmail, "User12");
         var dashboardB = await ReadDashboardAsync();
         Assert.Equal(1, dashboardB.ConteudosConcluidos);
         Assert.Equal(2, dashboardB.Favoritos);
         Assert.True(dashboardB.PossuiPlanoBiblicoAtivo);
+        Assert.Equal(2, dashboardB.TotalFavoritos);
+        Assert.Equal(1, dashboardB.TotalConteudosConcluidos);
+        Assert.Contains(contentB1, dashboardB.FavoritosRecentes);
+        Assert.Contains(contentB2, dashboardB.FavoritosRecentes);
+        Assert.Contains(contentB1, dashboardB.ConteudosComProgresso);
+        Assert.DoesNotContain(contentA, dashboardB.FavoritosRecentes);
+        Assert.DoesNotContain(contentA, dashboardB.ConteudosComProgresso);
+        Assert.NotNull(dashboardB.PlanoBiblicoAtivoId);
+        Assert.NotNull(dashboardB.LeituraHojeId);
     }
 
     [Fact]
@@ -411,6 +565,85 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
     }
 
     [Fact]
+    public async Task Admin_can_create_edit_publish_and_public_content_visibility_follows_publication_state()
+    {
+        await LoginAsync("admin@tests.local", "Admin12");
+        var suffix = Guid.NewGuid().ToString("N");
+        var categoryId = await CreateCategoryAsync($"Categoria Admin Conteudo {suffix}");
+        var createRequest = new ConteudoRequest(
+            $"Formacao Admin {suffix}",
+            null,
+            "Descricao inicial",
+            "Resumo inicial",
+            TipoConteudo.Video,
+            OrigemConteudo.YouTube,
+            $"https://www.youtube.com/watch?v={Guid.NewGuid():N}",
+            "https://example.com/thumb.jpg",
+            45,
+            categoryId,
+            false,
+            false,
+            0,
+            [
+                new MaterialApoioRequest("Roteiro", "Roteiro inicial", TipoMaterialApoio.PDF, "https://example.com/roteiro.pdf", 1, true)
+            ]);
+
+        var create = await _client.PostAsJsonAsync("/api/admin/conteudos", createRequest);
+        await EnsureSuccessAsync(create);
+        var contentId = await ReadGuidAsync(create, "id");
+        var slug = await ReadStringAsync(create, "slug");
+
+        var publicDraft = await _client.GetAsync($"/api/conteudos/{slug}");
+        Assert.Equal(HttpStatusCode.NotFound, publicDraft.StatusCode);
+
+        var adminDraftList = await _client.GetAsync($"/api/admin/conteudos?busca={Uri.EscapeDataString(suffix)}&publicado=false&pagina=1&tamanhoPagina=20");
+        await EnsureSuccessAsync(adminDraftList);
+        using (var document = JsonDocument.Parse(await adminDraftList.Content.ReadAsStringAsync()))
+        {
+            var items = document.RootElement.GetProperty("data").GetProperty("itens").EnumerateArray().ToArray();
+            Assert.Contains(items, x => x.GetProperty("id").GetGuid() == contentId && !x.GetProperty("publicado").GetBoolean());
+        }
+
+        var updateRequest = createRequest with
+        {
+            Titulo = $"Formacao Admin Editada {suffix}",
+            Slug = slug,
+            Resumo = "Resumo editado",
+            MateriaisApoio =
+            [
+                new MaterialApoioRequest("Roteiro editado", "Roteiro final", TipoMaterialApoio.Link, "https://example.com/roteiro-final", 2, false)
+            ]
+        };
+        var update = await _client.PutAsJsonAsync($"/api/admin/conteudos/{contentId}", updateRequest);
+        await EnsureSuccessAsync(update);
+
+        var adminDetail = await _client.GetAsync($"/api/admin/conteudos/{contentId}");
+        await EnsureSuccessAsync(adminDetail);
+        using (var document = JsonDocument.Parse(await adminDetail.Content.ReadAsStringAsync()))
+        {
+            var data = document.RootElement.GetProperty("data");
+            Assert.Equal($"Formacao Admin Editada {suffix}", data.GetProperty("titulo").GetString());
+            Assert.False(data.GetProperty("publicado").GetBoolean());
+            var material = Assert.Single(data.GetProperty("materiaisApoio").EnumerateArray());
+            Assert.Equal("Roteiro editado", material.GetProperty("titulo").GetString());
+            Assert.False(material.GetProperty("ativo").GetBoolean());
+        }
+
+        var publish = await _client.PatchAsJsonAsync($"/api/admin/conteudos/{contentId}/publicacao", new ConteudoPublicacaoRequest(true));
+        await EnsureSuccessAsync(publish);
+
+        var publicPublished = await _client.GetAsync($"/api/conteudos/{slug}");
+        await EnsureSuccessAsync(publicPublished);
+        using (var document = JsonDocument.Parse(await publicPublished.Content.ReadAsStringAsync()))
+        {
+            var data = document.RootElement.GetProperty("data");
+            Assert.Equal(contentId, data.GetProperty("id").GetGuid());
+            Assert.True(data.GetProperty("publicado").GetBoolean());
+            Assert.Empty(data.GetProperty("materiaisApoio").EnumerateArray());
+        }
+    }
+
+    [Fact]
     public async Task Error_response_does_not_expose_stack_trace()
     {
         await EnsureCsrfAsync();
@@ -517,6 +750,61 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
         return content.Id;
     }
 
+    private async Task<ContentSeed> CreatePublishedContentWithDetailsAsync(string title, TipoConteudo tipo, OrigemConteudo origem, string url, bool includeMaterial = false)
+    {
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var admin = await db.Users.FirstAsync(x => x.Email == "admin@tests.local");
+        var now = DateTime.UtcNow;
+        var category = new CategoriaConteudo
+        {
+            Id = Guid.NewGuid(),
+            Nome = $"Categoria {title}",
+            Slug = $"categoria-{Guid.NewGuid():N}",
+            Ativo = true,
+            Ordem = 1,
+            CriadoEm = now
+        };
+        var content = new Conteudo
+        {
+            Id = Guid.NewGuid(),
+            Titulo = title,
+            Slug = $"conteudo-{Guid.NewGuid():N}",
+            Resumo = $"Resumo {title}",
+            Descricao = $"Descricao {title}",
+            Tipo = tipo,
+            Origem = origem,
+            Url = url,
+            DuracaoMinutos = 10,
+            CategoriaConteudoId = category.Id,
+            CriadoPorUsuarioId = admin.Id,
+            Publicado = true,
+            PublicadoEm = now,
+            CriadoEm = now
+        };
+
+        db.CategoriasConteudo.Add(category);
+        db.Conteudos.Add(content);
+
+        if (includeMaterial)
+        {
+            db.MateriaisApoio.Add(new MaterialApoio
+            {
+                Id = Guid.NewGuid(),
+                ConteudoId = content.Id,
+                Titulo = $"Material {title}",
+                Tipo = TipoMaterialApoio.Link,
+                Url = "https://drive.google.com/file/d/material/view",
+                Ordem = 1,
+                Ativo = true,
+                CriadoEm = now
+            });
+        }
+
+        await db.SaveChangesAsync();
+        return new ContentSeed(content.Id, content.Slug, category.Slug);
+    }
+
     private async Task<Guid> CreateCategoryAsync(string name)
     {
         await using var scope = _factory.Services.CreateAsyncScope();
@@ -536,28 +824,6 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
         return category.Id;
     }
 
-    private async Task<Guid> CreateTrailAsync(string title)
-    {
-        await using var scope = _factory.Services.CreateAsyncScope();
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var admin = await db.Users.FirstAsync(x => x.Email == "admin@tests.local");
-        var trail = new TrilhaFormacao
-        {
-            Id = Guid.NewGuid(),
-            Titulo = title,
-            Slug = $"trilha-{Guid.NewGuid():N}",
-            Publicado = true,
-            Ordem = 1,
-            CriadoPorUsuarioId = admin.Id,
-            PublicadoEm = DateTime.UtcNow,
-            CriadoEm = DateTime.UtcNow
-        };
-
-        db.TrilhasFormacao.Add(trail);
-        await db.SaveChangesAsync();
-        return trail.Id;
-    }
-
     private static ConteudoRequest BuildContentRequest(string title, Guid categoryId) =>
         new(title, null, null, null, TipoConteudo.Video, OrigemConteudo.YouTube, $"https://www.youtube.com/watch?v={Guid.NewGuid():N}", null, 10, categoryId, true, false, 1);
 
@@ -571,17 +837,40 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
             .ToArray();
     }
 
-    private async Task<(int ConteudosConcluidos, int Favoritos, bool PossuiPlanoBiblicoAtivo)> ReadDashboardAsync()
+    private async Task<DashboardSnapshot> ReadDashboardAsync()
     {
         var response = await _client.GetAsync("/api/dashboard/me");
         await EnsureSuccessAsync(response);
         using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var data = document.RootElement.GetProperty("data");
-        return (
+        var estatisticas = data.GetProperty("estatisticas");
+        var planoBiblicoAtivo = data.GetProperty("planoBiblicoAtivo");
+        var leituraHoje = data.GetProperty("leituraHoje");
+
+        return new DashboardSnapshot(
             data.GetProperty("conteudosConcluidos").GetInt32(),
             data.GetProperty("favoritos").GetInt32(),
-            data.GetProperty("possuiPlanoBiblicoAtivo").GetBoolean());
+            data.GetProperty("possuiPlanoBiblicoAtivo").GetBoolean(),
+            data.GetProperty("favoritosRecentes").EnumerateArray().Select(x => x.GetProperty("conteudoId").GetGuid()).ToArray(),
+            data.GetProperty("conteudosComProgresso").EnumerateArray().Select(x => x.GetProperty("conteudoId").GetGuid()).ToArray(),
+            estatisticas.GetProperty("totalFavoritos").GetInt32(),
+            estatisticas.GetProperty("totalConteudosConcluidos").GetInt32(),
+            planoBiblicoAtivo.ValueKind == JsonValueKind.Null ? null : planoBiblicoAtivo.GetProperty("id").GetGuid(),
+            leituraHoje.ValueKind == JsonValueKind.Null ? null : leituraHoje.GetProperty("diaId").GetGuid());
     }
+
+    private sealed record DashboardSnapshot(
+        int ConteudosConcluidos,
+        int Favoritos,
+        bool PossuiPlanoBiblicoAtivo,
+        IReadOnlyCollection<Guid> FavoritosRecentes,
+        IReadOnlyCollection<Guid> ConteudosComProgresso,
+        int TotalFavoritos,
+        int TotalConteudosConcluidos,
+        Guid? PlanoBiblicoAtivoId,
+        Guid? LeituraHojeId);
+
+    private sealed record ContentSeed(Guid Id, string Slug, string CategorySlug);
 
     private static async Task<Guid> ReadGuidAsync(HttpResponseMessage response, string property)
     {
