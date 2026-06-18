@@ -17,8 +17,6 @@ public sealed class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRo
     public DbSet<CategoriaConteudo> CategoriasConteudo => Set<CategoriaConteudo>();
     public DbSet<Conteudo> Conteudos => Set<Conteudo>();
     public DbSet<MaterialApoio> MateriaisApoio => Set<MaterialApoio>();
-    public DbSet<TrilhaFormacao> TrilhasFormacao => Set<TrilhaFormacao>();
-    public DbSet<TrilhaConteudo> TrilhasConteudos => Set<TrilhaConteudo>();
     public DbSet<ProgressoConteudo> ProgressosConteudo => Set<ProgressoConteudo>();
     public DbSet<Favorito> Favoritos => Set<Favorito>();
     public DbSet<BaseBiblica> BaseBiblica => Set<BaseBiblica>();

@@ -43,8 +43,8 @@ public static class DependencyInjection
         services.AddScoped<IConteudoRepository, ConteudoRepository>();
         services.AddScoped<IFavoritoRepository, FavoritoRepository>();
         services.AddScoped<IProgressoRepository, ProgressoRepository>();
-        services.AddScoped<ITrilhaRepository, TrilhaRepository>();
         services.AddScoped<IPlanoBiblicoRepository, PlanoBiblicoRepository>();
+        services.AddScoped<IDashboardReadRepository, DashboardReadRepository>();
         services.AddScoped<DatabaseSeeder>();
         services.AddScoped<BaseBiblicaV2Importer>();
 

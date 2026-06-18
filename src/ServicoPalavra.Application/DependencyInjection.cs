@@ -6,7 +6,6 @@ using ServicoPalavra.Application.Dashboard;
 using ServicoPalavra.Application.Favoritos;
 using ServicoPalavra.Application.PlanosBiblicos;
 using ServicoPalavra.Application.Progresso;
-using ServicoPalavra.Application.Trilhas;
 
 namespace ServicoPalavra.Application;
 
@@ -19,7 +18,6 @@ public static class DependencyInjection
         services.AddScoped<IConteudoService, ConteudoService>();
         services.AddScoped<IFavoritoService, FavoritoService>();
         services.AddScoped<IProgressoService, ProgressoService>();
-        services.AddScoped<ITrilhaService, TrilhaService>();
         services.AddScoped<IBiblePlanGeneratorService, BiblePlanGeneratorService>();
         services.AddScoped<IPlanoBiblicoService, PlanoBiblicoService>();
         services.AddScoped<IDashboardService, DashboardService>();

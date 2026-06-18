@@ -12,5 +12,4 @@ public sealed class ApplicationUser : IdentityUser<Guid>
     public DateTime? AtualizadoEm { get; set; }
 
     public ICollection<Conteudo> ConteudosCriados { get; set; } = new List<Conteudo>();
-    public ICollection<TrilhaFormacao> TrilhasCriadas { get; set; } = new List<TrilhaFormacao>();
 }

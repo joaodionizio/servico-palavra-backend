@@ -26,5 +26,4 @@ public sealed class Conteudo
     public DateTime? AtualizadoEm { get; set; }
 
     public ICollection<MaterialApoio> MateriaisApoio { get; set; } = new List<MaterialApoio>();
-    public ICollection<TrilhaConteudo> Trilhas { get; set; } = new List<TrilhaConteudo>();
 }
