@@ -111,4 +111,4 @@ Para deploy futuro no Render:
 - Configure `ConnectionStrings__DefaultConnection` com a URL do Neon/PostgreSQL fora do repositorio.
 - Configure `ALLOWED_ORIGINS` com os dominios reais do frontend.
 
-Mais detalhes em [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/DATABASE.md](docs/DATABASE.md), [docs/API.md](docs/API.md) e [docs/ROADMAP.md](docs/ROADMAP.md).
+Mais detalhes em [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/API.md](docs/API.md), [docs/SECURITY.md](docs/SECURITY.md), [docs/BIBLE_PLAN.md](docs/BIBLE_PLAN.md), [docs/DEPLOY.md](docs/DEPLOY.md), [docs/DATABASE.md](docs/DATABASE.md) e [docs/MEDIA_STRATEGY.md](docs/MEDIA_STRATEGY.md).

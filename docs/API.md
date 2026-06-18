@@ -96,6 +96,8 @@ Alteracao de plano:
 }
 ```
 
+Detalhes de BaseBiblica, sequencia pastoral, importacao e peso de leitura estao em `BIBLE_PLAN.md`.
+
 ## Dashboard
 
 - `GET /api/dashboard/me`

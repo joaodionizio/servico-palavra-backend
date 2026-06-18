@@ -44,8 +44,6 @@ O `UsuarioId` de fluxos autenticados deve ser derivado da sessao no backend. O f
 
 ## Modulos Da Plataforma
 
-Os modulos oficiais atuais estao descritos em `MODULES.md`:
-
 - Auth
 - Users
 - Roles
@@ -79,7 +77,7 @@ A regra pastoral nao deve ser alterada sem justificativa documentada e validacao
 
 O banco de producao e PostgreSQL/Neon. SQLite pode ser usado localmente ou em testes quando configurado.
 
-Migrations, connection strings reais e comandos operacionais estao documentados em `DATABASE.md`, `POSTGRESQL_NEON_SETUP.md` e `BIBLE_BASE_IMPORT.md`.
+Migrations, connection strings reais e comandos operacionais estao documentados em `DATABASE.md` e `DEPLOY.md`.
 
 Secrets e connection strings reais devem ficar em variaveis de ambiente ou no provedor de deploy, nunca versionados.
 
