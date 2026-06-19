@@ -190,6 +190,101 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
     }
 
     [Fact]
+    public async Task Common_user_cannot_create_update_deactivate_or_delete_admin_category()
+    {
+        await EnsureCsrfAsync();
+        var suffix = Guid.NewGuid().ToString("N");
+        var categoryId = await CreateCategoryAsync($"Categoria Segura {suffix}");
+        await RegisterAsync("Usuario Categoria Comum", $"categoria-comum-{suffix}@tests.local");
+
+        var create = await _client.PostAsJsonAsync("/api/admin/categorias", new CategoriaRequest($"Categoria Bloqueada {suffix}", null, null, null, null, 1));
+        Assert.Equal(HttpStatusCode.Forbidden, create.StatusCode);
+
+        var update = await _client.PutAsJsonAsync($"/api/admin/categorias/{categoryId}", new CategoriaRequest($"Categoria Alterada {suffix}", null, null, null, null, 2));
+        Assert.Equal(HttpStatusCode.Forbidden, update.StatusCode);
+
+        var deactivate = await _client.PatchAsJsonAsync($"/api/admin/categorias/{categoryId}/status", new CategoriaStatusRequest(false));
+        Assert.Equal(HttpStatusCode.Forbidden, deactivate.StatusCode);
+
+        var delete = await _client.DeleteAsync($"/api/admin/categorias/{categoryId}");
+        Assert.Equal(HttpStatusCode.Forbidden, delete.StatusCode);
+    }
+
+    [Fact]
+    public async Task Admin_can_create_deactivate_list_inactive_and_public_hides_inactive_category()
+    {
+        await LoginAsync("admin@tests.local", "Admin12");
+        var suffix = Guid.NewGuid().ToString("N");
+        var create = await _client.PostAsJsonAsync("/api/admin/categorias", new CategoriaRequest($"Categoria Admin {suffix}", null, "Descricao admin", "#0A4F8F", "church", 3));
+        await EnsureSuccessAsync(create);
+        var categoryId = await ReadGuidAsync(create, "id");
+        var slug = await ReadStringAsync(create, "slug");
+
+        var publicActive = await _client.GetAsync("/api/categorias");
+        await EnsureSuccessAsync(publicActive);
+        Assert.Contains(categoryId, await ReadDataIdsAsync(publicActive));
+
+        var deactivate = await _client.PatchAsJsonAsync($"/api/admin/categorias/{categoryId}/status", new CategoriaStatusRequest(false));
+        await EnsureSuccessAsync(deactivate);
+        using (var document = JsonDocument.Parse(await deactivate.Content.ReadAsStringAsync()))
+        {
+            Assert.False(document.RootElement.GetProperty("data").GetProperty("ativo").GetBoolean());
+        }
+
+        var publicInactive = await _client.GetAsync("/api/categorias");
+        await EnsureSuccessAsync(publicInactive);
+        Assert.DoesNotContain(categoryId, await ReadDataIdsAsync(publicInactive));
+
+        var adminList = await _client.GetAsync("/api/admin/categorias");
+        await EnsureSuccessAsync(adminList);
+        using (var document = JsonDocument.Parse(await adminList.Content.ReadAsStringAsync()))
+        {
+            var category = document.RootElement.GetProperty("data").EnumerateArray().First(x => x.GetProperty("id").GetGuid() == categoryId);
+            Assert.False(category.GetProperty("ativo").GetBoolean());
+            Assert.Equal(slug, category.GetProperty("slug").GetString());
+        }
+
+        var adminDetail = await _client.GetAsync($"/api/admin/categorias/{categoryId}");
+        await EnsureSuccessAsync(adminDetail);
+        using (var document = JsonDocument.Parse(await adminDetail.Content.ReadAsStringAsync()))
+        {
+            var data = document.RootElement.GetProperty("data");
+            Assert.Equal(categoryId, data.GetProperty("id").GetGuid());
+            Assert.False(data.GetProperty("ativo").GetBoolean());
+        }
+    }
+
+    [Fact]
+    public async Task Public_filter_by_inactive_category_returns_empty_and_admin_delete_blocks_category_in_use()
+    {
+        await LoginAsync("admin@tests.local", "Admin12");
+        var suffix = Guid.NewGuid().ToString("N");
+        var content = await CreatePublishedContentWithDetailsAsync($"Categoria Em Uso {suffix}", TipoConteudo.Video, OrigemConteudo.YouTube, $"https://www.youtube.com/watch?v={Guid.NewGuid():N}");
+
+        var deactivate = await _client.PatchAsJsonAsync($"/api/admin/categorias/{content.CategoryId}/status", new CategoriaStatusRequest(false));
+        await EnsureSuccessAsync(deactivate);
+
+        var publicFiltered = await _client.GetAsync($"/api/conteudos?categoriaSlug={content.CategorySlug}");
+        await EnsureSuccessAsync(publicFiltered);
+        using (var document = JsonDocument.Parse(await publicFiltered.Content.ReadAsStringAsync()))
+        {
+            var data = document.RootElement.GetProperty("data");
+            Assert.Equal(0, data.GetProperty("totalItens").GetInt32());
+            Assert.Empty(data.GetProperty("itens").EnumerateArray());
+        }
+
+        var deleteUsed = await _client.DeleteAsync($"/api/admin/categorias/{content.CategoryId}");
+        Assert.Equal(HttpStatusCode.Conflict, deleteUsed.StatusCode);
+
+        var unusedCategoryId = await CreateCategoryAsync($"Categoria Livre {suffix}");
+        var deleteUnused = await _client.DeleteAsync($"/api/admin/categorias/{unusedCategoryId}");
+        await EnsureSuccessAsync(deleteUnused);
+
+        var deletedDetail = await _client.GetAsync($"/api/admin/categorias/{unusedCategoryId}");
+        Assert.Equal(HttpStatusCode.NotFound, deletedDetail.StatusCode);
+    }
+
+    [Fact]
     public async Task Published_content_list_supports_search_category_type_and_pagination()
     {
         var suffix = Guid.NewGuid().ToString("N");
@@ -955,7 +1050,7 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
         }
 
         await db.SaveChangesAsync();
-        return new ContentSeed(content.Id, content.Slug, category.Slug);
+        return new ContentSeed(content.Id, content.Slug, category.Id, category.Slug);
     }
 
     private async Task<Guid> CreateCategoryAsync(string name)
@@ -1023,7 +1118,7 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
         Guid? PlanoBiblicoAtivoId,
         Guid? LeituraHojeId);
 
-    private sealed record ContentSeed(Guid Id, string Slug, string CategorySlug);
+    private sealed record ContentSeed(Guid Id, string Slug, Guid CategoryId, string CategorySlug);
 
     private static async Task<Guid> ReadGuidAsync(HttpResponseMessage response, string property)
     {

@@ -18,7 +18,18 @@ public sealed class CategoriaService : ICategoriaService
     public async Task<IReadOnlyList<CategoriaResponse>> ListAsync(CancellationToken cancellationToken = default) =>
         (await _categorias.ListAtivasAsync(cancellationToken)).Select(ToResponse).ToList();
 
-    public async Task<CategoriaResponse> CreateAsync(CategoriaRequest request, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<CategoriaAdminResponse>> ListAdminAsync(CancellationToken cancellationToken = default) =>
+        (await _categorias.ListAdminAsync(cancellationToken)).Select(ToAdminResponse).ToList();
+
+    public async Task<CategoriaAdminResponse> GetAdminAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var categoria = await _categorias.GetByIdAsync(id, cancellationToken)
+            ?? throw new AppException("Categoria nao encontrada.", 404);
+
+        return ToAdminResponse(categoria);
+    }
+
+    public async Task<CategoriaAdminResponse> CreateAsync(CategoriaRequest request, CancellationToken cancellationToken = default)
     {
         var slug = BuildSlug(request);
         if (await _categorias.SlugExistsAsync(slug, cancellationToken: cancellationToken))
@@ -41,10 +52,10 @@ public sealed class CategoriaService : ICategoriaService
 
         _categorias.Add(categoria);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return ToResponse(categoria);
+        return ToAdminResponse(categoria);
     }
 
-    public async Task<CategoriaResponse> UpdateAsync(Guid id, CategoriaRequest request, CancellationToken cancellationToken = default)
+    public async Task<CategoriaAdminResponse> UpdateAsync(Guid id, CategoriaRequest request, CancellationToken cancellationToken = default)
     {
         var categoria = await _categorias.GetByIdAsync(id, cancellationToken)
             ?? throw new AppException("Categoria nao encontrada.", 404);
@@ -64,10 +75,37 @@ public sealed class CategoriaService : ICategoriaService
         categoria.Ativo = request.Ativo;
         categoria.AtualizadoEm = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return ToResponse(categoria);
+        return ToAdminResponse(categoria);
+    }
+
+    public async Task<CategoriaAdminResponse> UpdateStatusAsync(Guid id, CategoriaStatusRequest request, CancellationToken cancellationToken = default)
+    {
+        var categoria = await _categorias.GetByIdAsync(id, cancellationToken)
+            ?? throw new AppException("Categoria nao encontrada.", 404);
+
+        categoria.Ativo = request.Ativo;
+        categoria.AtualizadoEm = DateTime.UtcNow;
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return ToAdminResponse(categoria);
+    }
+
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var categoria = await _categorias.GetByIdAsync(id, cancellationToken)
+            ?? throw new AppException("Categoria nao encontrada.", 404);
+
+        if (await _categorias.HasConteudosAsync(id, cancellationToken))
+        {
+            throw new AppException("Categoria possui conteudos vinculados. Desative a categoria ou remova os vinculos antes de excluir.", 409);
+        }
+
+        _categorias.Remove(categoria);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
     private static string BuildSlug(CategoriaRequest request) => string.IsNullOrWhiteSpace(request.Slug) ? Slug.From(request.Nome) : Slug.From(request.Slug);
     private static CategoriaResponse ToResponse(CategoriaConteudo categoria) =>
         new(categoria.Id, categoria.Nome, categoria.Slug, categoria.Descricao, categoria.Cor, categoria.Icone, categoria.Ordem);
+    private static CategoriaAdminResponse ToAdminResponse(CategoriaConteudo categoria) =>
+        new(categoria.Id, categoria.Nome, categoria.Slug, categoria.Descricao, categoria.Cor, categoria.Icone, categoria.Ordem, categoria.Ativo);
 }

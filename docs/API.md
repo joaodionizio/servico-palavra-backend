@@ -28,8 +28,14 @@ Auth usa cookie HttpOnly. A API nao retorna JWT/token no login. Para `POST`, `PU
 ## Categorias
 
 - `GET /api/categorias`
+- `GET /api/admin/categorias` Admin
+- `GET /api/admin/categorias/{id}` Admin
 - `POST /api/admin/categorias` Admin
 - `PUT /api/admin/categorias/{id}` Admin
+- `PATCH /api/admin/categorias/{id}/status` Admin
+- `DELETE /api/admin/categorias/{id}` Admin
+
+`GET /api/categorias` retorna apenas categorias ativas. Os endpoints admin retornam categorias ativas e inativas. Categorias em uso por conteudos nao podem ser excluidas fisicamente; desative a categoria ou remova os vinculos antes de excluir.
 
 ## Conteudos
 
@@ -100,6 +106,12 @@ Detalhes de BaseBiblica, sequencia pastoral, importacao e peso de leitura estao 
 ## Dashboard
 
 - `GET /api/dashboard/me`
+
+## Biblioteca
+
+Biblioteca foi removida da V2 inicial. Nesta fase, o backend nao possui endpoints, entidades, tabelas ou servicos especificos de Biblioteca.
+
+Conteudos/Formacoes continuam sendo o nucleo do produto e seguem expostos pelos endpoints de `Conteudos`, com categorias, favoritos, progresso, dashboard, admin de conteudos e plano biblico.
 
 ## Trilhas
 
