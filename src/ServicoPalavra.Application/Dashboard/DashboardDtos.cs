@@ -17,6 +17,7 @@ public sealed record DashboardConteudoResumoResponse(
     string Slug,
     string Tipo,
     string Origem,
+    string Url,
     string? UrlThumbnail,
     int? DuracaoMinutos,
     string? Categoria,
@@ -27,6 +28,8 @@ public sealed record DashboardFavoritoResponse(
     string Titulo,
     string Slug,
     string Tipo,
+    string Origem,
+    string Url,
     string? UrlThumbnail,
     DateTime FavoritadoEm);
 
@@ -35,6 +38,8 @@ public sealed record DashboardProgressoConteudoResponse(
     string Titulo,
     string Slug,
     string Tipo,
+    string Origem,
+    string Url,
     string Status,
     decimal Percentual,
     DateTime? UltimoAcessoEm);

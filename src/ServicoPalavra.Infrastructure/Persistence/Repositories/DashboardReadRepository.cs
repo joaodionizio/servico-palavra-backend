@@ -57,6 +57,7 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
                 x.Slug,
                 x.Tipo,
                 x.Origem,
+                x.Url,
                 x.UrlThumbnail,
                 x.DuracaoMinutos,
                 Categoria = x.CategoriaConteudo == null ? null : x.CategoriaConteudo.Nome,
@@ -69,6 +70,7 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
             x.Slug,
             x.Tipo.ToString(),
             x.Origem.ToString(),
+            x.Url,
             x.UrlThumbnail,
             x.DuracaoMinutos,
             x.Categoria,
@@ -87,6 +89,8 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
                 x.Conteudo.Titulo,
                 x.Conteudo.Slug,
                 x.Conteudo.Tipo,
+                x.Conteudo.Origem,
+                x.Conteudo.Url,
                 x.Conteudo.UrlThumbnail,
                 x.CriadoEm
             })
@@ -96,6 +100,8 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
             x.Titulo,
             x.Slug,
             x.Tipo.ToString(),
+            x.Origem.ToString(),
+            x.Url,
             x.UrlThumbnail,
             x.CriadoEm))
         .ToList();
@@ -113,6 +119,8 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
                 x.Conteudo.Titulo,
                 x.Conteudo.Slug,
                 x.Conteudo.Tipo,
+                x.Conteudo.Origem,
+                x.Conteudo.Url,
                 x.Status,
                 x.Percentual,
                 x.UltimoAcessoEm
@@ -123,6 +131,8 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
             x.Titulo,
             x.Slug,
             x.Tipo.ToString(),
+            x.Origem.ToString(),
+            x.Url,
             x.Status.ToString(),
             x.Percentual,
             x.UltimoAcessoEm))

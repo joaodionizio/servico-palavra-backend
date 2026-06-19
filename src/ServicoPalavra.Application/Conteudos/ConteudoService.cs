@@ -237,7 +237,7 @@ public sealed class ConteudoService : IConteudoService
     }
 
     private static ConteudoResumoResponse ToResumoResponse(Conteudo conteudo) =>
-        new(conteudo.Id, conteudo.Titulo, conteudo.Slug, conteudo.Resumo, conteudo.Tipo, conteudo.Origem, conteudo.UrlThumbnail, conteudo.DuracaoMinutos, conteudo.CategoriaConteudoId, conteudo.CategoriaConteudo?.Nome, conteudo.Destaque, conteudo.PublicadoEm);
+        new(conteudo.Id, conteudo.Titulo, conteudo.Slug, conteudo.Resumo, conteudo.Tipo, conteudo.Origem, conteudo.Url, conteudo.UrlThumbnail, conteudo.DuracaoMinutos, conteudo.CategoriaConteudoId, conteudo.CategoriaConteudo?.Nome, conteudo.Destaque, conteudo.PublicadoEm);
     private static ConteudoAdminResumoResponse ToAdminResumoResponse(Conteudo conteudo) =>
         new(conteudo.Id, conteudo.Titulo, conteudo.Slug, conteudo.Resumo, conteudo.Tipo, conteudo.Origem, conteudo.UrlThumbnail, conteudo.DuracaoMinutos, conteudo.CategoriaConteudoId, conteudo.CategoriaConteudo?.Nome, conteudo.Publicado, conteudo.Destaque, conteudo.Ordem, conteudo.PublicadoEm);
     private static ConteudoResponse ToResponse(Conteudo conteudo) =>
