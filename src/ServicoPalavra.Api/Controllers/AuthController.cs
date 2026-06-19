@@ -50,4 +50,9 @@ public sealed class AuthController : ApiControllerBase
     [HttpGet("me")]
     public async Task<IActionResult> Me(CancellationToken cancellationToken) =>
         OkResponse(await _authService.MeAsync(CurrentUserId(_currentUser), cancellationToken));
+
+    [Authorize]
+    [HttpPut("me")]
+    public async Task<IActionResult> UpdateMe(UpdateMeRequest request, CancellationToken cancellationToken) =>
+        OkResponse(await _authService.UpdateMeAsync(CurrentUserId(_currentUser), request, cancellationToken));
 }

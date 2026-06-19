@@ -22,8 +22,20 @@ Resposta padrao:
 - `POST /api/auth/login`
 - `POST /api/auth/logout`
 - `GET /api/auth/me`
+- `PUT /api/auth/me`
 
 Auth usa cookie HttpOnly. A API nao retorna JWT/token no login. Para `POST`, `PUT`, `PATCH` e `DELETE`, envie `X-CSRF-TOKEN` obtido em `GET /api/auth/csrf`.
+
+Atualizacao de perfil autenticado:
+
+```json
+{
+  "nome": "Joao Luis",
+  "email": "novo@email.com"
+}
+```
+
+Somente `nome` e `email` podem ser atualizados nesta fase. Roles, tipo de acesso e senha nao sao aceitos neste contrato.
 
 ## Categorias
 

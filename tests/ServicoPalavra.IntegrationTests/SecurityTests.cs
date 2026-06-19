@@ -74,6 +74,104 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
     }
 
     [Fact]
+    public async Task Authenticated_user_can_update_own_name()
+    {
+        await EnsureCsrfAsync();
+        var suffix = Guid.NewGuid().ToString("N");
+        var email = $"perfil-nome-{suffix}@tests.local";
+        await RegisterAsync("Usuario Perfil", email);
+
+        var response = await _client.PutAsJsonAsync("/api/auth/me", new UpdateMeRequest("Usuario Perfil Atualizado", email));
+
+        await EnsureSuccessAsync(response);
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var data = document.RootElement.GetProperty("data");
+        Assert.Equal("Usuario Perfil Atualizado", data.GetProperty("nome").GetString());
+        Assert.Equal(email, data.GetProperty("email").GetString());
+        Assert.Contains(data.GetProperty("roles").EnumerateArray(), role => role.GetString() == "Usuario");
+    }
+
+    [Fact]
+    public async Task Authenticated_user_can_update_email_and_identity_names()
+    {
+        await EnsureCsrfAsync();
+        var suffix = Guid.NewGuid().ToString("N");
+        var originalEmail = $"perfil-email-{suffix}@tests.local";
+        var newEmail = $"perfil-email-novo-{suffix}@tests.local";
+        await RegisterAsync("Usuario Email", originalEmail);
+        var userId = await ReadCurrentUserIdAsync();
+
+        var response = await _client.PutAsJsonAsync("/api/auth/me", new UpdateMeRequest("Usuario Email", newEmail));
+
+        await EnsureSuccessAsync(response);
+        using (var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync()))
+        {
+            var data = document.RootElement.GetProperty("data");
+            Assert.Equal(newEmail, data.GetProperty("email").GetString());
+            Assert.False(data.TryGetProperty("passwordHash", out _));
+            Assert.False(data.TryGetProperty("normalizedEmail", out _));
+        }
+
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var user = await db.Users.FirstAsync(x => x.Id == userId);
+        Assert.Equal(newEmail, user.Email);
+        Assert.Equal(newEmail, user.UserName);
+        Assert.Equal(newEmail.ToUpperInvariant(), user.NormalizedEmail);
+        Assert.Equal(newEmail.ToUpperInvariant(), user.NormalizedUserName);
+    }
+
+    [Fact]
+    public async Task Update_me_rejects_duplicate_email()
+    {
+        await EnsureCsrfAsync();
+        var suffix = Guid.NewGuid().ToString("N");
+        var firstEmail = $"perfil-duplicado-a-{suffix}@tests.local";
+        var secondEmail = $"perfil-duplicado-b-{suffix}@tests.local";
+        await RegisterAsync("Usuario Duplicado A", firstEmail);
+        await RegisterAsync("Usuario Duplicado B", secondEmail);
+
+        var response = await _client.PutAsJsonAsync("/api/auth/me", new UpdateMeRequest("Usuario Duplicado B", firstEmail));
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Update_me_does_not_allow_role_changes()
+    {
+        await EnsureCsrfAsync();
+        var suffix = Guid.NewGuid().ToString("N");
+        var email = $"perfil-role-{suffix}@tests.local";
+        await RegisterAsync("Usuario Role", email);
+
+        var response = await _client.PutAsJsonAsync("/api/auth/me", new
+        {
+            nome = "Usuario Role",
+            email,
+            roles = new[] { "Admin" }
+        });
+
+        await EnsureSuccessAsync(response);
+        using (var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync()))
+        {
+            var roles = document.RootElement.GetProperty("data").GetProperty("roles").EnumerateArray().Select(x => x.GetString()).ToArray();
+            Assert.Contains("Usuario", roles);
+            Assert.DoesNotContain("Admin", roles);
+        }
+
+        var adminOnly = await _client.GetAsync("/api/admin/categorias");
+        Assert.Equal(HttpStatusCode.Forbidden, adminOnly.StatusCode);
+    }
+
+    [Fact]
+    public async Task Update_me_requires_authentication()
+    {
+        await EnsureCsrfAsync();
+        var response = await _client.PutAsJsonAsync("/api/auth/me", new UpdateMeRequest("Anonimo", "anonimo@tests.local"));
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
     public async Task Admin_endpoint_denies_common_user_and_allows_admin()
     {
         await EnsureCsrfAsync();
@@ -910,6 +1008,13 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
         var response = await _client.PostAsJsonAsync("/api/auth/login", new LoginRequest(email, password));
         await EnsureSuccessAsync(response);
         await EnsureCsrfAsync();
+    }
+
+    private async Task<Guid> ReadCurrentUserIdAsync()
+    {
+        var response = await _client.GetAsync("/api/auth/me");
+        await EnsureSuccessAsync(response);
+        return await ReadGuidAsync(response, "id");
     }
 
     private async Task ResetLoginStateAsync(string email)

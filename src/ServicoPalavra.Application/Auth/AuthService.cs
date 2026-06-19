@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using ServicoPalavra.Application.Common;
 using ServicoPalavra.Domain.Entities;
 
@@ -80,6 +81,60 @@ public sealed class AuthService : IAuthService
         var usuario = await _userManager.FindByIdAsync(usuarioId.ToString())
             ?? throw new AppException("Usuario nao encontrado.", 404);
 
+        return await ToResponseAsync(usuario);
+    }
+
+    public async Task<UsuarioResponse> UpdateMeAsync(Guid usuarioId, UpdateMeRequest request, CancellationToken cancellationToken = default)
+    {
+        var usuario = await _userManager.FindByIdAsync(usuarioId.ToString())
+            ?? throw new AppException("Usuario nao encontrado.", 404);
+
+        var nome = request.Nome.Trim();
+        var email = request.Email.Trim().ToLowerInvariant();
+
+        if (string.IsNullOrWhiteSpace(nome))
+        {
+            throw new AppException("Nome e obrigatorio.");
+        }
+
+        if (!new EmailAddressAttribute().IsValid(email))
+        {
+            throw new AppException("Email invalido.");
+        }
+
+        var existing = await _userManager.FindByEmailAsync(email);
+        if (existing is not null && existing.Id != usuario.Id)
+        {
+            throw new AppException("Email ja esta em uso.");
+        }
+
+        usuario.Nome = nome;
+        usuario.AtualizadoEm = DateTime.UtcNow;
+
+        if (!string.Equals(usuario.Email, email, StringComparison.OrdinalIgnoreCase))
+        {
+            var emailResult = await _userManager.SetEmailAsync(usuario, email);
+            if (!emailResult.Succeeded)
+            {
+                throw new AppException("Nao foi possivel atualizar o email.");
+            }
+
+            var userNameResult = await _userManager.SetUserNameAsync(usuario, email);
+            if (!userNameResult.Succeeded)
+            {
+                throw new AppException("Nao foi possivel atualizar o email.");
+            }
+
+            usuario.EmailConfirmed = false;
+        }
+
+        var result = await _userManager.UpdateAsync(usuario);
+        if (!result.Succeeded)
+        {
+            throw new AppException("Nao foi possivel atualizar o perfil.");
+        }
+
+        await _signInManager.RefreshSignInAsync(usuario);
         return await ToResponseAsync(usuario);
     }
 
