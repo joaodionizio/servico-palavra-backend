@@ -36,12 +36,12 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
     }
 
     private Task<int> CountFavoritosAsync(Guid usuarioId, CancellationToken cancellationToken) =>
-        _db.Favoritos.AsNoTracking().CountAsync(x => x.UsuarioId == usuarioId, cancellationToken);
+        _db.Favoritos.AsNoTracking().CountAsync(x => x.UsuarioId == usuarioId && x.Conteudo.Publicado, cancellationToken);
 
     private Task<int> CountConteudosConcluidosAsync(Guid usuarioId, CancellationToken cancellationToken) =>
         _db.ProgressosConteudo
             .AsNoTracking()
-            .CountAsync(x => x.UsuarioId == usuarioId && x.Status == StatusProgressoConteudo.Concluido, cancellationToken);
+            .CountAsync(x => x.UsuarioId == usuarioId && x.Conteudo.Publicado && x.Status == StatusProgressoConteudo.Concluido, cancellationToken);
 
     private async Task<IReadOnlyList<DashboardConteudoResumoResponse>> ListFormacoesRecentesAsync(CancellationToken cancellationToken) =>
         (await _db.Conteudos
@@ -78,7 +78,7 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
     private async Task<IReadOnlyList<DashboardFavoritoResponse>> ListFavoritosRecentesAsync(Guid usuarioId, CancellationToken cancellationToken) =>
         (await _db.Favoritos
             .AsNoTracking()
-            .Where(x => x.UsuarioId == usuarioId)
+            .Where(x => x.UsuarioId == usuarioId && x.Conteudo.Publicado)
             .OrderByDescending(x => x.CriadoEm)
             .Take(Limit)
             .Select(x => new
@@ -103,7 +103,7 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
     private async Task<IReadOnlyList<DashboardProgressoConteudoResponse>> ListConteudosComProgressoAsync(Guid usuarioId, CancellationToken cancellationToken) =>
         (await _db.ProgressosConteudo
             .AsNoTracking()
-            .Where(x => x.UsuarioId == usuarioId && x.Status != StatusProgressoConteudo.NaoIniciado)
+            .Where(x => x.UsuarioId == usuarioId && x.Conteudo.Publicado && x.Status != StatusProgressoConteudo.NaoIniciado)
             .OrderByDescending(x => x.UltimoAcessoEm ?? x.AtualizadoEm ?? x.CriadoEm)
             .ThenBy(x => x.Conteudo.Titulo)
             .Take(Limit)
