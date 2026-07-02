@@ -1,8 +1,12 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using ServicoPalavra.Application.Auth;
 using ServicoPalavra.Application.Categorias;
 using ServicoPalavra.Application.Conteudos;
@@ -40,6 +44,21 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
     }
 
     [Fact]
+    public void Application_cookie_uses_reasonable_sliding_expiration()
+    {
+        var options = _factory.Services
+            .GetRequiredService<IOptionsMonitor<CookieAuthenticationOptions>>()
+            .Get(IdentityConstants.ApplicationScheme);
+
+        Assert.Equal("__Host-ServicoPalavra", options.Cookie.Name);
+        Assert.True(options.Cookie.HttpOnly);
+        Assert.Equal(SameSiteMode.None, options.Cookie.SameSite);
+        Assert.Equal(CookieSecurePolicy.SameAsRequest, options.Cookie.SecurePolicy);
+        Assert.Equal(TimeSpan.FromHours(4), options.ExpireTimeSpan);
+        Assert.True(options.SlidingExpiration);
+    }
+
+    [Fact]
     public async Task Login_invalid_uses_generic_response()
     {
         await EnsureCsrfAsync();
@@ -71,6 +90,20 @@ public sealed class SecurityTests : IClassFixture<SecurityWebApplicationFactory>
     {
         var response = await _client.GetAsync("/api/auth/me");
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Protected_write_with_invalid_csrf_returns_clear_bad_request()
+    {
+        await LoginAsync("admin@tests.local", "Admin12");
+        _client.DefaultRequestHeaders.Remove("X-CSRF-TOKEN");
+        _client.DefaultRequestHeaders.Add("X-CSRF-TOKEN", "csrf-invalido");
+
+        var response = await _client.PostAsync("/api/auth/logout", null);
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains("Token CSRF invalido", body);
     }
 
     [Fact]

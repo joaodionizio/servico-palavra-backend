@@ -25,7 +25,7 @@ Cookies:
 - HttpOnly sempre.
 - Secure sempre fora de Development/Testing.
 - SameSite `None`, para frontend em dominio separado com CORS allowlist e credenciais.
-- Expiracao de 60 minutos com sliding expiration.
+- Expiracao de 4 horas com sliding expiration.
 
 ## CSRF
 

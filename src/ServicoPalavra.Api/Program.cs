@@ -197,7 +197,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Testing")
         ? CookieSecurePolicy.SameAsRequest
         : CookieSecurePolicy.Always;
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+    options.ExpireTimeSpan = TimeSpan.FromHours(4);
     options.SlidingExpiration = true;
     options.Events.OnRedirectToLogin = context =>
     {
