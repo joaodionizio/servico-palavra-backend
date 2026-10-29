@@ -12,7 +12,7 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
 
     public DashboardReadRepository(AppDbContext db) => _db = db;
 
-    public async Task<DashboardMeResponse> GetMeAsync(Guid usuarioId, CancellationToken cancellationToken = default)
+    public async Task<DashboardMeResponse> GetMeAsync(Guid usuarioId, DateOnly today, CancellationToken cancellationToken = default)
     {
         var overview = await GetOverviewAsync(usuarioId, cancellationToken);
         var formacoes = await ListFormacoesRecentesAsync(cancellationToken);
@@ -20,7 +20,7 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
         var conteudosComProgresso = await ListConteudosComProgressoAsync(usuarioId, cancellationToken);
         var leituraHoje = overview.Plano is null
             ? null
-            : await GetLeituraHojeAsync(usuarioId, overview.Plano.Id, cancellationToken);
+            : await GetLeituraHojeAsync(usuarioId, overview.Plano.Id, today, cancellationToken);
         var percentualPlano = overview.Plano?.Percentual ?? 0m;
 
         return new DashboardMeResponse(
@@ -190,20 +190,17 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
             x.UltimoAcessoEm))
         .ToList();
 
-    private Task<DashboardLeituraHojeResponse?> GetLeituraHojeAsync(Guid usuarioId, Guid planoId, CancellationToken cancellationToken)
-    {
-        var hoje = DateOnly.FromDateTime(DateTime.UtcNow);
-
-        return _db.PlanosBiblicosDias
+    private Task<DashboardLeituraHojeResponse?> GetLeituraHojeAsync(Guid usuarioId, Guid planoId, DateOnly today, CancellationToken cancellationToken) =>
+        _db.PlanosBiblicosDias
             .AsNoTracking()
             .Where(x =>
                 x.PlanoBiblicoUsuarioId == planoId &&
-                (x.DataPrevista == hoje ||
+                (x.DataPrevista == today ||
                     !_db.ProgressosLeitura.Any(p =>
                         p.UsuarioId == usuarioId &&
                         p.PlanoBiblicoDiaId == x.Id &&
                         p.Concluido)))
-            .OrderByDescending(x => x.DataPrevista == hoje)
+            .OrderByDescending(x => x.DataPrevista == today)
             .ThenBy(x => x.DiaNumero)
             .Select(x => new DashboardLeituraHojeResponse(
                 x.Id,
@@ -217,7 +214,6 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
                     p.PlanoBiblicoDiaId == x.Id &&
                     p.Concluido)))
             .FirstOrDefaultAsync(cancellationToken);
-    }
 
     private sealed record DashboardOverview(
         int Favoritos,
