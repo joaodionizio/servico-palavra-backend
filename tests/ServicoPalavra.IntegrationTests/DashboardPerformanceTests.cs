@@ -45,7 +45,7 @@ public sealed class DashboardPerformanceTests : IClassFixture<SecurityWebApplica
                 DuracaoDias = 1,
                 DataInicio = today,
                 DataFimPrevista = today,
-                ModoCriacao = ModoCriacaoPlanoBiblico.ComecarDoInicio,
+                ModoCriacao = ModoCriacaoPlanoBiblico.NovoDoInicio,
                 Ativo = true,
                 Status = StatusPlanoBiblico.Ativo,
                 CriadoEm = DateTime.UtcNow
