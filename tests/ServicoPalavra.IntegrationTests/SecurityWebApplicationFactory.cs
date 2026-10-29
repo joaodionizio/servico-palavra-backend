@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -12,6 +13,7 @@ public sealed class SecurityWebApplicationFactory : WebApplicationFactory<Progra
     private readonly string _databasePath = Path.Combine(Path.GetTempPath(), $"servico-palavra-security-{Guid.NewGuid():N}.db");
 
     public CapturingPasswordResetEmailSender PasswordResetEmailSender { get; } = new();
+    public DashboardCommandCounterInterceptor DashboardCommandCounter { get; } = new();
 
     public SecurityWebApplicationFactory()
     {
@@ -40,6 +42,7 @@ public sealed class SecurityWebApplicationFactory : WebApplicationFactory<Progra
         {
             services.RemoveAll<IPasswordResetEmailSender>();
             services.AddSingleton<IPasswordResetEmailSender>(PasswordResetEmailSender);
+            services.AddSingleton<IInterceptor>(DashboardCommandCounter);
         });
     }
 
