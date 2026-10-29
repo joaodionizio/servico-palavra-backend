@@ -4,5 +4,5 @@ namespace ServicoPalavra.Application.Abstractions;
 
 public interface IDashboardReadRepository
 {
-    Task<DashboardMeResponse> GetMeAsync(Guid usuarioId, CancellationToken cancellationToken = default);
+    Task<DashboardMeResponse> GetMeAsync(Guid usuarioId, DateOnly today, CancellationToken cancellationToken = default);
 }
