@@ -12,9 +12,9 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
 
     public DashboardReadRepository(AppDbContext db) => _db = db;
 
-    public async Task<DashboardMeResponse> GetMeAsync(Guid usuarioId, DateOnly today, CancellationToken cancellationToken = default)
+    public async Task<DashboardReadResult> GetMeAsync(Guid usuarioId, DateOnly today, CancellationToken cancellationToken = default)
     {
-        var overview = await GetOverviewAsync(usuarioId, cancellationToken);
+        var overview = await GetOverviewAsync(usuarioId, today, cancellationToken);
         var formacoes = await ListFormacoesRecentesAsync(cancellationToken);
         var favoritosRecentes = await ListFavoritosRecentesAsync(usuarioId, cancellationToken);
         var conteudosComProgresso = await ListConteudosComProgressoAsync(usuarioId, cancellationToken);
@@ -23,7 +23,7 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
             : await GetLeituraHojeAsync(usuarioId, overview.Plano.Id, today, cancellationToken);
         var percentualPlano = overview.Plano?.Percentual ?? 0m;
 
-        return new DashboardMeResponse(
+        var response = new DashboardMeResponse(
             overview.Concluidos,
             overview.Favoritos,
             overview.Plano is not null,
@@ -33,9 +33,11 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
             overview.Plano,
             leituraHoje,
             new DashboardEstatisticasResponse(overview.Favoritos, overview.Concluidos, percentualPlano));
+
+        return new DashboardReadResult(response, overview.NeedsCalendarRealignment);
     }
 
-    private async Task<DashboardOverview> GetOverviewAsync(Guid usuarioId, CancellationToken cancellationToken)
+    private async Task<DashboardOverview> GetOverviewAsync(Guid usuarioId, DateOnly today, CancellationToken cancellationToken)
     {
         var row = await (
             from usuario in _db.Users.AsNoTracking()
@@ -65,13 +67,20 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
                     : _db.ProgressosLeitura.Count(p =>
                         p.UsuarioId == usuarioId &&
                         p.Concluido &&
-                        p.PlanoBiblicoDia.PlanoBiblicoUsuarioId == plano.Id)
+                        p.PlanoBiblicoDia.PlanoBiblicoUsuarioId == plano.Id),
+                NeedsCalendarRealignment = plano != null && _db.PlanosBiblicosDias.Any(d =>
+                    d.PlanoBiblicoUsuarioId == plano.Id &&
+                    (!d.DataPrevista.HasValue || d.DataPrevista.Value < today) &&
+                    !_db.ProgressosLeitura.Any(p =>
+                        p.UsuarioId == usuarioId &&
+                        p.PlanoBiblicoDiaId == d.Id &&
+                        p.Concluido))
             })
             .FirstOrDefaultAsync(cancellationToken);
 
         if (row is null)
         {
-            return new DashboardOverview(0, 0, null);
+            return new DashboardOverview(0, 0, null, false);
         }
 
         DashboardPlanoBiblicoResumoResponse? planoResponse = null;
@@ -92,7 +101,7 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
                 percentual);
         }
 
-        return new DashboardOverview(row.Favoritos, row.Concluidos, planoResponse);
+        return new DashboardOverview(row.Favoritos, row.Concluidos, planoResponse, row.NeedsCalendarRealignment);
     }
 
     private async Task<IReadOnlyList<DashboardConteudoResumoResponse>> ListFormacoesRecentesAsync(CancellationToken cancellationToken) =>
@@ -218,5 +227,6 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
     private sealed record DashboardOverview(
         int Favoritos,
         int Concluidos,
-        DashboardPlanoBiblicoResumoResponse? Plano);
+        DashboardPlanoBiblicoResumoResponse? Plano,
+        bool NeedsCalendarRealignment);
 }
