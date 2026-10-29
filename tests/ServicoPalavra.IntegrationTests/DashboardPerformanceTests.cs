@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
+using ServicoPalavra.Application.Abstractions;
 using ServicoPalavra.Application.Auth;
 using ServicoPalavra.Domain.Entities;
 using ServicoPalavra.Domain.Enums;
@@ -31,12 +32,12 @@ public sealed class DashboardPerformanceTests : IClassFixture<SecurityWebApplica
     public async Task Dashboard_with_active_plan_and_today_reading_uses_exactly_five_read_commands()
     {
         var (client, userId) = await RegisterUserAsync();
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
         var planId = Guid.NewGuid();
 
         using (var scope = _factory.Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var today = scope.ServiceProvider.GetRequiredService<ICalendarClock>().Today;
             db.PlanosBiblicosUsuario.Add(new PlanoBiblicoUsuario
             {
                 Id = planId,
