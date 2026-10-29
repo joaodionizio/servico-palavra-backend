@@ -17,7 +17,7 @@ stories:
     title: "Hardening de timing na recuperação de senha"
   E2-BE-01-performance-dashboard:
     priority: P0
-    status: ready-for-dev
+    status: in-progress
     title: "Reduzir round-trips do dashboard"
   E3-BE-01-timezone-calendario:
     priority: P0
