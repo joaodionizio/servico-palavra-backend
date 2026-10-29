@@ -42,15 +42,13 @@ Status válidos:
 
 ## Verificação do backend
 
-Gate mínimo atual:
+Gate local único:
 
 ```bash
-dotnet restore ServicoPalavra.sln
-dotnet build ServicoPalavra.sln --no-restore
-dotnet test ServicoPalavra.sln --no-build
+bash tools/verify.sh
 ```
 
-O E0 deve consolidar isso em um comando `verify` e CI.
+O script executa restore, build Release e toda a suíte de testes da solução. O mesmo gate roda em `.github/workflows/verify.yml` para `push` e `pull_request` na `main`, sem depender de secrets de produção.
 
 ## Regras de arquitetura
 
