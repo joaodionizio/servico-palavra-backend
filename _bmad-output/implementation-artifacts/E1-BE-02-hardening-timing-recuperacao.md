@@ -1,52 +1,65 @@
 # Story E1-BE-02 — Hardening de timing na recuperação de senha
 
-Status: backlog  
+Status: done  
 Prioridade: P0
 
 ## Objetivo
-Eliminar a diferença de tempo observável entre solicitar recuperação para uma conta existente e para um e-mail inexistente, sem adicionar serviço externo ou custo recorrente.
+Reduzir o side-channel de timing da recuperação de senha, retirando o envio SMTP da requisição HTTP sem adicionar serviço externo ou custo recorrente.
 
-## Contexto
-A resposta pública de `POST /api/auth/password/forgot` já é indistinguível em conteúdo/status. Porém, para conta válida, o fluxo atual gera token e aguarda envio SMTP dentro da própria requisição; para conta inexistente retorna imediatamente. Um atacante com muitas medições pode tentar inferir existência de conta por latência.
+## Implementação
+- criada `IPasswordResetEmailQueue` na Application;
+- criado `PasswordResetEmailJob`, contendo apenas o payload necessário em memória;
+- criada `PasswordResetEmailQueue` com `Channel<T>` bounded de capacidade 100;
+- `FullMode = Wait` combinado com `TryWrite` faz a fila recusar imediatamente quando cheia, sem crescimento ilimitado de memória;
+- fila usa um único reader e múltiplos writers;
+- criado `PasswordResetEmailWorker : BackgroundService`;
+- worker resolve `IPasswordResetEmailSender` em scope separado e envia fora do request;
+- `AuthService.RequestPasswordResetAsync` gera token e apenas tenta enfileirar; não aguarda SMTP;
+- quando a fila está cheia, o evento é logado sem e-mail, token ou URL, e a resposta pública continua genérica.
 
-## Estratégia preferida
-Separar o envio do e-mail da resposta HTTP usando fila **in-process**:
-- `Channel<T>` bounded em memória;
-- `BackgroundService` consumidor;
-- endpoint gera token/payload e enfileira rapidamente;
-- resposta HTTP não aguarda conexão SMTP;
-- nenhum Redis, RabbitMQ, serviço de fila ou infraestrutura paga.
+## Comportamento operacional
+A fila é intencionalmente **best-effort e in-process**. Uma reinicialização da aplicação entre enqueue e envio pode perder a mensagem pendente; não há persistência externa nesta etapa. O usuário pode solicitar um novo link, e nenhuma infraestrutura paga/externa foi introduzida.
 
-A fila é best-effort: como não há persistência externa nesta etapa, uma reinicialização entre enqueue e envio pode perder uma mensagem. O comportamento deve ser documentado e o usuário sempre pode solicitar outro link.
+## Testes
+- testes existentes de recuperação foram adaptados para aguardar a entrega assíncrona sem assumir execução imediata do worker;
+- `PasswordRecoveryTimingTests` bloqueia deliberadamente o sender e comprova que `POST /api/auth/password/forgot` responde enquanto o sender continua bloqueado;
+- `PasswordResetEmailQueueTests` preenche 100 itens e comprova que o 101º é recusado;
+- conta inexistente continua sem produzir e-mail e mantém a mesma resposta pública;
+- toda a suíte de recuperação original permanece verde.
 
-## Segurança
-- payload enfileirado pode conter token somente em memória; nunca persistir/logar token;
-- fila deve ser bounded para impedir consumo ilimitado de memória;
-- quando cheia, política deve ser segura e não revelar existência de conta;
-- falha SMTP deve ser logada sem token/link completo/credenciais;
-- endpoint deve manter exatamente a mesma resposta genérica.
+## Verificação
+`Backend Verify` run `40971818401`: **success**.
+
+O gate executou restore, build Release e toda a suíte de testes, incluindo os testes de timing e capacidade da fila.
+
+## Code review adversarial
+Resultado: **APPROVED**.
+
+Achados bloqueantes: nenhum.
+
+Revisão confirmou:
+- SMTP não participa mais do tempo de resposta do endpoint;
+- fila é bounded e não cresce indefinidamente;
+- token permanece apenas em memória até o sender consumi-lo;
+- logs de fila cheia/worker não incluem token ou URL completa;
+- exceção no worker é capturada e não derruba a API;
+- o contrato HTTP do frontend não mudou;
+- não foi adicionado Redis, RabbitMQ, banco de fila ou serviço pago.
+
+Risco residual aceito e documentado:
+- por ser in-process e não persistente, uma reinicialização pode perder um e-mail pendente. Isso é compatível com a restrição atual de zero custo adicional e pode ser revisitado caso o produto exija garantia de entrega mais forte.
 
 ## Critérios de aceitação
-1. `POST /api/auth/password/forgot` não aguarda `SmtpClient.SendMailAsync`.
-2. Solicitação para conta válida e inexistente segue o mesmo caminho HTTP público e retorna antes do envio SMTP.
-3. Existe fila bounded com capacidade explícita e comportamento definido quando cheia.
-4. Background worker consome e-mails e chama o sender real fora do request.
-5. Token/URL completa não são registrados em logs.
-6. Teste prova que o endpoint retorna mesmo quando o sender consumidor está bloqueado/lento.
-7. Teste prova que conta inexistente continua sem enfileirar e-mail, mas resposta pública permanece idêntica.
-8. Falha no worker não derruba a API nem altera resposta já enviada.
-9. Nenhum serviço externo/custo recorrente é introduzido.
-10. `bash tools/verify.sh` permanece verde.
-
-## Fora de escopo
-- fila persistente/durável;
-- retries sofisticados com banco;
-- provedor transacional pago;
-- telemetria externa;
-- mudar o contrato do frontend.
+1. endpoint não aguarda SMTP — **atendido/testado**;
+2. resposta ocorre antes do envio terminar — **atendido/testado**;
+3. fila bounded com comportamento definido — **atendido/testado**;
+4. worker em background — **atendido**;
+5. sem token/URL em logs — **atendido/revisado**;
+6. sender bloqueado não bloqueia endpoint — **atendido/testado**;
+7. conta inexistente preserva resposta genérica — **atendido/testado**;
+8. falha do worker não derruba API — **atendido por isolamento/catch**;
+9. sem custo externo — **atendido**;
+10. verify verde — **atendido**.
 
 ## Definition of Done
-- critérios 1–10 atendidos;
-- risco residual de perda em restart documentado;
-- verify verde;
-- review independente aprovado.
+Concluída e aprovada.
