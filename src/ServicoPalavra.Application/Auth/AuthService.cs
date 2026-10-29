@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 using ServicoPalavra.Application.Common;
 using ServicoPalavra.Domain.Entities;
 
@@ -9,17 +10,22 @@ public sealed class AuthService : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly IPasswordResetEmailSender _passwordResetEmailSender;
 
-    public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+    public AuthService(
+        UserManager<ApplicationUser> userManager,
+        SignInManager<ApplicationUser> signInManager,
+        IPasswordResetEmailSender passwordResetEmailSender)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _passwordResetEmailSender = passwordResetEmailSender;
     }
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
     {
         var email = request.Email.Trim().ToLowerInvariant();
-        if (request.Senha.Length is < 6 or > 8)
+        if (string.IsNullOrWhiteSpace(request.Senha))
         {
             throw new AppException("Nao foi possivel concluir o cadastro.");
         }
@@ -72,6 +78,61 @@ public sealed class AuthService : IAuthService
         await _userManager.UpdateAsync(usuario);
 
         return new AuthResponse(await ToResponseAsync(usuario));
+    }
+
+    public async Task RequestPasswordResetAsync(ForgotPasswordRequest request, CancellationToken cancellationToken = default)
+    {
+        var email = request.Email.Trim().ToLowerInvariant();
+        if (!new EmailAddressAttribute().IsValid(email))
+        {
+            throw new AppException("Email invalido.");
+        }
+
+        var usuario = await _userManager.FindByEmailAsync(email);
+        if (usuario is null || !usuario.Ativo)
+        {
+            return;
+        }
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(usuario);
+        var encodedToken = EncodeToken(token);
+
+        await _passwordResetEmailSender.SendPasswordResetAsync(
+            usuario.Email ?? email,
+            usuario.Nome,
+            usuario.Id,
+            encodedToken,
+            cancellationToken);
+    }
+
+    public async Task ResetPasswordAsync(ResetPasswordRequest request, CancellationToken cancellationToken = default)
+    {
+        if (request.UserId == Guid.Empty || string.IsNullOrWhiteSpace(request.Token) || string.IsNullOrWhiteSpace(request.NovaSenha))
+        {
+            throw new AppException("Nao foi possivel redefinir a senha.");
+        }
+
+        var usuario = await _userManager.FindByIdAsync(request.UserId.ToString());
+        if (usuario is null || !usuario.Ativo)
+        {
+            throw new AppException("Nao foi possivel redefinir a senha.");
+        }
+
+        string token;
+        try
+        {
+            token = DecodeToken(request.Token);
+        }
+        catch (FormatException)
+        {
+            throw new AppException("Link de recuperacao invalido ou expirado.");
+        }
+
+        var result = await _userManager.ResetPasswordAsync(usuario, token, request.NovaSenha);
+        if (!result.Succeeded)
+        {
+            throw new AppException("Link de recuperacao invalido ou expirado.");
+        }
     }
 
     public Task LogoutAsync() => _signInManager.SignOutAsync();
@@ -142,5 +203,25 @@ public sealed class AuthService : IAuthService
     {
         var roles = await _userManager.GetRolesAsync(usuario);
         return new UsuarioResponse(usuario.Id, usuario.Nome, usuario.Email ?? string.Empty, roles.ToArray());
+    }
+
+    private static string EncodeToken(string token) =>
+        Convert.ToBase64String(Encoding.UTF8.GetBytes(token))
+            .TrimEnd('=')
+            .Replace('+', '-')
+            .Replace('/', '_');
+
+    private static string DecodeToken(string encodedToken)
+    {
+        var normalized = encodedToken.Replace('-', '+').Replace('_', '/');
+        normalized += normalized.Length % 4 switch
+        {
+            0 => string.Empty,
+            2 => "==",
+            3 => "=",
+            _ => throw new FormatException("Token Base64Url invalido.")
+        };
+
+        return Encoding.UTF8.GetString(Convert.FromBase64String(normalized));
     }
 }
