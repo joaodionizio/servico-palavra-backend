@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ServicoPalavra.Application.Abstractions;
+using ServicoPalavra.Application.Auth;
+using ServicoPalavra.Infrastructure.Email;
 using ServicoPalavra.Infrastructure.Persistence;
 using ServicoPalavra.Infrastructure.Persistence.Import;
 using ServicoPalavra.Infrastructure.Persistence.Seed;
@@ -45,6 +47,7 @@ public static class DependencyInjection
         services.AddScoped<IProgressoRepository, ProgressoRepository>();
         services.AddScoped<IPlanoBiblicoRepository, PlanoBiblicoRepository>();
         services.AddScoped<IDashboardReadRepository, DashboardReadRepository>();
+        services.AddScoped<IPasswordResetEmailSender, SmtpPasswordResetEmailSender>();
         services.AddScoped<DatabaseSeeder>();
         services.AddScoped<BaseBiblicaV2Importer>();
 
