@@ -5,7 +5,7 @@ workflow: bmad-lite
 stories:
   E0-BE-01-quality-gate-backend:
     priority: P1
-    status: in-progress
+    status: review
     title: "Quality gate do backend"
   E1-BE-01-recuperacao-de-senha:
     priority: P0
