@@ -1,0 +1,25 @@
+project: servico-palavra-backend
+updated: 2026-10-29
+workflow: bmad-lite
+
+stories:
+  E0-BE-01-quality-gate-backend:
+    priority: P1
+    status: ready-for-dev
+    title: "Quality gate do backend"
+  E1-BE-01-recuperacao-de-senha:
+    priority: P0
+    status: backlog
+    title: "Recuperação segura de senha"
+  E2-BE-01-performance-dashboard:
+    priority: P0
+    status: backlog
+    title: "Reduzir round-trips do dashboard"
+  E3-BE-01-timezone-calendario:
+    priority: P0
+    status: backlog
+    title: "Unificar timezone do calendário adaptativo e leitura de hoje"
+  E4-BE-01-observabilidade-performance:
+    priority: P1
+    status: backlog
+    title: "Medição de latência e cold start sem custo adicional"
