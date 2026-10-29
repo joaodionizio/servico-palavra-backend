@@ -22,25 +22,23 @@ public sealed class DashboardService : IDashboardService
     public async Task<DashboardMeResponse> GetMeAsync(Guid usuarioId, CancellationToken cancellationToken = default)
     {
         var today = _clock.Today;
-        var response = await _dashboard.GetMeAsync(usuarioId, today, cancellationToken);
-        var leitura = response.LeituraHoje;
+        var result = await _dashboard.GetMeAsync(usuarioId, today, cancellationToken);
 
-        var needsRealignment = response.PlanoBiblicoAtivo is not null
-            && leitura is not null
-            && (!leitura.DataPrevista.HasValue || leitura.DataPrevista.Value < today);
-
-        if (!needsRealignment)
+        if (!result.NeedsCalendarRealignment || result.Response.PlanoBiblicoAtivo is null)
         {
-            return response;
+            return result.Response;
         }
 
         var changed = await _calendar.RealignForReadAsync(
             usuarioId,
-            response.PlanoBiblicoAtivo!.Id,
+            result.Response.PlanoBiblicoAtivo.Id,
             cancellationToken);
 
-        return changed
-            ? await _dashboard.GetMeAsync(usuarioId, today, cancellationToken)
-            : response;
+        if (!changed)
+        {
+            return result.Response;
+        }
+
+        return (await _dashboard.GetMeAsync(usuarioId, today, cancellationToken)).Response;
     }
 }
