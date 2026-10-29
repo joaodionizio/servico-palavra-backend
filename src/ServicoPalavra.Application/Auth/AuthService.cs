@@ -214,7 +214,7 @@ public sealed class AuthService : IAuthService
     private static string DecodeToken(string encodedToken)
     {
         var normalized = encodedToken.Replace('-', '+').Replace('_', '/');
-        normalized += normalized.Length % 4 switch
+        normalized += (normalized.Length % 4) switch
         {
             0 => string.Empty,
             2 => "==",
