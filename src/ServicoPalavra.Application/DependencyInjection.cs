@@ -19,6 +19,7 @@ public static class DependencyInjection
         services.AddScoped<IFavoritoService, FavoritoService>();
         services.AddScoped<IProgressoService, ProgressoService>();
         services.AddScoped<IBiblePlanGeneratorService, BiblePlanGeneratorService>();
+        services.AddScoped<IPlanoBiblicoCalendarService, PlanoBiblicoCalendarService>();
         services.AddScoped<IPlanoBiblicoService, PlanoBiblicoService>();
         services.AddScoped<IDashboardService, DashboardService>();
 
