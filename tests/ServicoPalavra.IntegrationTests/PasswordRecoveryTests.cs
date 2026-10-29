@@ -30,7 +30,7 @@ public sealed class PasswordRecoveryTests : IClassFixture<SecurityWebApplication
         var existingBody = await existing.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, existing.StatusCode);
-        var captured = Assert.Single(_factory.PasswordResetEmailSender.Messages);
+        var captured = await WaitForSingleCapturedAsync();
         Assert.Equal(email, captured.Email);
         Assert.Equal("Usuario Recovery", captured.Nome);
         Assert.NotEqual(Guid.Empty, captured.UserId);
@@ -46,6 +46,7 @@ public sealed class PasswordRecoveryTests : IClassFixture<SecurityWebApplication
 
         Assert.Equal(HttpStatusCode.OK, missing.StatusCode);
         Assert.Equal(existingBody, missingBody);
+        await Task.Delay(100);
         Assert.Empty(_factory.PasswordResetEmailSender.Messages);
         Assert.DoesNotContain(email, existingBody, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(missingEmail, missingBody, StringComparison.OrdinalIgnoreCase);
@@ -65,7 +66,7 @@ public sealed class PasswordRecoveryTests : IClassFixture<SecurityWebApplication
         await EnsureCsrfAsync(_client);
         var forgot = await _client.PostAsJsonAsync("/api/auth/password/forgot", new ForgotPasswordRequest(email));
         Assert.Equal(HttpStatusCode.OK, forgot.StatusCode);
-        var captured = Assert.Single(_factory.PasswordResetEmailSender.Messages);
+        var captured = await WaitForSingleCapturedAsync();
 
         var reset = await _client.PostAsJsonAsync(
             "/api/auth/password/reset",
@@ -95,7 +96,7 @@ public sealed class PasswordRecoveryTests : IClassFixture<SecurityWebApplication
         await EnsureCsrfAsync(_client);
         var forgot = await _client.PostAsJsonAsync("/api/auth/password/forgot", new ForgotPasswordRequest(email));
         Assert.Equal(HttpStatusCode.OK, forgot.StatusCode);
-        var captured = Assert.Single(_factory.PasswordResetEmailSender.Messages);
+        var captured = await WaitForSingleCapturedAsync();
 
         var invalidToken = await _client.PostAsJsonAsync(
             "/api/auth/password/reset",
@@ -127,7 +128,7 @@ public sealed class PasswordRecoveryTests : IClassFixture<SecurityWebApplication
         await EnsureCsrfAsync(_client);
         var forgot = await _client.PostAsJsonAsync("/api/auth/password/forgot", new ForgotPasswordRequest(email));
         Assert.Equal(HttpStatusCode.OK, forgot.StatusCode);
-        var captured = Assert.Single(_factory.PasswordResetEmailSender.Messages);
+        var captured = await WaitForSingleCapturedAsync();
 
         var weak = await _client.PostAsJsonAsync(
             "/api/auth/password/reset",
@@ -156,6 +157,22 @@ public sealed class PasswordRecoveryTests : IClassFixture<SecurityWebApplication
             new RegisterRequest("Senha Longa", email, "UmaSenhaLonga123"));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    private async Task<CapturedPasswordResetEmail> WaitForSingleCapturedAsync()
+    {
+        for (var attempt = 0; attempt < 40; attempt++)
+        {
+            var messages = _factory.PasswordResetEmailSender.Messages;
+            if (messages.Count == 1)
+            {
+                return messages[0];
+            }
+
+            await Task.Delay(25);
+        }
+
+        return Assert.Single(_factory.PasswordResetEmailSender.Messages);
     }
 
     private async Task RegisterAsync(string nome, string email, string password)
