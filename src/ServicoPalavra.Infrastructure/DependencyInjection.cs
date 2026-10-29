@@ -54,6 +54,8 @@ public static class DependencyInjection
         services.AddScoped<IPlanoBiblicoRepository, PlanoBiblicoRepository>();
         services.AddScoped<IDashboardReadRepository, DashboardReadRepository>();
         services.AddScoped<IPasswordResetEmailSender, SmtpPasswordResetEmailSender>();
+        services.AddSingleton<IPasswordResetEmailQueue, PasswordResetEmailQueue>();
+        services.AddHostedService<PasswordResetEmailWorker>();
         services.AddScoped<DatabaseSeeder>();
         services.AddScoped<BaseBiblicaV2Importer>();
 
