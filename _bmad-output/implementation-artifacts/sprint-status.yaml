@@ -13,7 +13,7 @@ stories:
     title: "Recuperação segura de senha"
   E1-BE-02-hardening-timing-recuperacao:
     priority: P0
-    status: in-progress
+    status: done
     title: "Hardening de timing na recuperação de senha"
   E2-BE-01-performance-dashboard:
     priority: P0
@@ -21,7 +21,7 @@ stories:
     title: "Reduzir round-trips do dashboard"
   E3-BE-01-timezone-calendario:
     priority: P0
-    status: backlog
+    status: ready-for-dev
     title: "Unificar timezone do calendário adaptativo e leitura de hoje"
   E4-BE-01-observabilidade-performance:
     priority: P1
