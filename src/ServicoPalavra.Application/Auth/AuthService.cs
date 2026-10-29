@@ -8,6 +8,9 @@ namespace ServicoPalavra.Application.Auth;
 
 public sealed class AuthService : IAuthService
 {
+    private const string InvalidResetLinkMessage = "Link de recuperacao invalido ou expirado.";
+    private const string InvalidNewPasswordMessage = "A nova senha nao atende aos requisitos de seguranca.";
+
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IPasswordResetEmailSender _passwordResetEmailSender;
@@ -107,15 +110,20 @@ public sealed class AuthService : IAuthService
 
     public async Task ResetPasswordAsync(ResetPasswordRequest request, CancellationToken cancellationToken = default)
     {
-        if (request.UserId == Guid.Empty || string.IsNullOrWhiteSpace(request.Token) || string.IsNullOrWhiteSpace(request.NovaSenha))
+        if (request.UserId == Guid.Empty || string.IsNullOrWhiteSpace(request.Token))
         {
-            throw new AppException("Nao foi possivel redefinir a senha.");
+            throw new AppException(InvalidResetLinkMessage);
+        }
+
+        if (string.IsNullOrWhiteSpace(request.NovaSenha))
+        {
+            throw new AppException(InvalidNewPasswordMessage);
         }
 
         var usuario = await _userManager.FindByIdAsync(request.UserId.ToString());
         if (usuario is null || !usuario.Ativo)
         {
-            throw new AppException("Nao foi possivel redefinir a senha.");
+            throw new AppException(InvalidResetLinkMessage);
         }
 
         string token;
@@ -125,14 +133,21 @@ public sealed class AuthService : IAuthService
         }
         catch (FormatException)
         {
-            throw new AppException("Link de recuperacao invalido ou expirado.");
+            throw new AppException(InvalidResetLinkMessage);
         }
 
         var result = await _userManager.ResetPasswordAsync(usuario, token, request.NovaSenha);
-        if (!result.Succeeded)
+        if (result.Succeeded)
         {
-            throw new AppException("Link de recuperacao invalido ou expirado.");
+            return;
         }
+
+        if (result.Errors.Any(error => error.Code.StartsWith("Password", StringComparison.Ordinal)))
+        {
+            throw new AppException(InvalidNewPasswordMessage);
+        }
+
+        throw new AppException(InvalidResetLinkMessage);
     }
 
     public Task LogoutAsync() => _signInManager.SignOutAsync();
