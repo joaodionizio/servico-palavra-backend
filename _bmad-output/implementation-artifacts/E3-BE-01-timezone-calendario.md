@@ -1,61 +1,87 @@
 # Story E3-BE-01 — Unificar timezone e calendário adaptativo do plano bíblico
 
-Status: backlog  
+Status: done  
 Prioridade: P0
 
 ## Objetivo
 Garantir que todas as decisões de calendário civil do plano bíblico usem o mesmo “hoje” no timezone configurado, preservando timestamps instantâneos em UTC, e concluir o comportamento adaptativo sem alterar o schema.
 
-## Problema atual
-Há usos diretos de `DateTime.UtcNow` convertidos para `DateOnly`, inclusive na leitura de hoje e na alteração de plano. Para usuários em UTC-3, por exemplo, UTC pode virar o dia enquanto localmente ainda é noite, fazendo a aplicação tratar “amanhã” como “hoje”.
+## Implementação
+- criado `ICalendarClock`, com `UtcNow` e `Today`;
+- implementação `CalendarClock` usa `TimeProvider` + `TimeZoneInfo`;
+- `Calendar:TimeZone` configurável, com `America/Sao_Paulo` explícito em `appsettings.json` e fallback no código;
+- timestamps instantâneos continuam UTC;
+- criado `IPlanoBiblicoCalendarService` / `PlanoBiblicoCalendarService` para centralizar realinhamento;
+- endpoints/serviços de plano e dashboard usam a mesma fonte de data civil;
+- nenhum schema/migration foi adicionado.
 
-## Decisões
-- timezone de calendário configurável por `Calendar:TimeZone`, padrão `America/Sao_Paulo`;
-- fonte de tempo injetável (`TimeProvider` ou abstração equivalente), permitindo testes determinísticos;
-- `DateOnly` representa calendário civil e deve ser calculado após conversão para o timezone configurado;
-- `ConcluidoEm`, `CriadoEm`, `AtualizadoEm` e demais timestamps instantâneos continuam UTC;
-- sem migrations/schema novo;
-- campos já existentes: `DataInicio`, `DataFimPrevista`, `PlanoBiblicoDia.DataPrevista`, `ProgressoLeitura.ConcluidoEm`.
+## Regras implementadas
+1. Dias concluídos permanecem históricos e não têm `DataPrevista` reescrita.
+2. Apenas dias pendentes são redistribuídos.
+3. Consulta de plano atrasado realinha os pendentes a partir de `Today` local.
+4. Ao concluir, o restante dos pendentes começa em `Today + 1` local.
+5. Ao desmarcar, o dia volta à sequência pendente a partir de `Today` local.
+6. Datas já ocupadas por históricos concluídos são puladas, evitando colisão.
+7. Agenda com datas pendentes duplicadas ou sobreposição com histórico é reparada mesmo que nenhuma data esteja atrasada.
+8. `DataFimPrevista` é reconciliada com a última data efetiva do cronograma.
+9. Consultas repetidas sobre agenda já válida são idempotentes.
+10. Dashboard detecta atraso dentro da query de overview existente, sem adicionar round-trip no caminho normal.
+11. Leitura do dashboard continua priorizando a data local de hoje e preserva o fallback para a próxima pendente.
 
-## Regras do calendário adaptativo
-1. Dias concluídos são histórico imutável: seu `DiaNumero`, leitura e data prevista histórica não são reescritos pelo realinhamento.
-2. Apenas dias pendentes podem ser redistribuídos.
-3. Se ao consultar um plano houver dia pendente com `DataPrevista < hoje`, os pendentes devem ser realinhados a partir de `hoje`, mantendo a ordem e intervalo diário.
-4. Ao concluir uma leitura, o histórico concluído permanece intacto e os demais pendentes são redistribuídos a partir de **amanhã** no calendário local.
-5. Ao desmarcar uma conclusão, o sistema deve aplicar regra determinística documentada para reentrada do dia na sequência, sem duplicar datas ou corromper histórico.
-6. `DataFimPrevista` do plano acompanha a última data prevista dos dias após redistribuição.
-7. O dashboard e os endpoints de plano devem usar a mesma fonte de “hoje”.
-8. A leitura de hoje deve priorizar o dia previsto para hoje; se inexistente, o comportamento de fallback para próxima pendente deve ser explícito e testado.
+## Critérios de aceitação — resultado
+1. Virada UTC/local — atendido: teste congela `2026-10-30 00:30 UTC` e obtém `2026-10-29` em `America/Sao_Paulo`.
+2. Relógio congelável — atendido por `TimeProvider`/`ICalendarClock` fake nos testes.
+3. Plano atrasado altera somente pendentes — atendido.
+4. Conclusão grava `ConcluidoEm` UTC e reageenda a partir do amanhã local — atendido.
+5. Histórico concluído permanece imutável — atendido.
+6. Pendentes não ficam com datas duplicadas após realinhamento — atendido, inclusive edge case de duplicidade futura.
+7. `DataFimPrevista` acompanha o cronograma efetivo — atendido, inclusive plano totalmente concluído.
+8. Dashboard e plano compartilham `ICalendarClock.Today` — atendido.
+9. Nenhuma migration criada — atendido.
+10. Testes cobrem UTC/local, atraso, conclusão, desmarcação, plano concluído, idempotência, colisão e edge case do dashboard — atendido.
+11. `bash tools/verify.sh`/Backend Verify permanece verde — atendido.
 
-## Critérios de aceitação
-1. Às `00:30 UTC` de um instante em que ainda é o dia anterior em `America/Sao_Paulo`, dashboard/plano usam a data local correta.
-2. Fonte de tempo pode ser congelada em testes sem depender do relógio da máquina.
-3. Consultar plano atrasado realinha apenas pendentes e não altera concluídos.
-4. Concluir um dia registra `ConcluidoEm` em UTC e redistribui os pendentes a partir do amanhã local.
-5. Dias concluídos mantêm a data histórica mesmo após novas consultas/conclusões.
-6. Não existem duas leituras pendentes com a mesma `DataPrevista` após realinhamento.
-7. `DataFimPrevista` é recalculada de acordo com a última leitura pendente/histórica aplicável.
-8. Dashboard e endpoint do plano concordam sobre “leitura de hoje”.
-9. Nenhuma migration é criada.
-10. Testes cobrem virada UTC/local, atraso de múltiplos dias, conclusão, desmarcação, plano totalmente concluído e idempotência de consultas repetidas.
-11. `bash tools/verify.sh` permanece verde.
+## Testes adicionados/reforçados
+- `BiblePlanCalendarTests`:
+  - limite UTC/local;
+  - atraso de múltiplos dias;
+  - idempotência;
+  - conclusão e timestamp UTC;
+  - desmarcação;
+  - colisão com histórico concluído;
+  - plano totalmente concluído.
+- `AdaptiveCalendarEdgeCaseTests`:
+  - duplicidade futura entre pendentes;
+  - dashboard com leitura concluída hoje e outro pendente atrasado.
+- `DashboardPerformanceTests` passou a usar o mesmo `ICalendarClock` do produto.
 
-## Arquitetura sugerida
-- criar uma abstração única de relógio/calendário na Application, por exemplo `ICalendarClock`, expondo `UtcNow` e `Today`;
-- implementação baseada em `TimeProvider` + `TimeZoneInfo`, registrada por DI;
-- remover decisões de calendário baseadas em `DateTime.UtcNow` direto;
-- centralizar realinhamento em serviço de domínio/aplicação reutilizado por dashboard e plano, evitando duas regras paralelas.
+## Performance
+A sinalização `NeedsCalendarRealignment` é projetada dentro da query de overview já existente. O caminho normal do dashboard continua protegido pelos testes de performance de E2-BE-01: 4 comandos SQL sem plano e 5 com plano/leitura, sem cache externo ou serviço adicional.
+
+## Review adversarial
+Resultado: **APPROVED**.
+
+Pontos revisados:
+- sem migration/schema novo;
+- nenhuma data histórica concluída é reescrita;
+- `ConcluidoEm` permanece UTC;
+- nenhuma decisão de calendário relevante usa UTC diretamente como data civil;
+- duplicidade/colisão de datas é reparada;
+- `DataFimPrevista` não fica obsoleta;
+- dashboard não ganha query extra no caminho normal;
+- nenhum serviço pago ou infraestrutura recorrente foi introduzido.
+
+## Evidência de CI
+- Backend Verify `40974132693`: success com a suíte principal do calendário adaptativo.
+- Backend Verify `40974505697`: success com edge cases de duplicidade/dashboard.
+- Backend Verify `40974558833`: success após tornar `Calendar:TimeZone` explícito na configuração.
 
 ## Fora de escopo
-- alterar a sequência pastoral/conteúdo das leituras;
-- adicionar tabela de calendário;
+- alterar sequência pastoral/conteúdo das leituras;
+- tabela de calendário;
 - notificações/reminders;
-- mudar o timezone por usuário nesta etapa;
-- frontend visual do calendário, salvo ajustes de contrato indispensáveis.
+- timezone por usuário;
+- redesign visual do calendário.
 
 ## Definition of Done
-- critérios 1–11 atendidos;
-- nenhuma decisão de calendário relevante usa UTC como data civil diretamente;
-- testes determinísticos com relógio injetado;
-- verify verde;
-- story em `review` e code review independente aprovado.
+Critérios atendidos, CI verde e review independente aprovado.
