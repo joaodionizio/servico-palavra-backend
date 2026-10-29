@@ -14,34 +14,86 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
 
     public async Task<DashboardMeResponse> GetMeAsync(Guid usuarioId, CancellationToken cancellationToken = default)
     {
-        var favoritos = await CountFavoritosAsync(usuarioId, cancellationToken);
-        var concluidos = await CountConteudosConcluidosAsync(usuarioId, cancellationToken);
+        var overview = await GetOverviewAsync(usuarioId, cancellationToken);
         var formacoes = await ListFormacoesRecentesAsync(cancellationToken);
         var favoritosRecentes = await ListFavoritosRecentesAsync(usuarioId, cancellationToken);
         var conteudosComProgresso = await ListConteudosComProgressoAsync(usuarioId, cancellationToken);
-        var plano = await GetPlanoBiblicoAtivoAsync(usuarioId, cancellationToken);
-        var leituraHoje = plano is null ? null : await GetLeituraHojeAsync(usuarioId, plano.Id, cancellationToken);
-        var percentualPlano = plano?.Percentual ?? 0m;
+        var leituraHoje = overview.Plano is null
+            ? null
+            : await GetLeituraHojeAsync(usuarioId, overview.Plano.Id, cancellationToken);
+        var percentualPlano = overview.Plano?.Percentual ?? 0m;
 
         return new DashboardMeResponse(
-            concluidos,
-            favoritos,
-            plano is not null,
+            overview.Concluidos,
+            overview.Favoritos,
+            overview.Plano is not null,
             formacoes,
             favoritosRecentes,
             conteudosComProgresso,
-            plano,
+            overview.Plano,
             leituraHoje,
-            new DashboardEstatisticasResponse(favoritos, concluidos, percentualPlano));
+            new DashboardEstatisticasResponse(overview.Favoritos, overview.Concluidos, percentualPlano));
     }
 
-    private Task<int> CountFavoritosAsync(Guid usuarioId, CancellationToken cancellationToken) =>
-        _db.Favoritos.AsNoTracking().CountAsync(x => x.UsuarioId == usuarioId && x.Conteudo.Publicado, cancellationToken);
+    private async Task<DashboardOverview> GetOverviewAsync(Guid usuarioId, CancellationToken cancellationToken)
+    {
+        var row = await (
+            from usuario in _db.Users.AsNoTracking()
+            where usuario.Id == usuarioId
+            join plano in _db.PlanosBiblicosUsuario
+                    .AsNoTracking()
+                    .Where(x => x.Ativo && x.Status == StatusPlanoBiblico.Ativo)
+                on usuario.Id equals plano.UsuarioId into planos
+            from plano in planos.DefaultIfEmpty()
+            select new
+            {
+                Favoritos = _db.Favoritos.Count(x => x.UsuarioId == usuarioId && x.Conteudo.Publicado),
+                Concluidos = _db.ProgressosConteudo.Count(x =>
+                    x.UsuarioId == usuarioId &&
+                    x.Conteudo.Publicado &&
+                    x.Status == StatusProgressoConteudo.Concluido),
+                PlanoId = plano == null ? (Guid?)null : plano.Id,
+                PlanoNome = plano == null ? null : plano.Nome,
+                PlanoDuracaoDias = plano == null ? (int?)null : plano.DuracaoDias,
+                PlanoDataInicio = plano == null ? (DateOnly?)null : plano.DataInicio,
+                PlanoDataFimPrevista = plano == null ? (DateOnly?)null : plano.DataFimPrevista,
+                TotalDias = plano == null
+                    ? 0
+                    : _db.PlanosBiblicosDias.Count(d => d.PlanoBiblicoUsuarioId == plano.Id),
+                DiasConcluidos = plano == null
+                    ? 0
+                    : _db.ProgressosLeitura.Count(p =>
+                        p.UsuarioId == usuarioId &&
+                        p.Concluido &&
+                        p.PlanoBiblicoDia.PlanoBiblicoUsuarioId == plano.Id)
+            })
+            .FirstOrDefaultAsync(cancellationToken);
 
-    private Task<int> CountConteudosConcluidosAsync(Guid usuarioId, CancellationToken cancellationToken) =>
-        _db.ProgressosConteudo
-            .AsNoTracking()
-            .CountAsync(x => x.UsuarioId == usuarioId && x.Conteudo.Publicado && x.Status == StatusProgressoConteudo.Concluido, cancellationToken);
+        if (row is null)
+        {
+            return new DashboardOverview(0, 0, null);
+        }
+
+        DashboardPlanoBiblicoResumoResponse? planoResponse = null;
+        if (row.PlanoId.HasValue)
+        {
+            var percentual = row.TotalDias == 0
+                ? 0m
+                : Math.Round(row.DiasConcluidos * 100m / row.TotalDias, 2);
+
+            planoResponse = new DashboardPlanoBiblicoResumoResponse(
+                row.PlanoId.Value,
+                row.PlanoNome ?? "Plano biblico",
+                row.PlanoDuracaoDias ?? 0,
+                row.PlanoDataInicio ?? default,
+                row.PlanoDataFimPrevista ?? default,
+                row.DiasConcluidos,
+                row.TotalDias,
+                percentual);
+        }
+
+        return new DashboardOverview(row.Favoritos, row.Concluidos, planoResponse);
+    }
 
     private async Task<IReadOnlyList<DashboardConteudoResumoResponse>> ListFormacoesRecentesAsync(CancellationToken cancellationToken) =>
         (await _db.Conteudos
@@ -138,79 +190,37 @@ public sealed class DashboardReadRepository : IDashboardReadRepository
             x.UltimoAcessoEm))
         .ToList();
 
-    private async Task<DashboardPlanoBiblicoResumoResponse?> GetPlanoBiblicoAtivoAsync(Guid usuarioId, CancellationToken cancellationToken)
-    {
-        var plano = await _db.PlanosBiblicosUsuario
-            .AsNoTracking()
-            .Where(x => x.UsuarioId == usuarioId && x.Ativo && x.Status == StatusPlanoBiblico.Ativo)
-            .Select(x => new
-            {
-                x.Id,
-                x.Nome,
-                x.DuracaoDias,
-                x.DataInicio,
-                x.DataFimPrevista,
-                TotalDias = _db.PlanosBiblicosDias.Count(d => d.PlanoBiblicoUsuarioId == x.Id),
-                DiasConcluidos = _db.ProgressosLeitura.Count(p =>
-                    p.UsuarioId == usuarioId &&
-                    p.Concluido &&
-                    p.PlanoBiblicoDia.PlanoBiblicoUsuarioId == x.Id)
-            })
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if (plano is null)
-        {
-            return null;
-        }
-
-        var percentual = plano.TotalDias == 0 ? 0m : Math.Round(plano.DiasConcluidos * 100m / plano.TotalDias, 2);
-        return new DashboardPlanoBiblicoResumoResponse(
-            plano.Id,
-            plano.Nome,
-            plano.DuracaoDias,
-            plano.DataInicio,
-            plano.DataFimPrevista,
-            plano.DiasConcluidos,
-            plano.TotalDias,
-            percentual);
-    }
-
-    private async Task<DashboardLeituraHojeResponse?> GetLeituraHojeAsync(Guid usuarioId, Guid planoId, CancellationToken cancellationToken)
+    private Task<DashboardLeituraHojeResponse?> GetLeituraHojeAsync(Guid usuarioId, Guid planoId, CancellationToken cancellationToken)
     {
         var hoje = DateOnly.FromDateTime(DateTime.UtcNow);
-        var leitura = await GetLeituraByDataAsync(usuarioId, planoId, hoje, cancellationToken)
-            ?? await GetProximaLeituraPendenteAsync(usuarioId, planoId, cancellationToken);
 
-        return leitura;
+        return _db.PlanosBiblicosDias
+            .AsNoTracking()
+            .Where(x =>
+                x.PlanoBiblicoUsuarioId == planoId &&
+                (x.DataPrevista == hoje ||
+                    !_db.ProgressosLeitura.Any(p =>
+                        p.UsuarioId == usuarioId &&
+                        p.PlanoBiblicoDiaId == x.Id &&
+                        p.Concluido)))
+            .OrderByDescending(x => x.DataPrevista == hoje)
+            .ThenBy(x => x.DiaNumero)
+            .Select(x => new DashboardLeituraHojeResponse(
+                x.Id,
+                x.DiaNumero,
+                x.MesNumero,
+                x.DataPrevista,
+                x.LeiturasTexto,
+                x.SalmoNumero,
+                _db.ProgressosLeitura.Any(p =>
+                    p.UsuarioId == usuarioId &&
+                    p.PlanoBiblicoDiaId == x.Id &&
+                    p.Concluido)))
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
-    private Task<DashboardLeituraHojeResponse?> GetLeituraByDataAsync(Guid usuarioId, Guid planoId, DateOnly data, CancellationToken cancellationToken) =>
-        _db.PlanosBiblicosDias
-            .AsNoTracking()
-            .Where(x => x.PlanoBiblicoUsuarioId == planoId && x.DataPrevista == data)
-            .Select(x => new DashboardLeituraHojeResponse(
-                x.Id,
-                x.DiaNumero,
-                x.MesNumero,
-                x.DataPrevista,
-                x.LeiturasTexto,
-                x.SalmoNumero,
-                _db.ProgressosLeitura.Any(p => p.UsuarioId == usuarioId && p.PlanoBiblicoDiaId == x.Id && p.Concluido)))
-            .FirstOrDefaultAsync(cancellationToken);
-
-    private Task<DashboardLeituraHojeResponse?> GetProximaLeituraPendenteAsync(Guid usuarioId, Guid planoId, CancellationToken cancellationToken) =>
-        _db.PlanosBiblicosDias
-            .AsNoTracking()
-            .Where(x => x.PlanoBiblicoUsuarioId == planoId &&
-                !_db.ProgressosLeitura.Any(p => p.UsuarioId == usuarioId && p.PlanoBiblicoDiaId == x.Id && p.Concluido))
-            .OrderBy(x => x.DiaNumero)
-            .Select(x => new DashboardLeituraHojeResponse(
-                x.Id,
-                x.DiaNumero,
-                x.MesNumero,
-                x.DataPrevista,
-                x.LeiturasTexto,
-                x.SalmoNumero,
-                false))
-            .FirstOrDefaultAsync(cancellationToken);
+    private sealed record DashboardOverview(
+        int Favoritos,
+        int Concluidos,
+        DashboardPlanoBiblicoResumoResponse? Plano);
 }
