@@ -9,19 +9,34 @@ public sealed class PlanoBiblicoService : IPlanoBiblicoService
 {
     private readonly IPlanoBiblicoRepository _planos;
     private readonly IBiblePlanGeneratorService _generator;
+    private readonly IPlanoBiblicoCalendarService _calendar;
+    private readonly ICalendarClock _clock;
     private readonly IUnitOfWork _unitOfWork;
 
-    public PlanoBiblicoService(IPlanoBiblicoRepository planos, IBiblePlanGeneratorService generator, IUnitOfWork unitOfWork)
+    public PlanoBiblicoService(
+        IPlanoBiblicoRepository planos,
+        IBiblePlanGeneratorService generator,
+        IPlanoBiblicoCalendarService calendar,
+        ICalendarClock clock,
+        IUnitOfWork unitOfWork)
     {
         _planos = planos;
         _generator = generator;
+        _calendar = calendar;
+        _clock = clock;
         _unitOfWork = unitOfWork;
     }
 
     public async Task<PlanoBiblicoResponse?> GetAtivoAsync(Guid usuarioId, CancellationToken cancellationToken = default)
     {
         var plano = await _planos.GetAtivoAsync(usuarioId, cancellationToken);
-        return plano is null ? null : ToResponse(plano);
+        if (plano is null)
+        {
+            return null;
+        }
+
+        await _calendar.RealignForReadAsync(usuarioId, plano.Id, cancellationToken);
+        return ToResponse(plano);
     }
 
     public async Task<PlanoBiblicoResponse> CriarAsync(Guid usuarioId, CriarPlanoBiblicoRequest request, CancellationToken cancellationToken = default)
@@ -56,11 +71,11 @@ public sealed class PlanoBiblicoService : IPlanoBiblicoService
             var continuar = request.Modo == ModoAlteracaoPlanoBiblico.ContinuarDeOndeParei;
             var ordemInicio = continuar ? (posicao?.UltimaOrdemConcluida ?? 0) + 1 : 1;
             var modo = continuar ? ModoCriacaoPlanoBiblico.Continuacao : ModoCriacaoPlanoBiblico.Reinicio;
-            novoPlano = await _generator.GenerateAsync(usuarioId, planoAtual.Nome, request.DuracaoAnos, request.DuracaoMeses, DateOnly.FromDateTime(DateTime.UtcNow), modo, ordemInicio, planoAtual.Id, cancellationToken);
+            novoPlano = await _generator.GenerateAsync(usuarioId, planoAtual.Nome, request.DuracaoAnos, request.DuracaoMeses, _clock.Today, modo, ordemInicio, planoAtual.Id, cancellationToken);
 
             planoAtual.Ativo = false;
             planoAtual.Status = StatusPlanoBiblico.Substituido;
-            planoAtual.AtualizadoEm = DateTime.UtcNow;
+            planoAtual.AtualizadoEm = _clock.UtcNow.UtcDateTime;
 
             _planos.Add(novoPlano);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -69,14 +84,21 @@ public sealed class PlanoBiblicoService : IPlanoBiblicoService
         return ToResponse(novoPlano!);
     }
 
-    public async Task<PlanoBiblicoResponse> GetAsync(Guid usuarioId, Guid planoId, CancellationToken cancellationToken = default) =>
-        ToResponse(await _planos.GetByIdAsync(planoId, usuarioId, cancellationToken) ?? throw new AppException("Plano biblico nao encontrado.", 404));
+    public async Task<PlanoBiblicoResponse> GetAsync(Guid usuarioId, Guid planoId, CancellationToken cancellationToken = default)
+    {
+        await _calendar.RealignForReadAsync(usuarioId, planoId, cancellationToken);
+        return ToResponse(await _planos.GetByIdAsync(planoId, usuarioId, cancellationToken)
+            ?? throw new AppException("Plano biblico nao encontrado.", 404));
+    }
 
     public async Task<IReadOnlyList<PlanoBiblicoResponse>> GetHistoricoAsync(Guid usuarioId, CancellationToken cancellationToken = default) =>
         (await _planos.ListHistoricoAsync(usuarioId, cancellationToken)).Select(ToResponse).ToList();
 
-    public async Task<IReadOnlyList<PlanoBiblicoDiaResponse>> ListDiasAsync(Guid usuarioId, Guid planoId, CancellationToken cancellationToken = default) =>
-        await _planos.ListDiaResponsesAsync(planoId, usuarioId, cancellationToken);
+    public async Task<IReadOnlyList<PlanoBiblicoDiaResponse>> ListDiasAsync(Guid usuarioId, Guid planoId, CancellationToken cancellationToken = default)
+    {
+        await _calendar.RealignForReadAsync(usuarioId, planoId, cancellationToken);
+        return await _planos.ListDiaResponsesAsync(planoId, usuarioId, cancellationToken);
+    }
 
     public async Task<PosicaoBiblicaResponse> GetPosicaoAtualAsync(Guid usuarioId, CancellationToken cancellationToken = default)
     {
@@ -96,7 +118,7 @@ public sealed class PlanoBiblicoService : IPlanoBiblicoService
         {
             var dia = await _planos.GetDiaAsync(diaId, usuarioId, cancellationToken)
                 ?? throw new AppException("Dia do plano nao encontrado.", 404);
-            var now = DateTime.UtcNow;
+            var now = _clock.UtcNow.UtcDateTime;
             var progresso = await _planos.GetProgressoLeituraAsync(usuarioId, dia.Id, cancellationToken);
 
             if (progresso is null)
@@ -121,6 +143,15 @@ public sealed class PlanoBiblicoService : IPlanoBiblicoService
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             await RecalcularPosicaoBiblicaAsync(usuarioId, now, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            if (concluido)
+            {
+                await _calendar.RealignAfterCompletionAsync(usuarioId, dia.PlanoBiblicoUsuarioId, cancellationToken);
+            }
+            else
+            {
+                await _calendar.RealignAfterReopenAsync(usuarioId, dia.PlanoBiblicoUsuarioId, cancellationToken);
+            }
         }, cancellationToken);
 
         return await _planos.GetDiaResponseAsync(diaId, usuarioId, cancellationToken)
