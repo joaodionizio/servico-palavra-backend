@@ -42,16 +42,41 @@ public sealed class PlanoBiblicoCalendarService : IPlanoBiblicoCalendarService
         }
 
         var pendentes = await _planos.ListDiasPendentesForUpdateAsync(planoId, usuarioId, cancellationToken);
+        var datasConcluidas = await _planos.ListDatasDiasConcluidosAsync(planoId, usuarioId, cancellationToken);
+        var datasConcluidasSet = datasConcluidas.ToHashSet();
         var hoje = _clock.Today;
+        var now = _clock.UtcNow.UtcDateTime;
 
-        if (onlyWhenStale && pendentes.Count > 0 && pendentes.All(x => x.DataPrevista.HasValue && x.DataPrevista.Value >= hoje))
+        if (onlyWhenStale)
         {
-            return false;
+            var datasPendentes = pendentes
+                .Where(x => x.DataPrevista.HasValue)
+                .Select(x => x.DataPrevista!.Value)
+                .ToArray();
+
+            var needsRealignment =
+                pendentes.Any(x => !x.DataPrevista.HasValue || x.DataPrevista.Value < hoje) ||
+                datasPendentes.Distinct().Count() != datasPendentes.Length ||
+                datasPendentes.Any(datasConcluidasSet.Contains);
+
+            if (!needsRealignment)
+            {
+                var datasAtuais = datasConcluidas.Concat(datasPendentes).ToArray();
+                var expectedEnd = datasAtuais.Length > 0 ? datasAtuais.Max() : plano.DataInicio;
+
+                if (plano.DataFimPrevista == expectedEnd)
+                {
+                    return false;
+                }
+
+                plano.DataFimPrevista = expectedEnd;
+                plano.AtualizadoEm = now;
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                return true;
+            }
         }
 
-        var datasConcluidas = await _planos.ListDatasDiasConcluidosAsync(planoId, usuarioId, cancellationToken);
-        var datasOcupadas = datasConcluidas.ToHashSet();
-        var now = _clock.UtcNow.UtcDateTime;
+        var datasOcupadas = datasConcluidasSet;
         var changed = false;
         var nextDate = startDate;
 
