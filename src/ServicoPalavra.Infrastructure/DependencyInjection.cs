@@ -8,6 +8,7 @@ using ServicoPalavra.Infrastructure.Email;
 using ServicoPalavra.Infrastructure.Persistence;
 using ServicoPalavra.Infrastructure.Persistence.Import;
 using ServicoPalavra.Infrastructure.Persistence.Seed;
+using ServicoPalavra.Infrastructure.Time;
 
 namespace ServicoPalavra.Infrastructure;
 
@@ -45,6 +46,8 @@ public static class DependencyInjection
             }
         });
 
+        services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<ICalendarClock, CalendarClock>();
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AppDbContext>());
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
         services.AddScoped<ICategoriaRepository, CategoriaRepository>();
