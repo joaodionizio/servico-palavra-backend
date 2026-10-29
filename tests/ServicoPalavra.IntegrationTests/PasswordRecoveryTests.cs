@@ -85,7 +85,7 @@ public sealed class PasswordRecoveryTests : IClassFixture<SecurityWebApplication
     }
 
     [Fact]
-    public async Task Invalid_reset_token_is_rejected_without_internal_details()
+    public async Task Invalid_reset_token_and_unknown_user_use_same_public_error()
     {
         var suffix = Guid.NewGuid().ToString("N");
         var email = $"invalid-reset-{suffix}@tests.local";
@@ -97,16 +97,51 @@ public sealed class PasswordRecoveryTests : IClassFixture<SecurityWebApplication
         Assert.Equal(HttpStatusCode.OK, forgot.StatusCode);
         var captured = Assert.Single(_factory.PasswordResetEmailSender.Messages);
 
-        var reset = await _client.PostAsJsonAsync(
+        var invalidToken = await _client.PostAsJsonAsync(
             "/api/auth/password/reset",
             new ResetPasswordRequest(captured.UserId, captured.EncodedToken + "alterado", "NovaSenhaSegura123"));
-        var body = await reset.Content.ReadAsStringAsync();
+        var invalidTokenBody = await invalidToken.Content.ReadAsStringAsync();
 
-        Assert.Equal(HttpStatusCode.BadRequest, reset.StatusCode);
-        Assert.Contains("invalido ou expirado", body, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("Identity", body, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("PasswordHash", body, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(captured.EncodedToken, body, StringComparison.Ordinal);
+        var unknownUser = await _client.PostAsJsonAsync(
+            "/api/auth/password/reset",
+            new ResetPasswordRequest(Guid.NewGuid(), captured.EncodedToken, "NovaSenhaSegura123"));
+        var unknownUserBody = await unknownUser.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.BadRequest, invalidToken.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, unknownUser.StatusCode);
+        Assert.Equal(invalidTokenBody, unknownUserBody);
+        Assert.Contains("invalido ou expirado", invalidTokenBody, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("Identity", invalidTokenBody, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("PasswordHash", invalidTokenBody, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(captured.EncodedToken, invalidTokenBody, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task Weak_new_password_returns_policy_error_and_keeps_valid_token_usable()
+    {
+        var suffix = Guid.NewGuid().ToString("N");
+        var email = $"weak-reset-{suffix}@tests.local";
+        await RegisterAsync("Usuario Senha Fraca", email, "StrongPass123");
+
+        _factory.PasswordResetEmailSender.Clear();
+        await EnsureCsrfAsync(_client);
+        var forgot = await _client.PostAsJsonAsync("/api/auth/password/forgot", new ForgotPasswordRequest(email));
+        Assert.Equal(HttpStatusCode.OK, forgot.StatusCode);
+        var captured = Assert.Single(_factory.PasswordResetEmailSender.Messages);
+
+        var weak = await _client.PostAsJsonAsync(
+            "/api/auth/password/reset",
+            new ResetPasswordRequest(captured.UserId, captured.EncodedToken, "fraca"));
+        var weakBody = await weak.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.BadRequest, weak.StatusCode);
+        Assert.Contains("requisitos de seguranca", weakBody, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("invalido ou expirado", weakBody, StringComparison.OrdinalIgnoreCase);
+
+        var valid = await _client.PostAsJsonAsync(
+            "/api/auth/password/reset",
+            new ResetPasswordRequest(captured.UserId, captured.EncodedToken, "AgoraSim123"));
+        Assert.Equal(HttpStatusCode.OK, valid.StatusCode);
     }
 
     [Fact]
