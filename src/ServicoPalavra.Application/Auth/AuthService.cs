@@ -13,16 +13,16 @@ public sealed class AuthService : IAuthService
 
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
-    private readonly IPasswordResetEmailSender _passwordResetEmailSender;
+    private readonly IPasswordResetEmailQueue _passwordResetEmailQueue;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
-        IPasswordResetEmailSender passwordResetEmailSender)
+        IPasswordResetEmailQueue passwordResetEmailQueue)
     {
         _userManager = userManager;
         _signInManager = signInManager;
-        _passwordResetEmailSender = passwordResetEmailSender;
+        _passwordResetEmailQueue = passwordResetEmailQueue;
     }
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
@@ -100,12 +100,11 @@ public sealed class AuthService : IAuthService
         var token = await _userManager.GeneratePasswordResetTokenAsync(usuario);
         var encodedToken = EncodeToken(token);
 
-        await _passwordResetEmailSender.SendPasswordResetAsync(
+        _passwordResetEmailQueue.TryEnqueue(new PasswordResetEmailJob(
             usuario.Email ?? email,
             usuario.Nome,
             usuario.Id,
-            encodedToken,
-            cancellationToken);
+            encodedToken));
     }
 
     public async Task ResetPasswordAsync(ResetPasswordRequest request, CancellationToken cancellationToken = default)
