@@ -41,7 +41,7 @@ public sealed class SmtpPasswordResetEmailSender : IPasswordResetEmailSender
             return;
         }
 
-        var resetUrl = BuildResetUrl(frontendBaseUrl, userId, encodedToken);
+        var resetUrl = PasswordResetLinkBuilder.Build(frontendBaseUrl, userId, encodedToken);
         var fromName = Read("Email:Smtp:FromName", "SMTP_FROM_NAME") ?? "Servico da Palavra";
         var userName = Read("Email:Smtp:UserName", "SMTP_USERNAME");
         var password = Read("Email:Smtp:Password", "SMTP_PASSWORD");
@@ -89,12 +89,6 @@ public sealed class SmtpPasswordResetEmailSender : IPasswordResetEmailSender
 
     private bool ReadBool(string configKey, string envKey, bool fallback) =>
         bool.TryParse(Read(configKey, envKey), out var value) ? value : fallback;
-
-    private static string BuildResetUrl(string frontendBaseUrl, Guid userId, string encodedToken)
-    {
-        var baseUrl = frontendBaseUrl.TrimEnd('/');
-        return $"{baseUrl}/redefinir-senha?userId={Uri.EscapeDataString(userId.ToString())}&token={Uri.EscapeDataString(encodedToken)}";
-    }
 
     private static string BuildBody(string nome, string resetUrl)
     {
