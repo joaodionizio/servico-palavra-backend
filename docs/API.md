@@ -20,11 +20,35 @@ Resposta padrao:
 - `GET /api/auth/csrf`
 - `POST /api/auth/register`
 - `POST /api/auth/login`
+- `POST /api/auth/password/forgot`
+- `POST /api/auth/password/reset`
 - `POST /api/auth/logout`
 - `GET /api/auth/me`
 - `PUT /api/auth/me`
 
 Auth usa cookie HttpOnly. A API nao retorna JWT/token no login. Para `POST`, `PUT`, `PATCH` e `DELETE`, envie `X-CSRF-TOKEN` obtido em `GET /api/auth/csrf`.
+
+Recuperacao de senha:
+
+```json
+POST /api/auth/password/forgot
+{
+  "email": "pessoa@example.com"
+}
+```
+
+A resposta publica e generica para contas existentes e inexistentes, evitando enumeracao de usuarios. Para uma conta valida e ativa, a API gera um token temporario do ASP.NET Core Identity e solicita o envio do link para o frontend.
+
+```json
+POST /api/auth/password/reset
+{
+  "userId": "00000000-0000-0000-0000-000000000000",
+  "token": "token-url-safe",
+  "novaSenha": "NovaSenhaSegura123"
+}
+```
+
+O token de redefinicao usa o provider de protecao de dados do Identity e expira em 1 hora. O token e URL-safe e nao deve ser salvo em storage do frontend nem registrado em logs.
 
 Atualizacao de perfil autenticado:
 
@@ -35,7 +59,7 @@ Atualizacao de perfil autenticado:
 }
 ```
 
-Somente `nome` e `email` podem ser atualizados nesta fase. Roles, tipo de acesso e senha nao sao aceitos neste contrato.
+Somente `nome` e `email` podem ser atualizados nesta fase. Roles e tipo de acesso nao sao aceitos neste contrato. Alteracao de senha autenticada continua fora deste endpoint.
 
 ## Categorias
 
