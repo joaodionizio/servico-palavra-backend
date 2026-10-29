@@ -10,6 +10,8 @@ namespace ServicoPalavra.Api.Controllers;
 [Route("api/auth")]
 public sealed class AuthController : ApiControllerBase
 {
+    private const string ForgotPasswordResponse = "Se existir uma conta com esse e-mail, enviaremos as instrucoes de recuperacao.";
+
     private readonly IAuthService _authService;
     private readonly ICurrentUser _currentUser;
     private readonly IAntiforgery _antiforgery;
@@ -37,6 +39,22 @@ public sealed class AuthController : ApiControllerBase
     [EnableRateLimiting("auth")]
     public async Task<IActionResult> Login(LoginRequest request, CancellationToken cancellationToken) =>
         OkResponse(await _authService.LoginAsync(request, cancellationToken));
+
+    [HttpPost("password/forgot")]
+    [EnableRateLimiting("auth")]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request, CancellationToken cancellationToken)
+    {
+        await _authService.RequestPasswordResetAsync(request, cancellationToken);
+        return OkResponse(ForgotPasswordResponse);
+    }
+
+    [HttpPost("password/reset")]
+    [EnableRateLimiting("auth")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordRequest request, CancellationToken cancellationToken)
+    {
+        await _authService.ResetPasswordAsync(request, cancellationToken);
+        return OkResponse("Senha redefinida com sucesso.");
+    }
 
     [Authorize]
     [HttpPost("logout")]
