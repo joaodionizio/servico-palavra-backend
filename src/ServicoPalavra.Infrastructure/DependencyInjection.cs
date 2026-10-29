@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ServicoPalavra.Application.Abstractions;
@@ -14,7 +15,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<AppDbContext>(options =>
+        services.AddDbContext<AppDbContext>((serviceProvider, options) =>
         {
             var provider = (configuration["DATABASE_PROVIDER"] ?? "sqlite").Trim().ToLowerInvariant();
             var connectionString = configuration.GetConnectionString("DefaultConnection") ?? configuration["CONNECTION_STRING"];
@@ -27,16 +28,21 @@ public static class DependencyInjection
                 }
 
                 options.UseNpgsql(connectionString);
-                return;
             }
-
-            if (provider == "sqlite")
+            else if (provider == "sqlite")
             {
                 options.UseSqlite(string.IsNullOrWhiteSpace(connectionString) ? "Data Source=servico-palavra-dev.db" : connectionString);
-                return;
+            }
+            else
+            {
+                throw new InvalidOperationException("DATABASE_PROVIDER deve ser 'sqlite' ou 'postgresql'.");
             }
 
-            throw new InvalidOperationException("DATABASE_PROVIDER deve ser 'sqlite' ou 'postgresql'.");
+            var interceptors = serviceProvider.GetServices<IInterceptor>().ToArray();
+            if (interceptors.Length > 0)
+            {
+                options.AddInterceptors(interceptors);
+            }
         });
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AppDbContext>());
