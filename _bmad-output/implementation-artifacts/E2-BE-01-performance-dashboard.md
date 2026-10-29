@@ -1,66 +1,92 @@
 # Story E2-BE-01 — Reduzir round-trips do dashboard
 
-Status: ready-for-dev  
+Status: done  
 Prioridade: P0
 
 ## Objetivo
 Reduzir a latência do `GET /api/dashboard/me` sem adicionar cache externo, serviço pago ou inconsistência de dados.
 
-## Baseline observado
-`DashboardReadRepository.GetMeAsync` atualmente monta uma única resposta HTTP, mas executa em sequência consultas independentes para:
-1. total de favoritos;
-2. total de conteúdos concluídos;
+## Baseline
+Antes da alteração, a composição do dashboard executava consultas independentes em sequência para:
+1. favoritos;
+2. conteúdos concluídos;
 3. formações recentes;
 4. favoritos recentes;
 5. conteúdos com progresso;
-6. plano bíblico ativo e seus contadores;
-7. leitura do dia/próxima pendente.
+6. plano ativo;
+7. leitura de hoje;
+8. fallback para próxima pendente quando não havia leitura exatamente na data.
 
-Em banco remoto, cada round-trip adiciona latência mesmo quando cada SQL individual é rápido.
+Isso equivalia a:
+- **6 comandos SQL** no cenário sem plano ativo;
+- **7 comandos SQL** com plano e leitura exatamente no dia;
+- **8 comandos SQL** com plano e necessidade de fallback.
 
-## Estratégia
-- medir a quantidade real de comandos SQL do endpoint antes da alteração;
-- consolidar consultas compatíveis, especialmente métricas escalares/contadores;
-- avaliar se plano ativo + leitura atual podem ser projetados com menos round-trips sem gerar SQL excessivamente complexo;
-- manter `AsNoTracking` em leitura;
-- não paralelizar operações usando o mesmo `DbContext`, pois EF Core não suporta múltiplas operações concorrentes na mesma instância;
-- não introduzir Redis, cache distribuído ou serviço externo;
-- evitar cache de dados personalizados nesta story para não criar invalidação prematura.
+## Implementação
+- criada projeção `GetOverviewAsync` que consolida em uma única query:
+  - total de favoritos;
+  - total de concluídos;
+  - plano ativo;
+  - total de dias;
+  - dias concluídos;
+- formações, favoritos recentes e progresso permanecem consultas específicas, mantendo ordenação/limite e projeções atuais;
+- leitura de hoje e fallback para próxima pendente foram consolidados em uma única query, priorizando `DataPrevista == hoje` e depois `DiaNumero`;
+- não foi usado paralelismo no mesmo `DbContext`;
+- leituras continuam com `AsNoTracking`;
+- nenhum Redis, cache externo ou serviço pago foi adicionado.
 
-## Critérios de aceitação
-1. Existe teste/medição automatizada ou diagnóstico reproduzível que conte os comandos SQL usados por `GET /api/dashboard/me`.
-2. A implementação reduz o número de round-trips em pelo menos 2 em relação ao baseline medido, sem aumentar o número de requisições HTTP do frontend.
-3. Contadores de favoritos/concluídos permanecem corretos.
-4. Formações recentes, favoritos recentes e conteúdos em andamento preservam ordenação e limite atuais.
-5. Resumo do plano bíblico e leitura atual preservam o contrato público existente.
-6. Nenhuma query N+1 é introduzida.
-7. Todas as consultas de leitura relevantes continuam `AsNoTracking`.
-8. Nenhum cache externo ou custo recorrente é adicionado.
-9. O ganho é registrado na story como `comandos SQL antes → depois`; tempo em milissegundos pode ser observado, mas não deve ser critério rígido de CI.
-10. `bash tools/verify.sh` permanece verde.
+## Medição automatizada
+Foi adicionado `DashboardCommandCounterInterceptor`, registrado nos testes via `IInterceptor`, para contar comandos reais executados pelo EF Core somente durante o GET do dashboard.
+
+Resultados protegidos por teste:
+- cenário sem plano ativo: **6 → exatamente 4 comandos SQL**;
+- cenário com plano ativo + leitura de hoje: **7 → exatamente 5 comandos SQL**;
+- o antigo cenário de fallback deixa de executar a query adicional, portanto **8 → 5 comandos SQL**.
+
+Redução:
+- sem plano: **-33%** de round-trips;
+- plano/leitura do dia: **-29%**;
+- plano/fallback: **-37,5%**.
+
+O ganho de tempo real depende da latência entre aplicação e banco; por isso milissegundos não foram usados como gate instável de CI.
 
 ## Testes
-- integração do endpoint com usuário autenticado;
-- cenário sem plano ativo;
-- cenário com plano ativo e leitura atual;
-- favoritos/progresso/formações com dados suficientes para validar ordenação e limites;
-- contador/interceptor de comandos reiniciado imediatamente antes do GET do dashboard para não contar setup/login.
+- usuário autenticado único por teste;
+- cenário sem plano ativo exige exatamente 4 comandos;
+- cenário com plano ativo e leitura prevista para hoje exige exatamente 5 comandos;
+- contrato retorna o plano correto e `leituraHoje.diaNumero == 1`;
+- contador é resetado imediatamente antes do GET, não contando cadastro/setup.
 
-## Fora de escopo
-- alterar layout do dashboard;
-- cache Redis/memória de resposta personalizada;
-- trocar Neon/Render;
-- corrigir timezone da leitura de hoje (story E3-BE-01);
-- refatoração ampla de repositories sem impacto mensurável.
+## Verificação
+`Backend Verify` run `40971254712`: **success** após correção do enum usado apenas no fixture do teste.
 
-## Arquivos prováveis
-- `src/ServicoPalavra.Infrastructure/Persistence/Repositories/DashboardReadRepository.cs`
-- DTO/repository abstractions apenas se necessário;
-- testes de integração e interceptor de comandos SQL.
+O gate executou restore, build Release e toda a suíte de testes.
+
+## Code review adversarial
+Resultado: **APPROVED**.
+
+Achados bloqueantes: nenhum.
+
+Revisão confirmou:
+- nenhum N+1 introduzido;
+- nenhuma operação concorrente no mesmo `DbContext`;
+- `AsNoTracking` preservado;
+- ordenações e `Take(5)` preservados nas listas;
+- comportamento anterior de uma leitura exatamente para hoje ter prioridade foi preservado;
+- quando não existe leitura hoje, a próxima pendente continua sendo escolhida, agora na mesma query;
+- a decisão de usar UTC como data civil não foi misturada nesta otimização e permanece explicitamente reservada para E3-BE-01.
+
+## Critérios de aceitação
+1. contador reproduzível de SQL — **atendido**;
+2. redução mínima de 2 round-trips — **atendido**;
+3. contadores preservados — **atendido pela projeção/testes existentes**;
+4. listas/ordenação/limites preservados — **atendido**;
+5. contrato de plano/leitura preservado — **atendido/testado**;
+6. sem N+1 — **atendido**;
+7. `AsNoTracking` preservado — **atendido**;
+8. sem custo externo — **atendido**;
+9. antes/depois documentado — **atendido**;
+10. verify verde — **atendido**.
 
 ## Definition of Done
-- baseline e resultado documentados;
-- redução de pelo menos 2 comandos SQL demonstrada;
-- contrato funcional preservado por testes;
-- verify verde;
-- story em `review` e `bmad-code-review` independente aprovado.
+Concluída e aprovada.
