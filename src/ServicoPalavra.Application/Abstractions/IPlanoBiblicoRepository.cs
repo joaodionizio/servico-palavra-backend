@@ -7,7 +7,10 @@ public interface IPlanoBiblicoRepository
 {
     Task<PlanoBiblicoUsuario?> GetAtivoAsync(Guid usuarioId, CancellationToken cancellationToken = default);
     Task<PlanoBiblicoUsuario?> GetByIdAsync(Guid id, Guid usuarioId, CancellationToken cancellationToken = default);
+    Task<PlanoBiblicoUsuario?> GetByIdForUpdateAsync(Guid id, Guid usuarioId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<PlanoBiblicoDia>> ListDiasAsync(Guid planoId, Guid usuarioId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<PlanoBiblicoDia>> ListDiasPendentesForUpdateAsync(Guid planoId, Guid usuarioId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<DateOnly>> ListDatasDiasConcluidosAsync(Guid planoId, Guid usuarioId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<PlanoBiblicoDiaResponse>> ListDiaResponsesAsync(Guid planoId, Guid usuarioId, CancellationToken cancellationToken = default);
     Task<PlanoBiblicoDiaResponse?> GetDiaResponseAsync(Guid diaId, Guid usuarioId, CancellationToken cancellationToken = default);
     Task<PlanoBiblicoDia?> GetDiaAsync(Guid diaId, Guid usuarioId, CancellationToken cancellationToken = default);
