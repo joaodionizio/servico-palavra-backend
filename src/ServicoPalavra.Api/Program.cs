@@ -189,6 +189,11 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+{
+    options.TokenLifespan = TimeSpan.FromHours(1);
+});
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.Name = "__Host-ServicoPalavra";
