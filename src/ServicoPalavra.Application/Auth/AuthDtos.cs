@@ -2,6 +2,8 @@ namespace ServicoPalavra.Application.Auth;
 
 public sealed record RegisterRequest(string Nome, string Email, string Senha);
 public sealed record LoginRequest(string Email, string Senha);
+public sealed record ForgotPasswordRequest(string Email);
+public sealed record ResetPasswordRequest(Guid UserId, string Token, string NovaSenha);
 public sealed record UpdateMeRequest(string Nome, string Email);
 public sealed record AuthResponse(UsuarioResponse Usuario);
 public sealed record UsuarioResponse(Guid Id, string Nome, string Email, IReadOnlyCollection<string> Roles);
