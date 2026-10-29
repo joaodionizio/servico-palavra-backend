@@ -11,7 +11,30 @@ public sealed class PlanoBiblicoRepository : IPlanoBiblicoRepository
     public PlanoBiblicoRepository(AppDbContext db) => _db = db;
     public Task<PlanoBiblicoUsuario?> GetAtivoAsync(Guid usuarioId, CancellationToken cancellationToken = default) => _db.PlanosBiblicosUsuario.FirstOrDefaultAsync(x => x.UsuarioId == usuarioId && x.Ativo && x.Status == Domain.Enums.StatusPlanoBiblico.Ativo, cancellationToken);
     public Task<PlanoBiblicoUsuario?> GetByIdAsync(Guid id, Guid usuarioId, CancellationToken cancellationToken = default) => _db.PlanosBiblicosUsuario.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id && x.UsuarioId == usuarioId, cancellationToken);
+    public Task<PlanoBiblicoUsuario?> GetByIdForUpdateAsync(Guid id, Guid usuarioId, CancellationToken cancellationToken = default) => _db.PlanosBiblicosUsuario.FirstOrDefaultAsync(x => x.Id == id && x.UsuarioId == usuarioId, cancellationToken);
     public async Task<IReadOnlyList<PlanoBiblicoDia>> ListDiasAsync(Guid planoId, Guid usuarioId, CancellationToken cancellationToken = default) => await _db.PlanosBiblicosDias.AsNoTracking().Where(x => x.PlanoBiblicoUsuarioId == planoId && x.PlanoBiblicoUsuario.UsuarioId == usuarioId).OrderBy(x => x.DiaNumero).ToListAsync(cancellationToken);
+    public async Task<IReadOnlyList<PlanoBiblicoDia>> ListDiasPendentesForUpdateAsync(Guid planoId, Guid usuarioId, CancellationToken cancellationToken = default) => await _db.PlanosBiblicosDias
+        .Where(x =>
+            x.PlanoBiblicoUsuarioId == planoId &&
+            x.PlanoBiblicoUsuario.UsuarioId == usuarioId &&
+            !_db.ProgressosLeitura.Any(p =>
+                p.UsuarioId == usuarioId &&
+                p.PlanoBiblicoDiaId == x.Id &&
+                p.Concluido))
+        .OrderBy(x => x.DiaNumero)
+        .ToListAsync(cancellationToken);
+    public async Task<IReadOnlyList<DateOnly>> ListDatasDiasConcluidosAsync(Guid planoId, Guid usuarioId, CancellationToken cancellationToken = default) => await _db.PlanosBiblicosDias
+        .AsNoTracking()
+        .Where(x =>
+            x.PlanoBiblicoUsuarioId == planoId &&
+            x.PlanoBiblicoUsuario.UsuarioId == usuarioId &&
+            x.DataPrevista.HasValue &&
+            _db.ProgressosLeitura.Any(p =>
+                p.UsuarioId == usuarioId &&
+                p.PlanoBiblicoDiaId == x.Id &&
+                p.Concluido))
+        .Select(x => x.DataPrevista!.Value)
+        .ToListAsync(cancellationToken);
     public async Task<IReadOnlyList<PlanoBiblicoDiaResponse>> ListDiaResponsesAsync(Guid planoId, Guid usuarioId, CancellationToken cancellationToken = default) => await _db.PlanosBiblicosDias
         .AsNoTracking()
         .Where(x => x.PlanoBiblicoUsuarioId == planoId && x.PlanoBiblicoUsuario.UsuarioId == usuarioId)
