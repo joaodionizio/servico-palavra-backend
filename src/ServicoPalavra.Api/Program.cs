@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using System.Reflection;
 using System.Threading.RateLimiting;
@@ -17,6 +18,7 @@ using ServicoPalavra.Infrastructure.Persistence;
 using ServicoPalavra.Infrastructure.Persistence.Import;
 using ServicoPalavra.Infrastructure.Persistence.Seed;
 
+var appStartupTimer = Stopwatch.StartNew();
 var startupDiagnostics = string.Equals(Environment.GetEnvironmentVariable("STARTUP_DIAGNOSTICS"), "true", StringComparison.OrdinalIgnoreCase);
 void StartupTrace(string message)
 {
@@ -233,6 +235,7 @@ StartupTrace("Identity, cookies, antiforgery e autorizacao configurados.");
 var app = builder.Build();
 StartupTrace("Aplicacao construida.");
 
+app.UseMiddleware<RequestTimingMiddleware>();
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -264,6 +267,7 @@ var isEfTool = Assembly.GetEntryAssembly()?.GetName().Name == "ef";
 StartupTrace("Aplicacao configurada; iniciando bootstrap de banco.");
 if (!EF.IsDesignTime && !isEfTool)
 {
+    var databaseBootstrapTimer = Stopwatch.StartNew();
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     var databaseProvider = (app.Configuration["DATABASE_PROVIDER"] ?? "sqlite").Trim().ToLowerInvariant();
@@ -290,6 +294,11 @@ if (!EF.IsDesignTime && !isEfTool)
         Console.WriteLine($"BaseBiblica V2 importada: processados={result.Processed}; inseridos={result.Inserted}; atualizados={result.Updated}.");
     }
 
+    databaseBootstrapTimer.Stop();
+    app.Logger.LogInformation(
+        "Database bootstrap completed in {ElapsedMs:0.0} ms using provider {DatabaseProvider}",
+        databaseBootstrapTimer.Elapsed.TotalMilliseconds,
+        databaseProvider);
     StartupTrace("Bootstrap de banco concluido.");
 }
 
@@ -331,6 +340,12 @@ app.MapGet("/", () => Results.Ok(new
 })).RequireRateLimiting("general");
 app.MapHealthChecks("/health").RequireRateLimiting("general");
 app.MapControllers().RequireRateLimiting("general");
+
+appStartupTimer.Stop();
+app.Logger.LogInformation(
+    "Application ready in {ElapsedMs:0.0} ms in environment {EnvironmentName}",
+    appStartupTimer.Elapsed.TotalMilliseconds,
+    app.Environment.EnvironmentName);
 
 if (!EF.IsDesignTime && !isEfTool)
 {
