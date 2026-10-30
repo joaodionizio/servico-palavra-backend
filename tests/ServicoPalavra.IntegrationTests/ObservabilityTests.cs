@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServicoPalavra.Infrastructure.Persistence;
 
@@ -25,15 +24,15 @@ public sealed class ObservabilityTests : IClassFixture<SecurityWebApplicationFac
     }
 
     [Fact]
-    public async Task Data_protection_keys_are_persisted_in_database()
+    public void Sqlite_test_environment_keeps_data_protection_available_without_production_store()
     {
         using var scope = _factory.Services.CreateScope();
         var provider = scope.ServiceProvider.GetRequiredService<IDataProtectionProvider>();
+
         var protector = provider.CreateProtector("integration-test");
+        var protectedValue = protector.Protect("secret");
 
-        _ = protector.Protect("persistent-secret");
-
-        var db = scope.ServiceProvider.GetRequiredService<DataProtectionDbContext>();
-        Assert.True(await db.DataProtectionKeys.AnyAsync());
+        Assert.Equal("secret", protector.Unprotect(protectedValue));
+        Assert.Null(scope.ServiceProvider.GetService<DataProtectionDbContext>());
     }
 }
