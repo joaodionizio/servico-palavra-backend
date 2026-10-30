@@ -1,5 +1,5 @@
 project: servico-palavra-backend
-updated: 2026-10-29
+updated: 2026-10-30
 workflow: bmad-lite
 
 stories:
@@ -25,5 +25,5 @@ stories:
     title: "Unificar timezone do calendário adaptativo e leitura de hoje"
   E4-BE-01-observabilidade-performance:
     priority: P1
-    status: backlog
+    status: done
     title: "Medição de latência e cold start sem custo adicional"
