@@ -20,10 +20,11 @@ public static class DependencyInjection
     {
         var provider = (configuration["DATABASE_PROVIDER"] ?? "sqlite").Trim().ToLowerInvariant();
         var connectionString = configuration.GetConnectionString("DefaultConnection") ?? configuration["CONNECTION_STRING"];
+        var isPostgres = provider is "postgresql" or "postgres";
 
         void ConfigureDatabase(DbContextOptionsBuilder options)
         {
-            if (provider is "postgresql" or "postgres")
+            if (isPostgres)
             {
                 if (string.IsNullOrWhiteSpace(connectionString))
                 {
@@ -53,32 +54,36 @@ public static class DependencyInjection
             }
         });
 
-        services.AddDbContext<DataProtectionDbContext>(ConfigureDatabase);
-
         var dataProtection = services
             .AddDataProtection()
-            .PersistKeysToDbContext<DataProtectionDbContext>()
             .SetApplicationName("ServicoPalavra");
 
-        var certificateBase64 = configuration["DATA_PROTECTION_CERTIFICATE_BASE64"];
-        var certificatePassword = configuration["DATA_PROTECTION_CERTIFICATE_PASSWORD"];
-        if (!string.IsNullOrWhiteSpace(certificateBase64))
+        if (isPostgres)
         {
-            if (string.IsNullOrWhiteSpace(certificatePassword))
+            services.AddDbContext<DataProtectionDbContext>(ConfigureDatabase);
+            dataProtection.PersistKeysToDbContext<DataProtectionDbContext>();
+
+            var certificateBase64 = configuration["DATA_PROTECTION_CERTIFICATE_BASE64"];
+            var certificatePassword = configuration["DATA_PROTECTION_CERTIFICATE_PASSWORD"];
+            if (!string.IsNullOrWhiteSpace(certificateBase64))
             {
-                throw new InvalidOperationException("DATA_PROTECTION_CERTIFICATE_PASSWORD deve ser configurada quando DATA_PROTECTION_CERTIFICATE_BASE64 estiver presente.");
-            }
+                if (string.IsNullOrWhiteSpace(certificatePassword))
+                {
+                    throw new InvalidOperationException("DATA_PROTECTION_CERTIFICATE_PASSWORD deve ser configurada quando DATA_PROTECTION_CERTIFICATE_BASE64 estiver presente.");
+                }
 
 #pragma warning disable SYSLIB0057
-            var certificate = new X509Certificate2(
-                Convert.FromBase64String(certificateBase64),
-                certificatePassword,
-                X509KeyStorageFlags.EphemeralKeySet);
+                var certificate = new X509Certificate2(
+                    Convert.FromBase64String(certificateBase64),
+                    certificatePassword,
+                    X509KeyStorageFlags.EphemeralKeySet);
 #pragma warning restore SYSLIB0057
-            dataProtection.ProtectKeysWithCertificate(certificate);
+                dataProtection.ProtectKeysWithCertificate(certificate);
+            }
+
+            services.AddHostedService<DataProtectionKeyStoreInitializer>();
         }
 
-        services.AddHostedService<DataProtectionKeyStoreInitializer>();
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<ICalendarClock, CalendarClock>();
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AppDbContext>());
