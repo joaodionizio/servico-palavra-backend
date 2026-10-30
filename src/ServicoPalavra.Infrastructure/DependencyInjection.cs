@@ -1,3 +1,5 @@
+using System.Security.Cryptography.X509Certificates;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -16,11 +18,11 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<AppDbContext>((serviceProvider, options) =>
-        {
-            var provider = (configuration["DATABASE_PROVIDER"] ?? "sqlite").Trim().ToLowerInvariant();
-            var connectionString = configuration.GetConnectionString("DefaultConnection") ?? configuration["CONNECTION_STRING"];
+        var provider = (configuration["DATABASE_PROVIDER"] ?? "sqlite").Trim().ToLowerInvariant();
+        var connectionString = configuration.GetConnectionString("DefaultConnection") ?? configuration["CONNECTION_STRING"];
 
+        void ConfigureDatabase(DbContextOptionsBuilder options)
+        {
             if (provider is "postgresql" or "postgres")
             {
                 if (string.IsNullOrWhiteSpace(connectionString))
@@ -38,6 +40,11 @@ public static class DependencyInjection
             {
                 throw new InvalidOperationException("DATABASE_PROVIDER deve ser 'sqlite' ou 'postgresql'.");
             }
+        }
+
+        services.AddDbContext<AppDbContext>((serviceProvider, options) =>
+        {
+            ConfigureDatabase(options);
 
             var interceptors = serviceProvider.GetServices<IInterceptor>().ToArray();
             if (interceptors.Length > 0)
@@ -45,6 +52,29 @@ public static class DependencyInjection
                 options.AddInterceptors(interceptors);
             }
         });
+
+        services.AddDbContext<DataProtectionDbContext>(ConfigureDatabase);
+
+        var dataProtection = services
+            .AddDataProtection()
+            .PersistKeysToDbContext<DataProtectionDbContext>()
+            .SetApplicationName("ServicoPalavra");
+
+        var certificateBase64 = configuration["DATA_PROTECTION_CERTIFICATE_BASE64"];
+        var certificatePassword = configuration["DATA_PROTECTION_CERTIFICATE_PASSWORD"];
+        if (!string.IsNullOrWhiteSpace(certificateBase64))
+        {
+            if (string.IsNullOrWhiteSpace(certificatePassword))
+            {
+                throw new InvalidOperationException("DATA_PROTECTION_CERTIFICATE_PASSWORD deve ser configurada quando DATA_PROTECTION_CERTIFICATE_BASE64 estiver presente.");
+            }
+
+            var certificate = X509CertificateLoader.LoadPkcs12(
+                Convert.FromBase64String(certificateBase64),
+                certificatePassword,
+                X509KeyStorageFlags.EphemeralKeySet);
+            dataProtection.ProtectKeysWithCertificate(certificate);
+        }
 
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<ICalendarClock, CalendarClock>();
