@@ -69,10 +69,12 @@ public static class DependencyInjection
                 throw new InvalidOperationException("DATA_PROTECTION_CERTIFICATE_PASSWORD deve ser configurada quando DATA_PROTECTION_CERTIFICATE_BASE64 estiver presente.");
             }
 
-            var certificate = X509CertificateLoader.LoadPkcs12(
+#pragma warning disable SYSLIB0057
+            var certificate = new X509Certificate2(
                 Convert.FromBase64String(certificateBase64),
                 certificatePassword,
                 X509KeyStorageFlags.EphemeralKeySet);
+#pragma warning restore SYSLIB0057
             dataProtection.ProtectKeysWithCertificate(certificate);
         }
 
