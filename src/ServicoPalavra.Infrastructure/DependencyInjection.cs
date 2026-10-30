@@ -78,6 +78,7 @@ public static class DependencyInjection
             dataProtection.ProtectKeysWithCertificate(certificate);
         }
 
+        services.AddHostedService<DataProtectionKeyStoreInitializer>();
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<ICalendarClock, CalendarClock>();
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AppDbContext>());
