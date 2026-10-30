@@ -238,10 +238,19 @@ StartupTrace("Aplicacao construida.");
 app.UseMiddleware<RequestTimingMiddleware>();
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
-app.UseForwardedHeaders(new ForwardedHeadersOptions
+var forwardedHeadersOptions = new ForwardedHeadersOptions
 {
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+    ForwardLimit = 1
+};
+if (string.Equals(app.Configuration["RENDER"], "true", StringComparison.OrdinalIgnoreCase))
+{
+    // Render's public web-service port is only reachable through its managed edge.
+    // Trust one forwarded hop there so HTTPS scheme and client IP are restored.
+    forwardedHeadersOptions.KnownNetworks.Clear();
+    forwardedHeadersOptions.KnownProxies.Clear();
+}
+app.UseForwardedHeaders(forwardedHeadersOptions);
 
 if (!app.Environment.IsDevelopment() && !app.Environment.IsEnvironment("Testing"))
 {
