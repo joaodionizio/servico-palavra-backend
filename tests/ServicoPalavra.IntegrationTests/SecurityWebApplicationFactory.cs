@@ -15,6 +15,15 @@ public sealed class SecurityWebApplicationFactory : WebApplicationFactory<Progra
     public CapturingPasswordResetEmailSender PasswordResetEmailSender { get; } = new();
     public DashboardCommandCounterInterceptor DashboardCommandCounter { get; } = new();
 
+    public SecurityWebApplicationFactory()
+    {
+        Environment.SetEnvironmentVariable("DATABASE_PROVIDER", "sqlite");
+        Environment.SetEnvironmentVariable("ConnectionStrings__DefaultConnection", $"Data Source={_databasePath}");
+        Environment.SetEnvironmentVariable("INITIAL_ADMIN_EMAIL", "admin@tests.local");
+        Environment.SetEnvironmentVariable("INITIAL_ADMIN_PASSWORD", "Admin12");
+        Environment.SetEnvironmentVariable("INITIAL_ADMIN_NAME", "Admin Tests");
+    }
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
@@ -40,6 +49,11 @@ public sealed class SecurityWebApplicationFactory : WebApplicationFactory<Progra
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
+        Environment.SetEnvironmentVariable("DATABASE_PROVIDER", null);
+        Environment.SetEnvironmentVariable("ConnectionStrings__DefaultConnection", null);
+        Environment.SetEnvironmentVariable("INITIAL_ADMIN_EMAIL", null);
+        Environment.SetEnvironmentVariable("INITIAL_ADMIN_PASSWORD", null);
+        Environment.SetEnvironmentVariable("INITIAL_ADMIN_NAME", null);
         TryDelete(_databasePath);
         TryDelete(_databasePath + "-shm");
         TryDelete(_databasePath + "-wal");
