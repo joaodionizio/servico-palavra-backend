@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using ServicoPalavra.Api.Middleware;
+using ServicoPalavra.Api.RateLimiting;
 using ServicoPalavra.Api.Services;
 using ServicoPalavra.Application;
 using ServicoPalavra.Application.Abstractions;
@@ -140,37 +141,49 @@ builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
     var isTesting = builder.Environment.IsEnvironment("Testing");
-    options.AddFixedWindowLimiter("auth", limiter =>
-    {
-        limiter.PermitLimit = isTesting ? 1000 : 5;
-        limiter.Window = TimeSpan.FromMinutes(1);
-        limiter.QueueLimit = 0;
-    });
-    options.AddFixedWindowLimiter("sensitive", limiter =>
-    {
-        limiter.PermitLimit = isTesting ? 1000 : 20;
-        limiter.Window = TimeSpan.FromMinutes(1);
-        limiter.QueueLimit = 0;
-    });
-    options.AddFixedWindowLimiter("general", limiter =>
-    {
-        limiter.PermitLimit = isTesting ? 1000 : 120;
-        limiter.Window = TimeSpan.FromMinutes(1);
-        limiter.QueueLimit = 0;
-    });
-    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
-    {
-        var key = context.User.Identity?.IsAuthenticated == true
-            ? context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "authenticated"
-            : context.Connection.RemoteIpAddress?.ToString() ?? "anonymous";
 
-        return RateLimitPartition.GetFixedWindowLimiter(key, _ => new FixedWindowRateLimiterOptions
-        {
-            PermitLimit = isTesting ? 1000 : 180,
-            Window = TimeSpan.FromMinutes(1),
-            QueueLimit = 0
-        });
-    });
+    // Login, registration and password recovery are unauthenticated flows:
+    // isolate their fixed-window budgets by the trusted remote IP.
+    options.AddPolicy("auth", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            RateLimitPartitionKey.ForIp(context),
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = isTesting ? 1000 : 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+
+    // Authenticated users must not share one process-wide counter.
+    options.AddPolicy("sensitive", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            RateLimitPartitionKey.ForUserOrIp(context),
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = isTesting ? 1000 : 20,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+
+    options.AddPolicy("general", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            RateLimitPartitionKey.ForUserOrIp(context),
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = isTesting ? 1000 : 120,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            RateLimitPartitionKey.ForUserOrIp(context),
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = isTesting ? 1000 : 180,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
 });
 
 builder.Services.AddHttpContextAccessor();
@@ -321,9 +334,10 @@ if (!app.Environment.IsEnvironment("Testing"))
 {
     app.UseHttpsRedirection();
 }
+app.UseRouting();
 app.UseCors("DefaultCors");
-app.UseRateLimiter();
 app.UseAuthentication();
+app.UseRateLimiter();
 app.UseAuthorization();
 
 app.Use(async (context, next) =>
