@@ -153,18 +153,29 @@ public sealed class ConteudoService : IConteudoService
         conteudo.Ordem = request.Ordem;
         conteudo.AtualizadoEm = now;
 
-        if (request.MateriaisApoio is not null)
+        if (request.MateriaisApoio is null)
         {
-            await _conteudos.DeleteMateriaisApoioAsync(conteudo.Id, cancellationToken);
-
-            foreach (var material in BuildMateriaisApoio(request.MateriaisApoio, now))
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+        else
+        {
+            // ExecuteDeleteAsync runs immediately; the deletion and the following
+            // SaveChanges must be in the same transaction to preserve old materials
+            // if an insert or content update fails.
+            await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                material.ConteudoId = conteudo.Id;
-                _conteudos.AddMaterialApoio(material);
-            }
+                await _conteudos.DeleteMateriaisApoioAsync(conteudo.Id, cancellationToken);
+
+                foreach (var material in BuildMateriaisApoio(request.MateriaisApoio, now))
+                {
+                    material.ConteudoId = conteudo.Id;
+                    _conteudos.AddMaterialApoio(material);
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+            }, cancellationToken);
         }
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
         return ToResponse(conteudo);
     }
 
